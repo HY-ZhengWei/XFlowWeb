@@ -7,6 +7,7 @@ import org.hy.common.app.Param;
 import org.hy.common.thread.ThreadPool;
 import org.hy.common.xml.XJava;
 import org.hy.common.xml.plugins.AppInitConfig;
+import org.hy.xflow.engine.XFlowEngine;
 
 
 
@@ -60,6 +61,8 @@ public final class InitConfig extends AppInitConfig
                 this.initW((List<Param>)XJava.getObject("StartupConfig") ,this.xmlRoot);
                 this.initW(((Param)XJava.getObject("RootPackageName")).getValue());
                 init_TPool();
+                
+                XFlowEngine.init();
                 
                 this.initW("job.Config.xml" ,this.xmlRoot);
             }
