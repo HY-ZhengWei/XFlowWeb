@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rest-client version="3.5"><request><http-version>1.1</http-version><http-follow-redirects/><URL>http://127.0.0.1/XFlowWeb/app</URL><method>POST</method><body><string content-type="text/plain" charset="UTF-8">{
+    "sysid": "xx",
+    "sid": "I003ToNext",
+    "body": {
+        "user": {
+            "userID": "8a81b2b54b7b391b014b7d14a00409ff",
+            "userName": "公用主管",
+            "roles": [
+                {
+                    "roleID": "001",
+                    "roleName": "选型主管"
+                }
+            ]
+        },
+        "serviceDataID": "SID001",
+        "activityRouteCode": "选型评审-单人选型",
+        "participants": [
+            {
+                "objectID": "8a81b2b54b7b391b014b7d143a7400fe",
+                "objectName": "公用选型负责人",
+                "objectType": "1"
+            }
+        ]
+    }
+}</string></body></request></rest-client>

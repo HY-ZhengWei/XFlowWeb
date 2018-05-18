@@ -78,6 +78,14 @@ public class FlowWeb extends BaseWeb
         {
             v_Ret.setBody(null);
             v_Ret.setResult(false);
+            if ( exce.getCause() != null )
+            {
+                v_Ret.setRi(exce.getCause().toString() + "   " + Help.isNull(exce.getMessage()));
+            }
+            else
+            {
+                v_Ret.setRi(exce.getMessage());
+            }
         }
         
         return v_Ret;
@@ -125,6 +133,16 @@ public class FlowWeb extends BaseWeb
                 v_Routs = v_XFlowEngine.queryNextRoutesByServiceDataID(v_FlowData.getUser() ,v_FlowData.getServiceDataID());
             }
             
+            // 防止递归引用，删除部分对象引用
+            if ( !Help.isNull(v_Routs) )
+            {
+                for (ActivityRoute v_Route : v_Routs)
+                {
+                    v_Route.setActivity(null);
+                    v_Route.setNextActivity(null);
+                }
+            }
+            
             v_Ret.setBody(v_Routs);
             v_Ret.setResult(true);
         }
@@ -132,6 +150,14 @@ public class FlowWeb extends BaseWeb
         {
             v_Ret.setBody(null);
             v_Ret.setResult(false);
+            if ( exce.getCause() != null )
+            {
+                v_Ret.setRi(exce.getCause().toString() + "   " + Help.isNull(exce.getMessage()));
+            }
+            else
+            {
+                v_Ret.setRi(exce.getMessage());
+            }
         }
         
         return v_Ret;
@@ -191,13 +217,13 @@ public class FlowWeb extends BaseWeb
                 if ( Help.isNull(v_FlowData.getParticipants()) )
                 {
                     v_Process = v_XFlowEngine.toNextByServiceDataID(v_FlowData.getUser() 
-                                                                   ,v_FlowData.getWorkID() 
+                                                                   ,v_FlowData.getServiceDataID()
                                                                    ,v_FlowData.getActivityRouteCode());
                 }
                 else
                 {
                     v_Process = v_XFlowEngine.toNextByServiceDataID(v_FlowData.getUser() 
-                                                                   ,v_FlowData.getWorkID() 
+                                                                   ,v_FlowData.getServiceDataID()
                                                                    ,v_FlowData.getActivityRouteCode()
                                                                    ,v_FlowData.getParticipants());
                 }
@@ -210,6 +236,14 @@ public class FlowWeb extends BaseWeb
         {
             v_Ret.setBody(null);
             v_Ret.setResult(false);
+            if ( exce.getCause() != null )
+            {
+                v_Ret.setRi(exce.getCause().toString() + "   " + Help.isNull(exce.getMessage()));
+            }
+            else
+            {
+                v_Ret.setRi(exce.getMessage());
+            }
         }
         
         return v_Ret;
@@ -260,6 +294,14 @@ public class FlowWeb extends BaseWeb
         {
             v_Ret.setBody(null);
             v_Ret.setResult(false);
+            if ( exce.getCause() != null )
+            {
+                v_Ret.setRi(exce.getCause().toString() + "   " + Help.isNull(exce.getMessage()));
+            }
+            else
+            {
+                v_Ret.setRi(exce.getMessage());
+            }
         }
         
         return v_Ret;
@@ -310,6 +352,14 @@ public class FlowWeb extends BaseWeb
         {
             v_Ret.setBody(null);
             v_Ret.setResult(false);
+            if ( exce.getCause() != null )
+            {
+                v_Ret.setRi(exce.getCause().toString() + "   " + Help.isNull(exce.getMessage()));
+            }
+            else
+            {
+                v_Ret.setRi(exce.getMessage());
+            }
         }
         
         return v_Ret;

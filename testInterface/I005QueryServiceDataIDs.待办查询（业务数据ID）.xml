@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rest-client version="3.5"><request><http-version>1.1</http-version><http-follow-redirects/><URL>http://127.0.0.1/XFlowWeb/app</URL><method>POST</method><body><string content-type="text/plain" charset="UTF-8">{
     "sysid": "xx",
-    "sid": "I001Create",
+    "sid": "I005QueryServiceDataIDs",
     "body": {
         "user": {
-            "userID": "8a81b2b54b7b391b014b7d12b66400fc",
-            "userName": "公用销售人员",
+            "userID": "8a81b2b54b7b391b014b7d143a7400fe",
+            "userName": "公用选型负责人",
             "roles": [
                 {
-                    "roleID": "004",
-                    "roleName": "销售人员"
+                    "roleID": "002",
+                    "roleName": "选型负责人"
                 }
             ]
-        },
-        "templateName": "智能选型",
-        "serviceDataID": "SID001"
+        }
     }
 }</string></body></request></rest-client>
