@@ -8,9 +8,9 @@ import org.hy.common.xml.annotation.Xjava;
 import org.hy.common.xml.plugins.AppMessage;
 import org.hy.xflow.engine.XFlowEngine;
 import org.hy.xflow.engine.bean.ActivityRoute;
+import org.hy.xflow.engine.bean.FlowData;
 import org.hy.xflow.engine.bean.FlowInfo;
 import org.hy.xflow.engine.bean.FlowProcess;
-import org.hy.xflow.web.bean.FlowData;
 import org.hy.xflow.web.common.BaseWeb;
 
 
