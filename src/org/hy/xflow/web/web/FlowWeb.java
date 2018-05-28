@@ -77,6 +77,7 @@ public class FlowWeb extends BaseWeb
         }
         catch (Exception exce)
         {
+            exce.printStackTrace();
             v_Ret.setBody(null);
             v_Ret.setResult(false);
             if ( exce.getCause() != null )
@@ -157,6 +158,7 @@ public class FlowWeb extends BaseWeb
         }
         catch (Exception exce)
         {
+            exce.printStackTrace();
             v_Ret.setBody(null);
             v_Ret.setResult(false);
             if ( exce.getCause() != null )
@@ -203,7 +205,6 @@ public class FlowWeb extends BaseWeb
         XFlowEngine        v_XFlowEngine = XFlowEngine.getInstance();
         FlowProcess        v_Process     = null;
         
-        System.out.println(v_FlowData);
         
         try
         {
@@ -304,6 +305,7 @@ public class FlowWeb extends BaseWeb
         }
         catch (Exception exce)
         {
+            exce.printStackTrace();
             v_Ret.setBody(null);
             v_Ret.setResult(false);
             if ( exce.getCause() != null )
@@ -362,6 +364,7 @@ public class FlowWeb extends BaseWeb
         }
         catch (Exception exce)
         {
+            exce.printStackTrace();
             v_Ret.setBody(null);
             v_Ret.setResult(false);
             if ( exce.getCause() != null )
