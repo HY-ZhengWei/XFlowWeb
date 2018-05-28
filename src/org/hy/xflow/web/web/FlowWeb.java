@@ -12,6 +12,7 @@ import org.hy.xflow.engine.bean.ActivityRoute;
 import org.hy.xflow.engine.bean.FlowData;
 import org.hy.xflow.engine.bean.FlowInfo;
 import org.hy.xflow.engine.bean.FlowProcess;
+import org.hy.xflow.engine.bean.NextRoutes;
 import org.hy.xflow.web.common.BaseWeb;
 
 
@@ -122,26 +123,26 @@ public class FlowWeb extends BaseWeb
         AppMessage<Object>  v_Ret         = i_AppMsg.clone();
         FlowData            v_FlowData    = i_AppMsg.getBody();
         XFlowEngine         v_XFlowEngine = XFlowEngine.getInstance();
-        List<ActivityRoute> v_Routs       = null;
+        NextRoutes          v_NextRouts   = null;
         List<ActivityRoute> v_RetRoutes   = null;
         
         try
         {
             if ( Help.isNull(v_FlowData.getServiceDataID()) )
             {
-                v_Routs = v_XFlowEngine.queryNextRoutes(v_FlowData.getUser() ,v_FlowData.getWorkID());
+                v_NextRouts = v_XFlowEngine.queryNextRoutes(v_FlowData.getUser() ,v_FlowData.getWorkID());
             }
             else 
             {
-                v_Routs = v_XFlowEngine.queryNextRoutesByServiceDataID(v_FlowData.getUser() ,v_FlowData.getServiceDataID());
+                v_NextRouts = v_XFlowEngine.queryNextRoutesByServiceDataID(v_FlowData.getUser() ,v_FlowData.getServiceDataID());
             }
             
             // 防止递归引用，删除部分对象引用
-            if ( !Help.isNull(v_Routs) )
+            if ( !Help.isNull(v_NextRouts.getRoutes()) )
             {
                 v_RetRoutes = new ArrayList<ActivityRoute>();
                 
-                for (ActivityRoute v_Route : v_Routs)
+                for (ActivityRoute v_Route : v_NextRouts.getRoutes())
                 {
                     ActivityRoute v_NewRoute = new ActivityRoute();
                     
