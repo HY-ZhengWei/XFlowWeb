@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rest-client version="3.5"><request><http-version>1.1</http-version><http-follow-redirects/><URL>http://127.0.0.1/XFlowWeb/app</URL><method>POST</method><body><string content-type="text/plain" charset="UTF-8">{
     "sysid": "xx",
-    "sid": "I002QueryNextRoutes",
+    "sid": "I003ToNext",
     "body": {
         "user": {
             "userID": "8a81b2b54b7b391b014b7d12b66400fc",
@@ -13,6 +13,7 @@
                 }
             ]
         },
-        "serviceDataID": "SID999"
+        "serviceDataID": "SID003",
+        "activityRouteCode": "选型申请-选型受理"
     }
 }</string></body></request></rest-client>

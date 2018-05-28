@@ -1,5 +1,6 @@
 package org.hy.xflow.web.web;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hy.common.Help;
@@ -121,6 +122,7 @@ public class FlowWeb extends BaseWeb
         FlowData            v_FlowData    = i_AppMsg.getBody();
         XFlowEngine         v_XFlowEngine = XFlowEngine.getInstance();
         List<ActivityRoute> v_Routs       = null;
+        List<ActivityRoute> v_RetRoutes   = null;
         
         try
         {
@@ -136,14 +138,21 @@ public class FlowWeb extends BaseWeb
             // 防止递归引用，删除部分对象引用
             if ( !Help.isNull(v_Routs) )
             {
+                v_RetRoutes = new ArrayList<ActivityRoute>();
+                
                 for (ActivityRoute v_Route : v_Routs)
                 {
-                    v_Route.setActivity(null);
-                    v_Route.setNextActivity(null);
+                    ActivityRoute v_NewRoute = new ActivityRoute();
+                    
+                    v_NewRoute.initNotNull(v_Route);
+                    v_NewRoute.setActivity(null);
+                    v_NewRoute.setNextActivity(null);
+                    
+                    v_RetRoutes.add(v_NewRoute);
                 }
             }
             
-            v_Ret.setBody(v_Routs);
+            v_Ret.setBody(v_RetRoutes);
             v_Ret.setResult(true);
         }
         catch (Exception exce)
@@ -194,6 +203,8 @@ public class FlowWeb extends BaseWeb
         XFlowEngine        v_XFlowEngine = XFlowEngine.getInstance();
         FlowProcess        v_Process     = null;
         
+        System.out.println(v_FlowData);
+        
         try
         {
             if ( Help.isNull(v_FlowData.getServiceDataID()) )
@@ -234,6 +245,7 @@ public class FlowWeb extends BaseWeb
         }
         catch (Exception exce)
         {
+            exce.printStackTrace();
             v_Ret.setBody(null);
             v_Ret.setResult(false);
             if ( exce.getCause() != null )
