@@ -1,0 +1,60 @@
+<html>
+<head>
+	<script src="d3/d3.min.js" charset="utf-8"></script>
+</head>
+<body>
+
+	<p>AAAAAAAAA</p>
+	<p id="ID_B">BBBBBBBBB</p>
+	<p class="myClass">CCCCCCCCC</p>
+	<p class="myClass">DDDDDDDDD</p>
+
+<script>  
+          
+        
+        /* 选择首个元素 */
+        var p1 = d3.select("body").select("p");  
+        p1.style("color" ,"red");
+        
+        /* 按ID选择元素 */
+        var p2 = d3.select("body").select("#ID_B");
+        p2.style("color" ,"green");
+        
+        /* 按Class选择元素 */
+        var p3_4 = d3.select("body").selectAll(".myClass");
+        p3_4.style("color" ,"blue");
+        
+        d3.select("body").append("p").text("append p element");
+        
+        p1.insert("p").text("insert p element");
+        
+        
+        var body = d3.select("body");
+        var svg  = body.append("svg").attr("width" ,"500").attr("height" ,"400");
+        var rect = svg.append("rect");
+        
+        rect.attr("x" ,"100").attr("y" ,"100").attr("width" ,"100").attr("height" ,"100");
+  
+        /* 
+        var dataset = [ 10 , 20 , 30 , 40 , 50 ];
+        
+        var update = d3.select("body").selectAll("p").data(dataset);
+        var enter  = update;
+          
+        update.text(function(d,i){  
+                return "update " + d;  
+            });  
+          
+        enter.enter()  
+             .append("p")  
+             .text(function(d,i){  
+                return "enter " + d;  
+            });  
+        
+        update.style("color" ,"red").style("font-size" ,"72px"); 
+        */
+            
+</script>    
+
+</body>
+</html>
