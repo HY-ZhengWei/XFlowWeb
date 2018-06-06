@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rest-client version="3.5"><request><http-version>1.1</http-version><http-follow-redirects/><URL>http://127.0.0.1/XFlowWeb/app</URL><method>POST</method><body><string content-type="text/plain" charset="UTF-8">{
+    "sysid": "xx",
+    "sid": "I003ToNext",
+    "body": {
+        "user": {
+            "userID": "8a81b2b54b7b391b014b7d12b66400fc",
+            "userName": "公用销售人员",
+            "roles": [
+                {
+                    "roleID": "004",
+                    "roleName": "销售人员"
+                }
+            ]
+        },
+        "serviceDataID": "SID20180606171158gyxsry",
+        "activityRouteCode": "选型结果确认-选型完成"
+    }
+}</string></body></request></rest-client>
