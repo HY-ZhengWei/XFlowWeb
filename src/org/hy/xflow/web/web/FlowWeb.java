@@ -381,4 +381,118 @@ public class FlowWeb extends BaseWeb
         return v_Ret;
     }
     
+    
+    
+    /**
+     * 获取用户已处理过的工作流实例ID。
+     * 
+     *   1. 通过用户ID查询。
+     * 
+     * @author      ZhengWei(HY)
+     * @createDate  2018-06-11
+     * @version     v1.0
+     *
+     * @param i_AppMsg
+     * @return
+     */
+    @XRequest(id="I006QueryWorkIDsByDone")
+    public AppMessage<Object> queryWorkIDsByDone(AppMessage<FlowData> i_AppMsg)
+    {
+        if ( i_AppMsg == null )
+        {
+            return null;
+        }
+        
+        if ( i_AppMsg.getBody() == null )
+        {
+            return null;
+        }
+        
+        AppMessage<Object> v_Ret         = i_AppMsg.clone();
+        FlowData           v_FlowData    = i_AppMsg.getBody();
+        XFlowEngine        v_XFlowEngine = XFlowEngine.getInstance();
+        List<String>       v_WorkIDs     = null;
+        
+        try
+        {
+            v_WorkIDs = v_XFlowEngine.queryWorkIDsByDone(v_FlowData.getUser());
+            
+            v_Ret.setBody(v_WorkIDs);
+            v_Ret.setResult(true);
+        }
+        catch (Exception exce)
+        {
+            exce.printStackTrace();
+            v_Ret.setBody(null);
+            v_Ret.setResult(false);
+            if ( exce.getCause() != null )
+            {
+                v_Ret.setRi(exce.getCause().toString() + "   " + Help.isNull(exce.getMessage()));
+            }
+            else
+            {
+                v_Ret.setRi(exce.getMessage());
+            }
+        }
+        
+        return v_Ret;
+    }
+    
+    
+    
+    /**
+     * 获取用户已处理过的工作流实例对应的第三方使用系统的业务数据ID。
+     * 
+     *   1. 通过用户ID查询。
+     * 
+     * @author      ZhengWei(HY)
+     * @createDate  2018-06-11
+     * @version     v1.0
+     *
+     * @param i_AppMsg
+     * @return
+     */
+    @XRequest(id="I007QueryServiceDataIDsByDone")
+    public AppMessage<Object> queryServiceDataIDsByDone(AppMessage<FlowData> i_AppMsg)
+    {
+        if ( i_AppMsg == null )
+        {
+            return null;
+        }
+        
+        if ( i_AppMsg.getBody() == null )
+        {
+            return null;
+        }
+        
+        AppMessage<Object> v_Ret         = i_AppMsg.clone();
+        FlowData           v_FlowData    = i_AppMsg.getBody();
+        XFlowEngine        v_XFlowEngine = XFlowEngine.getInstance();
+        List<String>       v_WorkIDs     = null;
+        
+        try
+        {
+            v_WorkIDs = v_XFlowEngine.queryServiceDataIDsByDone(v_FlowData.getUser());
+            
+            v_Ret.setBody(v_WorkIDs);
+            v_Ret.setResult(true);
+        }
+        catch (Exception exce)
+        {
+            exce.printStackTrace();
+            v_Ret.setBody(null);
+            v_Ret.setResult(false);
+            if ( exce.getCause() != null )
+            {
+                v_Ret.setRi(exce.getCause().toString() + "   " + Help.isNull(exce.getMessage()));
+            }
+            else
+            {
+                v_Ret.setRi(exce.getMessage());
+            }
+        }
+        
+        return v_Ret;
+    }
+    
 }
