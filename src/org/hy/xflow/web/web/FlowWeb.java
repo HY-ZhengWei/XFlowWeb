@@ -66,11 +66,11 @@ public class FlowWeb extends BaseWeb
         {
             if ( Help.isNull(v_FlowData.getServiceDataID()) )
             {
-                v_Flow = v_XFlowEngine.createByName(v_FlowData.getUser() ,v_FlowData.getTemplateName());
+                v_Flow = v_XFlowEngine.createByName(v_FlowData.getUser() ,v_FlowData.getTemplateName() ,v_FlowData.getVersionNo());
             }
             else
             {
-                v_Flow = v_XFlowEngine.createByName(v_FlowData.getUser() ,v_FlowData.getTemplateName() ,v_FlowData.getServiceDataID());
+                v_Flow = v_XFlowEngine.createByName(v_FlowData.getUser() ,v_FlowData.getTemplateName() ,v_FlowData.getServiceDataID() ,v_FlowData.getVersionNo());
             }
             
             v_Ret.setBody(v_Flow);
