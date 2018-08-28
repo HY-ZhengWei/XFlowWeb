@@ -1,7 +1,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<script src="d3/d3.min.js" charset="utf-8"></script>
+	<script src="../../d3/d3.min.js" charset="utf-8"></script>
 	
 	<style type="text/css">
 	body { 
@@ -90,6 +90,8 @@
 							return i_Height - v_Padding.bottom - v_yScale(d);
 					   })
 					   .attr("width" ,v_RectWidth)
+					   .attr("height" ,0)
+					   .transition().duration(1000)
 					   .attr("height" ,function(d ,i) 
 					   {
 							return v_yScale(d);
