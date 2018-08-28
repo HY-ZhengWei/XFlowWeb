@@ -1,0 +1,212 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<script src="d3/d3.min.js" charset="utf-8"></script>
+	
+	<style type="text/css">
+	body { 
+	  background-color: #333; 
+	  margin: 20px;
+	  color: white;
+	}
+	
+	.axis path, .axis line{
+        stroke: white;
+    }
+    .axis text{
+        font-family: sans-serif;
+        font-size: 12px;
+        fill: white;
+    }
+	</style>
+</head>
+<body>
+
+	<button type="button" onclick="f_Sort()">排序</button>
+	<button type="button" onclick="f_Add()">添加</button>
+	<button type="button" onclick="f_Del()">删除</button>
+	
+	
+	<svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg">
+	</svg>
+	
+	
+	<script type="text/javascript">
+	    var v_Width     = 500;
+	    var v_Height    = 200;
+		var v_Datas     = [50 ,43 ,120 ,87 ,99 ,167 ,5];
+		var v_SortIndex = 0;
+		
+		
+		/**
+		 * i_RectName  样式class名称
+		 * i_Datas     柱形图数据
+		 * i_Width     柱形图的宽度
+		 * i_Height    柱形图的高度
+		 */
+		function f_DrawRect(i_RectName ,i_Datas ,i_Width ,i_Height)
+		{
+			var v_SVG        = d3.select("body").select("svg");
+			var v_Padding    = {top:20 ,right:20 ,bottom:20 ,left:50};  // 边距
+			var v_RectStep   = i_Width / i_Datas.length;                // 矩形含留白的宽度，矩形间的步长宽度
+			var v_RectWidth  = v_RectStep * 0.85;                       // 矩形的宽度
+			var v_xScale     = d3.scaleBand()                           // x轴的比例尺
+			                     .domain(d3.range(i_Datas.length))
+			                     .range([0 ,i_Width]);
+			var v_yScale     = d3.scaleLinear()                         // y轴的比例尺
+			                     .domain([0 ,d3.max(i_Datas)])
+			                     .range([0 ,i_Height - v_Padding.top - v_Padding.bottom]);
+			
+			// 绘制柱形
+			var v_RectUpdate = v_SVG.selectAll("." + i_RectName + "_Rect").data(i_Datas);
+			var v_RectEnter  = v_RectUpdate.enter();
+			var v_RectExit   = v_RectUpdate.exit();
+			
+			v_RectUpdate.attr("x" ,function(d ,i) 
+						{
+							return v_Padding.left + v_xScale(i);
+						})
+						.attr("y" ,function(d ,i) 
+						{
+							return v_Height - v_Padding.bottom - v_yScale(d);
+						})
+						.attr("width" ,v_RectWidth)
+						.attr("height" ,function(d ,i) 
+						{
+							return v_yScale(d); 
+						});
+			
+			v_RectEnter.append("rect")
+			           .classed(i_RectName + "_Rect" ,true)
+			           .attr("stroke" ,"black")
+			           .attr("stroke-width" ,2)
+					   .attr("fill" ,"steelblue")
+					   .attr("x" ,function(d ,i) 
+					   {
+							return v_Padding.left + v_xScale(i);
+					   })
+					   .attr("y" ,function(d ,i) 
+					   {
+							return i_Height - v_Padding.bottom - v_yScale(d);
+					   })
+					   .attr("width" ,v_RectWidth)
+					   .attr("height" ,function(d ,i) 
+					   {
+							return v_yScale(d);
+					   });
+			
+			v_RectExit.remove();
+			
+			
+			//  绘制文字
+			var v_TextUpdate = v_SVG.selectAll("." + i_RectName + "_Text").data(i_Datas);
+			var v_TextEnter  = v_TextUpdate.enter();
+			var v_TextExit   = v_TextUpdate.exit();
+			
+			v_TextUpdate.attr("x" ,function(d ,i)
+						{
+							return v_Padding.left + v_xScale(i);
+						})
+						.attr("y" ,function(d ,i)
+						{
+							return i_Height - v_Padding.bottom - v_yScale(d);
+						})
+						.attr("dx" ,v_RectWidth / 2)
+						.attr("dy" ,"-0.2em")
+						.text(function(d ,i)
+						{
+							return d;
+						});
+			
+			v_TextEnter.append("text")
+						.classed(i_RectName + "_Text" ,true)
+						.attr("fill" ,"white")
+						.attr("font-size" ,"14px")
+						.attr("text-anchor" ,"middle")   // 有三个值：start、middle、end
+						.attr("x" ,function(d ,i)
+						{
+							return v_Padding.left + v_xScale(i);
+						})
+						.attr("y" ,function(d ,i)
+						{
+							return i_Height - v_Padding.bottom - v_yScale(d);
+						})
+						.attr("dx" ,v_RectWidth / 2)
+						.attr("dy" ,"-0.2em")
+						.text(function(d ,i)
+						{
+							return d;
+						});
+			
+			v_TextExit.remove();
+			
+			
+			// 绘制x轴
+			var v_XAxis  = d3.axisBottom(v_xScale);
+			var v_GXAxis = v_SVG.select("#" + i_RectName + "_XAxis");
+			if ( v_GXAxis.empty() )
+			{
+				v_GXAxis = v_SVG.append("g").attr("id" ,i_RectName + "_XAxis");
+			}
+			v_GXAxis
+			.attr("class" ,"axis")
+			.attr("transform" ,"translate(" + (v_Padding.left - 5) + "," + i_Height + ")")
+			.call(v_XAxis);
+			
+			
+			// 绘制x轴
+			var v_yScaleByAxis = d3.scaleLinear()                         // y轴的比例尺（向反的）
+                                .domain([0 ,d3.max(i_Datas)])
+	                            .range([i_Height - v_Padding.top - v_Padding.bottom ,0]);
+			var v_YAxis = d3.axisLeft(v_yScaleByAxis);
+			var v_GYAxis = v_SVG.select("#" + i_RectName + "_YAxis");
+			if ( v_GYAxis.empty() )
+			{
+				v_GYAxis = v_SVG.append("g").attr("id" ,i_RectName + "_YAxis");
+			}
+			v_GYAxis
+			.attr("class" ,"axis")
+			.attr("transform" ,"translate(" + (v_Padding.left - 5) + "," + (v_Padding.top - 5) + ")")
+			.call(v_YAxis);
+		}
+		
+		
+		
+		function f_Sort()
+		{
+			if ( v_SortIndex % 2 == 1 )
+			{
+				v_Datas.sort(d3.ascending);
+			}
+			else
+			{
+				v_Datas.sort(d3.descending);
+			}
+			
+			v_SortIndex++;
+			f_DrawRect("MyRect" ,v_Datas ,v_Width ,v_Height);
+		}
+		
+		
+		
+		function f_Add()
+		{
+			v_Datas.push(Math.floor(Math.random() * 200));
+			f_DrawRect("MyRect" ,v_Datas ,v_Width ,v_Height);
+		}
+		
+		
+		
+		function f_Del()
+		{
+			v_Datas.pop(v_Datas.length - 1);
+			f_DrawRect("MyRect" ,v_Datas ,v_Width ,v_Height);
+		}
+		
+		
+		f_DrawRect("MyRect" ,v_Datas ,v_Width ,v_Height);
+		
+	</script>
+
+</body>
+</html>

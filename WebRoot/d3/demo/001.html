@@ -1,0 +1,67 @@
+<html>
+<head>
+	<script src="d3/d3.min.js" charset="utf-8"></script>
+</head>
+<body>
+
+	<svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg">
+		<path d="M100,200
+                 A200,150 0 1 0 150,50 
+                 Z "
+           style="fill:yellow" stroke="blue" stroke-width="4" />
+           
+           
+<defs>
+	<marker id="arrow" 
+	                markerUnits="strokerWidth"
+	                markerWidth="12"
+	                markerHeight="12"
+	                viewBox="0 0 12 12"
+	                refX="6"
+	                refY="6"
+	                orient="auto">
+		<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:black;" />
+	</marker>
+	
+	<filter id="f_GB">
+		<feGaussianBlur in="SourceGraphic" stdDeviation="2" />
+	</filter>
+	
+	<linearGradient id="myGradient"
+		x1="0%"
+		y1="0%"
+		x2="100%"
+		y2="0%">
+		<stop offset="0%" stop-color="#F00" />
+		<stop offset="100%" stop-color="#0FF">
+	</linearGradient>
+	
+
+</defs>
+
+<line x1="0" y1="0" x2="200" y2="50" stroke="url(#myGradient)" stocke-width="2" marker-end="url(#arrow)" />
+
+<rect fill="url(#myGradient)" stocke-width="2" x="10" y="10" width="300" height="100" />
+
+
+<path d="M20,70 T80,100 T160,80 T200,90" fill="white" stroke="red" stroke-width="2" 
+	marker-start="url(#arrow)"
+	marker-mid="url(#arrow)"
+	marker-end="url(#arrow)"
+	filter="url(#f_GB)" />
+
+	</svg>
+	
+	
+<script>  
+console.log(d3.quantile([1,2,3] ,0.4));
+
+var v_Datas = [{id:1 ,color:"red"} ,{id:2 ,color:"green"} ,{id:3 ,color:"blue"}];
+var v_Map   = d3.map(v_Datas ,function(d){ return d.id; });
+
+
+console.log(v_Map.values());
+</script>
+
+</body>
+</html>
