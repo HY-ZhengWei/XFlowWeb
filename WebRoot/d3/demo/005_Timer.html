@@ -1,0 +1,72 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<script src="../../d3/d3.min.js" charset="utf-8"></script>
+	
+	<style type="text/css">
+	body { 
+		background-color: #333; 
+		margin: 20px;
+	  	color: white;
+	}
+	
+	.time {
+		font-family: Cursive;
+		font-size: 70px;
+		stroke: white;
+		fill: white;
+		stroke-width: 2;
+	}
+	</style>
+</head>
+<body>
+
+	<svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg">
+	</svg>
+	
+	
+	<script type="text/javascript">
+		var v_SVG = d3.select("body").select("svg");
+		
+		var v_TimeText01 = v_SVG.append("text")
+		.attr("x" ,400)
+		.attr("y" ,100)
+		.attr("class" ,"time")
+		.text(getTimeString(new Date() ,1));
+		
+		var v_TimeText02 = v_SVG.append("text")
+		.attr("x" ,400)
+		.attr("y" ,200)
+		.attr("class" ,"time")
+		.text(getTimeString(new Date() ,-1));
+		
+		function getTimeString(i_Date ,i_Orient)
+		{
+			var v_Hours   = i_Date.getHours();
+			var v_Minutes = i_Date.getMinutes();
+			var v_Seconds = i_Date.getSeconds();
+			
+			// 倒计时
+			if ( i_Orient < 0 )
+			{
+				v_Hours   = 23 - v_Hours;
+				v_Minutes = 59 - v_Minutes;
+				v_Seconds = 59 - v_Seconds;
+			}
+						v_Hours   = v_Hours   < 10 ? "0" + v_Hours   : v_Hours;
+			v_Minutes = v_Minutes < 10 ? "0" + v_Minutes : v_Minutes;
+			v_Seconds = v_Seconds < 10 ? "0" + v_Seconds : v_Seconds;
+			
+			return v_Hours + ":" + v_Minutes + ":" + v_Seconds;
+		}
+		
+		setInterval(function()
+		{
+			v_TimeText01.text(getTimeString(new Date() ,1));
+			v_TimeText02.text(getTimeString(new Date() ,-1));
+		} 
+		,1000);
+	</script>
+
+</body>
+</html>

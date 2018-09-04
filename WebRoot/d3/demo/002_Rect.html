@@ -36,6 +36,8 @@
 	    var v_Height    = 200;
 		var v_Datas     = [50 ,43 ,120 ,87 ,99 ,167 ,5];
 		var v_SortIndex = 0;
+		var v_XOffset   = 0;
+		var v_YOffset   = 0;
 		
 		
 		/**
@@ -56,6 +58,21 @@
 			var v_yScale     = d3.scaleLinear()                         // y轴的比例尺
 			                     .domain([0 ,d3.max(i_Datas)])
 			                     .range([0 ,i_Height - v_Padding.top - v_Padding.bottom]);
+			var v_Drag       = d3.drag()                                // 创建一个拖曳行为
+			                     .on("start" ,function()
+			                     {
+			                    	 var v_MyDragItem = d3.select(this);
+			                    	 v_XOffset = d3.event.x - v_MyDragItem.attr("x");
+			                    	 v_YOffset = d3.event.y - v_MyDragItem.attr("y");
+			                     })
+			                     .on("drag" ,function(d)
+			                     {
+			                    	 var v_MyDragItem = d3.select(this);
+			                    	 v_MyDragItem
+			                    	 .attr("x" ,d.x = d3.event.x)
+			                    	 .attr("y" ,d.y = d3.event.y);
+			                     });
+			
 			
 			// 绘制柱形
 			var v_RectUpdate = v_SVG.selectAll("." + i_RectName + "_Rect").data(i_Datas);
@@ -81,6 +98,19 @@
 			           .attr("stroke" ,"black")
 			           .attr("stroke-width" ,2)
 					   .attr("fill" ,"steelblue")
+					   .call(v_Drag)
+					   .on("mouseover" ,function(d ,i)
+					   {
+						   d3.select(this).attr("fill" ,"yellow");
+					   })
+					   .on("mouseout" ,function(d ,i)
+					   {
+						   // 鼠标离开时，渐变为变色 
+						   d3.select(this)
+						   .attr("fill" ,"yellow")
+						   .transition().duration(500)
+						   .attr("fill" ,"steelblue");
+					   })
 					   .attr("x" ,function(d ,i) 
 					   {
 							return v_Padding.left + v_xScale(i);
@@ -91,7 +121,7 @@
 					   })
 					   .attr("width" ,v_RectWidth)
 					   .attr("height" ,0)
-					   .transition().duration(1000)
+					   .transition().duration(1000).ease(function(t){ return d3.easeExpIn(t); })
 					   .attr("height" ,function(d ,i) 
 					   {
 							return v_yScale(d);
