@@ -1,0 +1,41 @@
+{
+	"name": "中国",
+	"children": [
+		{
+			"name": "陕西",
+			"children": [
+				{
+					"name": "西安",
+					"children": [
+						{"name": "莲湖区" ,"hidden": true},
+						{"name": "雁塔区" ,"hidden": true}
+					]
+				},
+				{
+					"name": "咸阳",
+					"children": [
+						{"name": "渭城区"},
+						{"name": "秦都区"}
+					]
+				},
+				{"name": "宝鸡"},
+				{"name": "渭南"},
+				{"name": "延安"},
+				{"name": "铜川"},
+				{"name": "安康"},
+				{"name": "汉中"},
+				{"name": "榆林"},
+				{"name": "商洛"}
+			]
+		},
+		{
+			"name": "宁夏",
+			"children": [
+				{"name": "银川"},
+				{"name": "吴忠"},
+				{"name": "中宁"},
+				{"name": "固原"}
+			]
+		}
+	]
+}
