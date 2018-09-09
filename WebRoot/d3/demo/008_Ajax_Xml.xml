@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+
+	<import name="xconfig"         class="java.util.ArrayList" />
+	<import name="xparam"          class="java.util.Hashtable" />
+	<import name="item"            class="org.hy.common.app.Param" />
+	
+	
+	
+	<!-- 系统配置参数信息 -->
+	<xconfig>
+		
+	    <xparam id="SYSParam" key="name">
+	    
+	    	<item id="APPWEBID">
+	            <name>APPWEBID</name>
+				<value>XFlowWeb</value>
+				<comment>部署Web服务所在主机的标示(建议只包含：数字和英文)</comment>
+	        </item>
+	        
+	    	<item id="RootPackageName">
+	            <name>RootPackageName</name>
+				<value>org.hy.xflow.web</value>
+				<comment>顶级包的路径。用于初始化。一般不修改</comment>
+	        </item>
+	        
+		</xparam>
+		
+	</xconfig>
+	
+</config>

@@ -1,0 +1,16 @@
+{
+	"sysid": "xx",
+	"sid": "I001Create",
+	"body": {
+		"user": {
+			"userID": "8a81b2b54b7b391b014b7d12b66400fc",
+			"userName": "公用销售人员",
+			"roles": [{
+				"roleID": "004",
+				"roleName": "销售人员"
+			}]
+		},
+		"templateName": "智能选型",
+		"serviceDataID": "SID001"
+	}
+}

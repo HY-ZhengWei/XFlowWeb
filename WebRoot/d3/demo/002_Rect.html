@@ -25,6 +25,7 @@
 	<button type="button" onclick="f_Sort()">排序</button>
 	<button type="button" onclick="f_Add()">添加</button>
 	<button type="button" onclick="f_Del()">删除</button>
+	<button type="button" onclick="f_Save()">保存</button>
 	
 	
 	<svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -69,8 +70,8 @@
 			                     {
 			                    	 var v_MyDragItem = d3.select(this);
 			                    	 v_MyDragItem
-			                    	 .attr("x" ,d.x = d3.event.x)
-			                    	 .attr("y" ,d.y = d3.event.y);
+			                    	 .attr("x" ,d.x = d3.event.x - v_XOffset)
+			                    	 .attr("y" ,d.y = d3.event.y - v_YOffset);
 			                     });
 			
 			
@@ -233,6 +234,18 @@
 		{
 			v_Datas.pop(v_Datas.length - 1);
 			f_DrawRect("MyRect" ,v_Datas ,v_Width ,v_Height);
+		}
+		
+		
+		
+		function f_Save()
+		{
+			d3.select("svg").call(d3.downloadable(
+			{
+				width: 500,
+				height: 500,
+				filename: "FileName"
+			}));
 		}
 		
 		
