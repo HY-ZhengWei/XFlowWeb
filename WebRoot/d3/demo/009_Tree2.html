@@ -1,7 +1,11 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<script src="../../d3/d3.min.js" charset="utf-8"></script>
+	<script type="text/javascript" src="../../d3/d3.min.js" charset="utf-8"></script>
+	<script type="text/javascript" src="../../jquery/jquery.min.js" ></script>
+	<script type="text/javascript" src="../..//jquery/jquery-ui.min.js"></script>
+
+	<link rel="stylesheet" href="../..//jquery/jquery-ui.min.css" />
 	
 	<style type="text/css">
 	body { 
@@ -100,12 +104,21 @@
 		right: 20;
 		top: 30%;
 	}
+	
+	#menuDiv {
+	    position: fixed;
+	}
+	
+	#menuDiv .ui-menu { 
+		width: 150px; 
+	}
 	</style>
 </head>
-<body>
+<body oncontextmenu="return false">
 
 	<button type="button" onclick="f_ToBig()">放大</button>
 	<button type="button" onclick="f_ToSmall()">缩小</button>
+	<button type="button" onclick="f_ToSave()">保存成Png图片</button>
 	<svg id="mainSVG" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg">
 	
 		<defs>
@@ -122,11 +135,47 @@
 		</defs>
 	
 	</svg>
+	
 	<div id="tooltip"></div>
 	
 	<div id="legend">
 		<svg id="legendSVG" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg">
 		</svg>
+	</div>
+	
+	<div id="menuDiv">
+		<ul id="menu">
+		  <li class="ui-state-disabled"><div>Toys (n/a)</div></li>
+		  <li><div>Books</div></li>
+		  <li><div>Clothing</div></li>
+		  <li><div>Electronics</div>
+		    <ul>
+		      <li class="ui-state-disabled"><div>Home Entertainment</div></li>
+		      <li><div>Car Hifi</div></li>
+		      <li><div>Utilities</div></li>
+		    </ul>
+		  </li>
+		  <li><div>Movies</div></li>
+		  <li><div>Music</div>
+		    <ul>
+		      <li><div>Rock</div>
+		        <ul>
+		          <li><div>Alternative</div></li>
+		          <li><div>Classic</div></li>
+		        </ul>
+		      </li>
+		      <li><div>Jazz</div>
+		        <ul>
+		          <li><div>Freejazz</div></li>
+		          <li><div>Big Band</div></li>
+		          <li><div>Modern</div></li>
+		        </ul>
+		      </li>
+		      <li><div>Pop</div></li>
+		    </ul>
+		  </li>
+		  <li class="ui-state-disabled"><div>Specials (n/a)</div></li>
+		</ul>
 	</div>
 	
 	
@@ -136,7 +185,8 @@
 		var v_Height       = 1000;    /* 画布高度 */
 		var v_LevelSpacing = 128;     /* 不同层级间的间隔 */
 		var v_NodeSpacing  = 50;      /* 同一父节点的多个子节点间的间隔 */
-		var v_JsonDatas    = null;
+		var v_JsonDatas    = null;    /* 整个Json数据 */
+		var v_MenuJson     = null;    /* 右键菜单选中的Json数据 */
 		var v_SVG          = d3.select("body").select("#mainSVG");
 		var v_LegendSVG    = d3.select("body").select("#legendSVG");
 		
@@ -329,12 +379,18 @@
 					drawTree(v_JsonDatas);
 				}
 			})
+			.on("contextmenu" ,function()
+			{
+				var v_MenuDiv = d3.select("body").select("#menuDiv")
+				.style("left" ,(d3.event.pageX - 170) + "px")     
+				.style("top"  ,(d3.event.pageY - 28) + "px");
+			})
 			.on("mouseover" ,function() 
 			{         
 				v_Tooltip.html(makeTooltipText(i_Json))  
 				.style("left" ,(d3.event.pageX + (v_LevelSpacing/2)) + "px")     
 				.style("top"  ,(d3.event.pageY - 28) + "px")
-				.style("opacity" ,100);    
+				.style("opacity" ,100);
 			})
 			.on("mouseout" ,function() 
 			{
@@ -658,6 +714,30 @@
 			v_Zoom.scaleTo(v_SVG ,v_ZoomValue);
 		}
 		
+		
+		
+		function f_ToSave()
+		{
+			var svgHeadInfo = '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN"\n"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">';
+ 
+            var svgSource = v_SVG
+                .attr("version", 1.1)
+                .attr("xmlns", "http://www.w3.org/2000/svg")
+                .node().parentNode.innerHTML;
+ 
+            d3.select("body").append("a")
+                .attr("title", "file.svg")
+                .attr("href-lang", "image/svg+xml")
+                .attr("href", "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgHeadInfo + svgSource))))
+                .text("Download");
+		}
+		
+		
+		
+		$( function() 
+		{
+			$( "#menu" ).menu();
+		});
 	</script>
 
 </body>
