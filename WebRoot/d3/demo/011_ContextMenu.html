@@ -1,0 +1,48 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<script src="../../d3/d3.min.js" charset="utf-8"></script>
+	
+	<style type="text/css">
+	body { 
+	  background-color: #333; 
+	  margin: 20px;
+	  color: white;
+	}
+	</style>
+</head>
+<body oncontextmenu="return false">
+
+	<svg width="100%" height="400" version="1.1" xmlns="http://www.w3.org/2000/svg">
+	</svg>
+	
+	
+	<script type="text/javascript">
+		var v_Datas = d3.range(10);
+		var v_SVG   = d3.select("body").select("svg");
+		var v_Color = d3.scaleOrdinal(d3.schemeCategory10);    // 颜色比例尺
+		
+		v_SVG.selectAll(".MyCircle")
+		.data(v_Datas)
+		.enter()
+		.append("circle")
+		.attr("cx" ,function(d ,i) { return 30 + i * 80; })
+		.attr("cy" ,100)
+		.attr("r" ,30)
+		.attr("fill" ,function(d ,i) { return v_Color(i); })
+		.on("contextmenu" ,function()
+		{
+			console.log("Circle ContextMenu.");
+			console.log(d3.event);
+			d3.event.preventDefault();
+		});
+		
+		
+		v_SVG.on("contextmenu" ,function()
+		{
+			console.log("SVG ContextMenu.");	
+		});
+	</script>
+
+</body>
+</html>

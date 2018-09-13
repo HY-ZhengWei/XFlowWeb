@@ -5,9 +5,28 @@
 	
 	<style type="text/css">
 	body { 
-		background-color: #333; 
+		background-color: #FAFAFA; 
 		margin: 20px;
-	  	color: white;
+	}
+	
+	#createdBy {
+		width: 120px; 
+		height: 15px; 
+		position: fixed;
+		right: 10;
+		bottom: 10;
+		font-size: 11px;
+	}
+	
+	a { 
+		color: #669900; 
+		text-decoration: none; 
+		outline: none;
+	}
+	
+	a:hover {
+		color: #99CC00;
+		text-decoration: none;
 	}
 	</style>
 </head>
@@ -17,14 +36,31 @@
 		<path d="M100,100 
                  Q190,20 270,100
                  T450,100" 
-            style="fill:#333; stroke:black; stroke-width:3" />
-		
+            style="fill:#FAFAFA; stroke:black; stroke-width:3" />
 	</svg>
 	
+	<div id="createdBy">
+		<a href="https://github.com/HY-ZhengWei/XJava" target="_brank">Source code by <b>XSQL</b></a>
+	</div>
 	
 	<script type="text/javascript">
 		var v_SVG = d3.select("body").select("svg");
 		
+		var v_LineGenerator = d3.line()
+		.x(function(d)
+		{
+			return d[0];
+		})
+		.y(function(d)
+		{
+			return d[1];	
+		});
+		
+		v_SVG.append("path")
+		.attr("d" ,v_LineGenerator([80,80] ,[200,100] ,[100 ,200]))
+		.attr("fill" ,"#333")
+		.attr("stroke" ,"yellow")
+		.attr("stroke-width" ,"3");
 		
 	</script>
 

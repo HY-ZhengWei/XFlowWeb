@@ -3,9 +3,10 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<script type="text/javascript" src="../../d3/d3.min.js" charset="utf-8"></script>
 	<script type="text/javascript" src="../../jquery/jquery.min.js" ></script>
-	<script type="text/javascript" src="../..//jquery/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../jquery/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../html2canvas/html2canvas.min.js"></script>
 
-	<link rel="stylesheet" href="../..//jquery/jquery-ui.min.css" />
+	<link rel="stylesheet" href="../../jquery/jquery-ui.min.css" />
 	
 	<style type="text/css">
 	body { 
@@ -114,27 +115,30 @@
 	}
 	</style>
 </head>
-<body oncontextmenu="return false">
+<body oncontextmenu="return false" class="bodyClass">
 
 	<button type="button" onclick="f_ToBig()">放大</button>
 	<button type="button" onclick="f_ToSmall()">缩小</button>
 	<button type="button" onclick="f_ToSave()">保存成Png图片</button>
-	<svg id="mainSVG" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg">
-	
-		<defs>
-			<marker id="arrow" 
-			                markerUnits="strokerWidth"
-			                markerWidth="16"
-			                markerHeight="16"
-			                viewBox="0 0 12 12"
-			                refX="6"
-			                refY="6"
-			                orient="auto">
-				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:green;" />
-			</marker>
-		</defs>
-	
-	</svg>
+	<a id="saveAHref" href="#">下载</a>
+	<div class="svg-wrap">
+		<svg id="mainSVG" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg">
+		
+			<defs>
+				<marker id="arrow" 
+				                markerUnits="strokerWidth"
+				                markerWidth="16"
+				                markerHeight="16"
+				                viewBox="0 0 12 12"
+				                refX="6"
+				                refY="6"
+				                orient="auto">
+					<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:green;" />
+				</marker>
+			</defs>
+		
+		</svg>
+	</div>
 	
 	<div id="tooltip"></div>
 	
@@ -187,8 +191,17 @@
 		var v_NodeSpacing  = 50;      /* 同一父节点的多个子节点间的间隔 */
 		var v_JsonDatas    = null;    /* 整个Json数据 */
 		var v_MenuJson     = null;    /* 右键菜单选中的Json数据 */
-		var v_SVG          = d3.select("body").select("#mainSVG");
+		var v_SVG          = d3.select("body").select("#mainSVG").append("g");
 		var v_LegendSVG    = d3.select("body").select("#legendSVG");
+		var v_CircleZoom   = d3.zoom().scaleExtent([0.5 ,2])
+		.on("zoom" ,function()
+	    {
+			console.log(d3.select(this).attr("transform"));
+			d3.select(this).attr("transform" ,d3.select(this).attr("transform") + " scale(" + d3.event.transform.k + ")"); 
+		});
+		
+		
+		
 		
 		
 		
@@ -391,10 +404,17 @@
 				.style("left" ,(d3.event.pageX + (v_LevelSpacing/2)) + "px")     
 				.style("top"  ,(d3.event.pageY - 28) + "px")
 				.style("opacity" ,100);
+				
+				console.log("dddddddddddddddeeeeeeeeeee");
+				v_CircleZoom.scaleTo(d3.select(this) ,1.25);
 			})
 			.on("mouseout" ,function() 
 			{
-				v_Tooltip.style("opacity" ,0);   
+				v_Tooltip
+				.style("left" ,"-1000px")     
+				.style("top"  ,"-1000px")
+				.style("opacity" ,0);
+				v_CircleZoom.scaleTo(v_G ,0.8);
 			});
 			
 			var v_Circle = v_G.append("circle")
@@ -690,13 +710,13 @@
 		
 		
 		var v_Zoom = d3.zoom()
-        .scaleExtent([1.1 ,1.1])
+        .scaleExtent([0.5 ,2])
         .on("zoom" ,function()
         {
-        		d3.select(this).attr("transform" ,d3.event.transform);   
+        	d3.select(this).attr("transform", "translate(" + d3.event.transform.x + "," + d3.event.transform.y + ") scale(" + d3.event.transform.k + ")");
         });
 
-		v_SVG.call(v_Zoom);
+		d3.select("#mainSVG").call(v_Zoom);
 		
 		
 		var v_ZoomValue = 1.0;
@@ -716,27 +736,43 @@
 		
 		
 		
+		function toCanvas(svgData, width, height, callback) 
+		{
+			  var src = 'data:image/svg+xml;charset=utf-8;base64,' + svgData;
+			  var canvas = document.createElement('canvas');
+			  var context = canvas.getContext('2d');
+			  var image = new window.Image();
+			  canvas.width = width;
+			  canvas.height = height;
+			  image.onload = function () {
+			    
+			    callback(canvas);
+			  };
+			  image.src = src;
+			  
+			  context.drawImage(image, 0, 0);
+			  
+			  console.log(src);
+			  
+			  d3.select("#saveAHref").
+			  attr("download" ,"123.png")
+			  .attr("href" ,canvas.toDataURL('image/png'));
+		};
+		
+		
+		
 		function f_ToSave()
 		{
-			var svgHeadInfo = '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN"\n"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">';
- 
-            var svgSource = v_SVG
-                .attr("version", 1.1)
-                .attr("xmlns", "http://www.w3.org/2000/svg")
-                .node().parentNode.innerHTML;
- 
-            d3.select("body").append("a")
-                .attr("title", "file.svg")
-                .attr("href-lang", "image/svg+xml")
-                .attr("href", "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgHeadInfo + svgSource))))
-                .text("Download");
+			html2canvas(document.body).then(canvas => {
+			    document.body.appendChild(canvas)
+			});
 		}
 		
 		
 		
 		$( function() 
 		{
-			$( "#menu" ).menu();
+			$("#menu").menu();
 		});
 	</script>
 
