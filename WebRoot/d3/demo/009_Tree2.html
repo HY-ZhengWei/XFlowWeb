@@ -61,10 +61,22 @@
 	    fill: steelblue;
 	}
 	
+	.NodeFlagW {
+	    font-size: 12px;
+	    font-weight: bold;
+	    fill: steelblue;
+	}
+	
 	.NodeFlagC {
 	    font-size: 12px;
 	    font-weight: bold;
 	    fill: red;
+	}
+	
+	.NodeFlagF {
+	    font-size: 12px;
+	    font-weight: bold;
+	    fill: #FF00FF;
 	}
 	
 	.NodeFlagComment {
@@ -98,12 +110,17 @@
 	
 	#legend {
 		width: 160px; 
-		height: 240px; 
+		height: 320px; 
 		border: 1px solid #888; 
 		border-radius: 5px;
 		position: fixed;
 		right: 20;
-		top: 30%;
+		top: 25%;
+	}
+	
+	#title {
+		font-size: 14px;
+		text-align: center;
 	}
 	
 	#menuDiv {
@@ -122,6 +139,7 @@
 	<button type="button" onclick="f_ToSave()">保存成Png图片</button>
 	<a id="saveAHref" href="#">下载</a>
 	<div class="svg-wrap">
+		<div id="title">xxx的业务流程图</div>
 		<svg id="mainSVG" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg">
 		
 			<defs>
@@ -503,12 +521,15 @@
 		 */
 		function drawLegends()
 		{
-			var v_Nodes = [{"flag":"S" ,"comment":"查询数据库节点"} 
-			              ,{"flag":"U" ,"comment":"更新数据库节点"} 
-			              ,{"flag":"J" ,"comment":"执行Java方法的节点"} 
-			              ,{"flag":"C" ,"comment":"云计算节点"} 
-			              ,{"flag":"T" ,"comment":"并行计算节点"} 
-			              ,{"flag":"R" ,"comment":"缓存集合遍历节点"}];
+			var v_Nodes = [{"flag":" "  ,"comment":"组、节点。有右击菜单"}
+			              ,{"flag":"S"  ,"comment":"查询数据库节点"} 
+			              ,{"flag":"U"  ,"comment":"更新数据库节点"} 
+			              ,{"flag":"J"  ,"comment":"执行Java方法的节点"} 
+			              ,{"flag":"C"  ,"comment":"云计算节点"} 
+			              ,{"flag":"T"  ,"comment":"并行计算节点"} 
+			              ,{"flag":"W"  ,"comment":"并行等待"} 
+			              ,{"flag":"R"  ,"comment":"缓存集合遍历节点"}
+			              ,{"flag":"F"  ,"comment":"组递归循环"}];
 			
 			var v_Lines = [{"className":"NodeLineRef"  ,"dasharray":"2,5" ,"markerEnd":""            ,"comment":"组及节点的关系线"}
 			              ,{"className":"NodeLineFlow" ,"dasharray":""    ,"markerEnd":"url(#arrow)" ,"comment":"业务走势线"}
