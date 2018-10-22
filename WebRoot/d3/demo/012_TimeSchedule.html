@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>时间进度</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	
+	<script type="text/javascript" charset="utf-8" src="../../d3/d3.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="../../jquery/jquery.min.js" ></script>
+	<script type="text/javascript" charset="utf-8" src="../../jquery/jquery-ui.min.js"></script>
+	
+	<link rel="stylesheet" href="jquery/jquery-ui.min.css" />
+	
+	<style type="text/css">
+	body {
+	  font-family: 'Open Sans', sans-serif;
+	  font-size: 12px;
+	  font-weight: 400;
+	  background-color: #fff;
+	}
+	
+	#workingTimesTooltip {
+		background: white;
+	    display: inline-block;
+	    position: absolute;
+	    padding: 0px 0px;
+	    border-radius: 0px;
+	    border: 0px solid #DDD;
+	    z-index: 99999;
+		opacity: 0;
+	}
+	
+	#videoTooltip {
+		background: white;
+	    display: inline-block;
+	    position: absolute;
+	    padding: 5px 5px;
+	    margin: 0px;
+	    border-radius: 5px;
+	    border: 1px solid #DDD;
+	   	z-index: 99999;
+		opacity: 0;
+	}
+	
+	.frameClass {
+		padding: 0px; 
+		margin: 0px;
+	}
+	</style>
+	
+</head>
+<body>
+
+	<svg width="100%" height="900" version="1.1" xmlns="http://www.w3.org/2000/svg">
+	
+		<defs>
+		
+			<filter id="shadow">
+		        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur"></feGaussianBlur>
+		        <feOffset in="blur" dx="2" dy="2" result="offset"></feOffset>
+		        <feMerge>
+		        <feMergeNode in="offset"></feMergeNode>
+		        <feMergeNode in="SourceGraphic"></feMergeNode>
+		        </feMerge>
+	        </filter>
+	        
+	        
+	        <marker id="arrow_Working" 
+			                markerUnits="strokerWidth"
+			                markerWidth="12px"
+			                markerHeight="12px"
+			                viewBox="0 0 12 12"
+			                refX="6"
+			                refY="6"
+			                orient="auto">
+				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:#DE783B;" />
+			</marker>
+    		
+		</defs>
+		
+	</svg>
+	
+	
+	<div id="workingTimesTooltip"></div>
+	<div id="videoTooltip"></div>
+	
+
+<script type="text/javascript">
+
+var v_Colors = {
+		  "finish":  "#6AB975",
+		  "working": "#DE783B",
+		  "timeout": "#FF4444",
+		  "wait":    "#BBBBBB"
+		};
+
+var b = {w:80 ,h:30 ,s:3 ,t:10 ,top:350};
+
+
+
+function breadcrumbPoints(d ,i)
+{
+	var points = [];
+	points.push("0,0");
+	points.push(b.w + ",0");
+	points.push(b.w + b.t + "," + (b.h / 2));
+	points.push(b.w + "," + b.h);
+	points.push("0," + b.h);
+	if ( i > 0 ) 
+	{ 
+		points.push(b.t + "," + (b.h / 2));
+	}
+	return points.join(" ");
+}
+
+
+
+var v_Schedules = [{"name":"合同评审" ,"progress":"100"} 
+                  ,{"name":"排产确认" ,"progress":"100"} 
+                  ,{"name":"商品计划" ,"progress":"100"} 
+                  ,{"name":"产品设计" ,"progress":"100"} 
+                  ,{"name":"工艺设计" ,"progress":"100"} 
+                  ,{"name":"生产计划" ,"progress":"100"} 
+                  ,{"name":"采购"    ,"progress":"50"} 
+                  ,{"name":"铸造"    ,"progress":"-1"} 
+                  ,{"name":"零件加工" ,"progress":"-1"} 
+                  ,{"name":"装配"    ,"progress":"-1"} 
+                  ,{"name":"入库"    ,"progress":"-1"} 
+                  ,{"name":"包装发运" ,"progress":"-1"} ];
+
+var v_SVG     = d3.select("body").select("svg");
+var v_GEnter  = v_SVG.selectAll("g").data(v_Schedules).enter();
+var v_OldData = null;
+var v_OldG    = null;
+
+v_GEnter.append("g")
+.attr("class" ,"ScheduleClass")
+.attr("transform", function(d ,i) 
+{
+    return "translate(" + i * (b.w + b.s) + "," + b.top + ")";
+});
+
+v_SVG.selectAll("g").data(v_Schedules).each(function(d ,i)
+{
+	var v_MyG = d3.select(this);
+	d3.select(this).append("polygon")
+	.attr("points" ,breadcrumbPoints(d ,i))
+	.style("fill"  ,function(d ,i)
+	{
+		return v_Colors.wait;
+	})
+	.attr("filter" ,"url(#shadow)")
+	.on("mouseenter" ,function() 
+	{
+		if ( 0 <= d.progress )
+		{
+			if ( v_OldData == null || d.name != v_OldData.name )
+			{
+				v_OldData = d;
+				showTooltips(v_MyG ,d ,i ,true);
+			}
+		}
+	})
+	.transition()
+	.delay(i * 500)
+	.duration(2000)
+	.style("fill" ,function(d ,i)
+	{
+		if ( d.progress >= 100 )
+		{
+			return v_Colors.finish;
+		}
+		else if ( d.progress >= 0 )
+		{
+			return v_Colors.working;
+		}
+		else
+		{
+			return v_Colors.wait;
+		}
+	});
+	
+	d3.select(this).append("text")
+	.attr("x", (b.w + b.t) / 2)
+	.attr("y", b.h / 2)
+	.attr("dy", "0.35em")
+	.attr("text-anchor", "middle")
+	.attr("font-weight" ,"bold")
+	.attr("fill" ,"white")
+	.text(function(d) 
+	{ 
+		if ( 0 <= d.progress && d.progress < 100 )
+		{
+			return d.name + d.progress + "%"; 
+		}
+		else
+		{
+			return d.name;
+		}
+	});
+	
+	if ( 0 <= d.progress && d.progress < 100 )
+	{
+		setTimeout(function()
+		{ 
+			v_OldData = d;
+			showTooltips(v_MyG ,d ,i ,true); 
+		} ,i * 500 + 1000);
+	}
+	else if ( d.progress >= 100 )
+	{
+		setTimeout(function()
+		{ 
+			v_OldData = d;
+			showTooltips(v_MyG ,d ,i ,false); 
+		} ,i * 500 + 1000);
+	}
+});
+
+
+
+function showTooltips(i_MyG ,d ,i ,i_IsTransition)
+{
+	if ( v_OldG != null )
+	{
+		v_OldG.selectAll("rect").remove();
+		v_OldG.selectAll("line").remove();
+		d3.select("#videoTooltip").selectAll("a").remove();
+		d3.select("#videoTooltip").selectAll("iframe").remove();
+		
+		$("#workingTimesTooltip").css("opacity" ,0);
+		$("#videoTooltip")       .css("opacity" ,0);
+	}
+	v_OldG = i_MyG;
+		
+	var v_Width        = 235;
+	var v_Height       = 200;
+	var v_Space        = 30;                   <!-- 与进度块的间隔 -->
+	var v_WidthPadding = (v_Width - b.w) / 2;  <!-- 相对于进度块两边各扩展的宽度 -->
+	var v_Radius       = 8;                    <!-- 圆角大小 -->
+	var v_StrokeWidth  = 3;
+	var v_LineColor    = (d.progress < 100) ? v_Colors.working : v_Colors.finish;
+	
+	<!-- 上位引线框 -->
+	var v_Rect = i_MyG.append("rect")
+	.attr("fill" ,"white")
+	.attr("stroke" ,v_LineColor)
+	.attr("stroke-width" ,v_StrokeWidth)
+	.attr("width" ,v_Width)
+	.attr("height" ,v_Height)
+	.attr("rx" ,v_Radius) 
+	.attr("ry" ,v_Radius) 
+	.attr("x" ,function()
+	{
+		return -v_WidthPadding;	
+	})
+	.attr("y" ,function()
+	{
+		return (v_Space + v_Height) * -1;	
+	});
+	
+	if ( i_IsTransition )
+	{
+		v_Rect.attr("opacity" ,0)
+		.transition()
+		.duration(2000)
+		.attr("opacity" ,1);
+	}
+	
+	
+	<!-- 上位引线框的遮盖线 -->
+	i_MyG.append("line")
+	.attr("fill" ,"white")
+	.attr("stroke" ,"white")
+	.attr("stroke-width" ,v_StrokeWidth + 1)
+	.attr("x1" ,(v_WidthPadding) * -1)
+	.attr("y1" ,-v_Space)
+	.attr("x2" ,(b.w / 2 + 20)) 
+	.attr("y2" ,-v_Space);
+	
+	<!-- 上位引线框的斜引线 -->
+	var v_Line = i_MyG.append("line")
+	.attr("fill" ,"white")
+	.attr("stroke" ,v_LineColor)
+	.attr("stroke-width" ,v_StrokeWidth)
+	.attr("x1" ,(v_WidthPadding - 2) * -1)
+	.attr("y1" ,(v_Space + 2.5) * -1)
+	.attr("x2" ,(b.w / 2)) 
+	.attr("y2" ,0);
+	
+	if ( i_IsTransition )
+	{
+		v_Line.attr("opacity" ,0)
+		.transition()
+		.duration(2000)
+		.attr("opacity" ,1);
+	}
+	
+	$("#workingTimesTooltip").html(makeWorkingTimesTooltipText(d));
+	$("#workingTimesTooltip").css("left" ,(i * b.w + i * b.s - 50) + "px");    
+	$("#workingTimesTooltip").css("top"  ,(b.top - v_Height - v_Space + 15) + "px");
+	$("#workingTimesTooltip").css("opacity" ,1);
+	
+	if ( 0 <= d.progress && d.progress < 100  )
+	{
+		<!-- 下位引线的竖线 -->
+		i_MyG.append("line")
+		.attr("fill" ,"white")
+		.attr("stroke" ,v_LineColor)
+		.attr("stroke-width" ,v_StrokeWidth)
+		.attr("x1" ,(b.w / 2))
+		.attr("y1" ,b.h)
+		.attr("x2" ,(b.w / 2))
+		.attr("y2" ,(b.h + v_Space))
+		.attr("opacity" ,0)
+		.transition()
+		.duration(2000)
+		.attr("opacity" ,1);
+		
+		<!-- 下位引线的横线 -->
+		i_MyG.append("line")
+		.attr("fill" ,"white")
+		.attr("stroke" ,v_LineColor)
+		.attr("stroke-width" ,v_StrokeWidth)
+		.attr("x1" ,(b.w / 2 + v_WidthPadding) * -1)
+		.attr("y1" ,(b.h + v_Space))
+		.attr("x2" ,(b.w +  b.w / 2 + v_WidthPadding)) 
+		.attr("y2" ,(b.h + v_Space))
+		.attr("opacity" ,0)
+		.transition()
+		.duration(2000)
+		.attr("opacity" ,1);
+		
+		$("#videoTooltip").css("left" ,(i * b.w + i * b.s - 108) + "px");   
+		$("#videoTooltip").css("top"  ,(b.top + b.h + v_Space + 15) + "px");
+		$("#videoTooltip").css("opacity" ,1);
+		$("#videoTooltip").css("width" ,"300");
+		$("#videoTooltip").css("height" ,"240");
+		
+		d3.select("#videoTooltip").append("a")
+		.attr("id" ,"openVideo")
+		.attr("class" ,"ui-button ui-widget ui-corner-all")
+		.attr("href" ,"#")
+		.text("查看视频")
+		.on("click" ,openVideo);
+		
+		$("#openVideo").css("top" ,"100px");
+		$("#openVideo").css("left" ,"110px");
+	}
+	
+	// opacityTransition("#workingTimesTooltip" ,2000 ,0 ,1);
+	// opacityTransition("#videoTooltip"        ,2000 ,0 ,1);
+}
+
+
+
+/**
+ * 延时显示或隐藏对象
+ * 
+ * @param i_ID            JQuery标记ID
+ * @param i_Duration      持续时间
+ * @param i_OpacityStart  开始显示值(0~1)
+ * @param i_OpacityEnd    结束显示值(0~1)
+ */
+function opacityTransition(i_ID ,i_Duration ,i_OpacityStart ,i_OpacityEnd)
+{
+	var v_Step    = Math.abs(i_OpacityEnd - i_OpacityStart) / (i_Duration / 100);
+	var v_Opacity = i_OpacityStart + v_Step;
+	
+	setTimeout(function()
+	{
+		$(i_ID).css("opacity" ,v_Opacity);
+		
+		if ( v_Opacity < i_OpacityEnd )
+		{
+			opacityTransition(i_ID ,i_Duration ,v_Opacity ,i_OpacityEnd);
+		}
+	} ,100);
+}
+
+
+
+function openVideo()
+{
+	d3.select("#videoTooltip").select("a").remove();
+	d3.select("#videoTooltip").append("iframe")
+	.attr("class" ,"frameClass")
+	.attr("src" ,"http://10.1.90.23/calc/xt/xt.html?ip=10.1.130.68")
+	.attr("width" ,"100%")
+	.attr("height" ,"100%")
+	.attr("frameborder" ,"0")
+	.attr("scrolling" ,"no");
+}
+
+
+
+function makeWorkingTimesTooltipText(d)
+{
+	var v_Text = "";
+	
+	v_Text += "<table>";
+	
+	v_Text += "<tr>";
+	v_Text += "<td><font color='gray'>计划开始时间：</font></td>";
+	v_Text += "<td>2018-01-01 09:00</td>";
+	v_Text += "</tr>";
+	
+	v_Text += "<tr>";
+	v_Text += "<td><font color='gray'>实际开始时间：</font></td>";
+	v_Text += "<td>2018-01-01 09:00</td>";
+	v_Text += "</tr>";
+	
+	v_Text += "<tr>";
+	v_Text += "<td><font color='gray'>计划结束时间：</font></td>";
+	v_Text += "<td>2018-01-01 09:00</td>";
+	v_Text += "</tr>";
+	
+	v_Text += "<tr>";
+	v_Text += "<td><font color='gray'>实际结束时间：</font></td>";
+	v_Text += "<td>2018-01-01 09:00</td>";
+	v_Text += "</tr>";
+	
+	v_Text += "<tr>";
+	v_Text += "<td><font color='gray'>计划开始时间：</font></td>";
+	v_Text += "<td>2018-01-01 09:00</td>";
+	v_Text += "</tr>";
+	
+	v_Text += "<tr>";
+	v_Text += "<td><font color='gray'>阶段完工率：</font></td>";
+	v_Text += "<td>" + d.progress + "%</td>";
+	v_Text += "</tr>";
+	
+	v_Text += "<tr>";
+	v_Text += "<td><font color='gray'>是否超时：</font></td>";
+	v_Text += "<td>正常</td>";
+	v_Text += "</tr>";
+	
+	v_Text += "<tr>";
+	v_Text += "<td><font color='gray'>超时原因：</font></td>";
+	v_Text += "<td>无</td>";
+	v_Text += "</tr>";
+	
+	v_Text += "</table>";
+	
+	return v_Text
+}
+
+
+</script>
+
+</body>
+</html>
