@@ -37,7 +37,7 @@
 	        </filter>
 	        
 	        
-	        <marker id="arrowStart" 
+	        <marker id="arrowTo" 
 			                markerUnits="strokerWidth"
 			                markerWidth="12px"
 			                markerHeight="12px"
@@ -88,21 +88,10 @@
    		{
     		var v_RouteData = v_RouteMap.get(v_RouteIDs[i]);
     		var v_RounteObj = d3.select("#" + v_RouteData.id);
-    		var v_Points    = v_RounteObj.attr("points");
-    		var v_OldXY     = "";
+    		var v_FromG     = d3.select("#" + v_RouteData.from);
+    		var v_ToG       = d3.select("#" + v_RouteData.to);
     		
-    		if ( v_RouteData.from == v_NodeID )
-   			{
-    			v_OldXY = v_Points.split(" ")[0];
-   			}
-    		else if ( v_RouteData.to == v_NodeID )
-   			{
-    			var v_TempArr = v_Points.split(" ");
-    			v_OldXY = v_TempArr[v_TempArr.length - 1];
-   			}
-    		
-    		v_Points = v_Points.replace(v_OldXY ,d3.event.x + "," + d3.event.y);
-    		v_RounteObj.attr("points" ,v_Points);
+    		v_RounteObj.attr("points" ,calcRouteXY(v_FromG ,v_ToG));
    		}
     });
 	
@@ -159,7 +148,7 @@
 	 *    Map.value 为路由信息
 	 *
 	 * @author      ZhengWei(HY)
-	 * @createDate  2018-09-09
+	 * @createDate  2018-10-23
 	 * @version     v1.0
 	 */
 	function makeRouteMap(i_Routes)
@@ -184,7 +173,7 @@
 	 *                    .节点ID3.["路由ID1-3" ,"路由ID2-3"]
 	 *
 	 * @author      ZhengWei(HY)
-	 * @createDate  2018-09-09
+	 * @createDate  2018-10-23
 	 * @version     v1.0
 	 */
 	function makeRouteRefs(i_Routes)
@@ -213,12 +202,156 @@
 	
 	/**
 	 * 获取G元素的XY坐标位置
+	 * 
+	 * @author      ZhengWei(HY)
+	 * @createDate  2018-10-23
+	 * @version     v1.0
 	 */
 	function getGXY(i_G)
 	{
 		return i_G.attr("transform").replace("translate(" ,"").replace(")" ,"").split(",");
 	}
 	
+	
+	
+	/**
+	 * 计算两元素XY坐标位置的关系
+	 *
+	 * 返回以元素A为中心点，元素B所在的位置（E东、W西、S南、N北、ES东南。。。）
+	 * 
+	 * @author      ZhengWei(HY)
+	 * @createDate  2018-10-23
+	 * @version     v1.0
+	 *
+	 * @param i_X1  A元素的X坐标
+	 * @param i_Y1  A元素的Y坐标
+	 * @param i_X2  B元素的X坐标
+	 * @param i_Y2  B元素的Y坐标
+	 */
+	function calcPositionRelation(i_X1 ,i_Y1 ,i_X2 ,i_Y2)
+	{
+		/* AB两元素，垂直上下关系，A在上，B在下 */
+		if ( i_X1 == i_X2 && i_Y1 < i_Y2 )
+		{
+			console.log(i_Y1 + " S " +  i_Y2);
+			return "S";
+		}
+		/* AB两元素，垂直上下关系，A在下，B在上 */
+		else if ( i_X1 == i_X2 && i_Y1 > i_Y2 )
+		{
+			console.log(i_Y1 + " N " +  i_Y2);
+			return "N";
+		}
+		/* AB两元素，水平左右关系，A在左，B在右 */
+		else if ( i_X1 < i_X2 && i_Y1 == i_Y2 )
+		{
+			return "E";
+		}
+		/* AB两元素，水平左右关系，A在右，B在左 */
+		else if ( i_X1 > i_X2 && i_Y1 == i_Y2 )
+		{
+			return "W";
+		}
+		/* AB两元素，B在A的左下方 */
+		else if ( i_X1 > i_X2 && i_Y1 < i_Y2 )
+		{
+			return "WS";
+		}
+		/* AB两元素，B在A的右下方 */
+		else if ( i_X1 < i_X2 && i_Y1 < i_Y2 )
+		{
+			return "ES";
+		}
+		/* AB两元素，B在A的左上方 */
+		else if ( i_X1 > i_X2 && i_Y1 > i_Y2 )
+		{
+			return "WN";
+		}
+		/* AB两元素，B在A的右上方 */
+		else if ( i_X1 < i_X2 && i_Y1 > i_Y2 )
+		{
+			return "EN";
+		}
+	}
+	
+	
+	
+	function calcRouteXY(i_FromG ,i_ToG)
+	{
+		var v_FromXY = getGXY(i_FromG);
+		var v_ToXY   = getGXY(i_ToG);
+		var v_PR     = calcPositionRelation(Number(v_FromXY[0]) 
+				                           ,Number(v_FromXY[1]) 
+				                           ,Number(v_ToXY[0]) 
+				                           ,Number(v_ToXY[1]));
+		
+		if ( v_PR == "E" )
+		{
+			v_FromXY[0] = Number(v_FromXY[0]) + N.width;
+			v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+			
+			v_ToXY[0] = Number(v_ToXY[0]) + 0;
+			v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+ 		}
+		else if ( v_PR == "W" )
+		{
+			v_FromXY[0] = Number(v_FromXY[0]) + 0;
+			v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+			
+			v_ToXY[0] = Number(v_ToXY[0]) + N.width;
+			v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+		}
+		else if ( v_PR == "N" )
+		{
+			v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
+			v_FromXY[1] = Number(v_FromXY[1]) + 0;
+			
+			v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
+			v_ToXY[1] = Number(v_ToXY[1]) + N.height;
+		}
+		else if ( v_PR == "S" )
+		{
+			v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
+			v_FromXY[1] = Number(v_FromXY[1]) + N.height;
+			
+			v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
+			v_ToXY[1] = Number(v_ToXY[1]) + 0;
+		}
+		else if ( v_PR == "EN" )
+		{
+			v_FromXY[0] = Number(v_FromXY[0]) + N.width;
+			v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+			
+			v_ToXY[0] = Number(v_ToXY[0]) + 0;
+			v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+		}
+		else if ( v_PR == "ES" )
+		{
+			v_FromXY[0] = Number(v_FromXY[0]) + N.width;
+			v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+			
+			v_ToXY[0] = Number(v_ToXY[0]) + 0;
+			v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+		}
+		else if ( v_PR == "WN" )
+		{
+			v_FromXY[0] = Number(v_FromXY[0]) + 0;
+			v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+			
+			v_ToXY[0] = Number(v_ToXY[0]) + N.width;
+			v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+		}
+		else if ( v_PR == "WS" )
+		{
+			v_FromXY[0] = Number(v_FromXY[0]) + 0;
+			v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+			
+			v_ToXY[0] = Number(v_ToXY[0]) + N.width;
+			v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+		}
+		
+		return v_FromXY[0] + "," + v_FromXY[1] + " " + v_ToXY[0] + "," + v_ToXY[1]; 
+	}
 	
 	
 	
@@ -231,7 +364,7 @@
 	})
 	.attr("transform", function(d ,i) 
 	{
-	    return "translate(100," + (N.height * i * 3 + N.height) + ")";
+	    return "translate(" + (N.width * i * 2 + N.width) + "," + (N.height * i * 3 + N.height) + ")";
 	})
 	.attr("filter" ,"url(#shadow)")
 	.call(v_Drag);
@@ -255,11 +388,10 @@
 	{
 		var v_FromG  = d3.select("#" + d.from);
 		var v_ToG    = d3.select("#" + d.to);
-		var v_FromXY = getGXY(v_FromG);
-		var v_ToXY   = getGXY(v_ToG);
 		
-		return v_FromXY[0] + "," + v_FromXY[1] + " " + v_ToXY[0] + "," + v_ToXY[1];
+		return calcRouteXY(v_FromG ,v_ToG);
 	})
+	.attr("marker-end" ,"url(#arrowTo)")
 	.attr("stroke-width" ,1)
 	.attr("stroke" ,function(d ,i)
 	{
