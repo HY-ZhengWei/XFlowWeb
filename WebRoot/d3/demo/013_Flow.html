@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>工作流</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	
+	<script type="text/javascript" charset="utf-8" src="../../d3/d3.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="../../jquery/jquery.min.js" ></script>
+	<script type="text/javascript" charset="utf-8" src="../../jquery/jquery-ui.min.js"></script>
+	
+	<link rel="stylesheet" href="../../jquery/jquery-ui.min.css" />
+	
+	<style type="text/css">
+	body {
+	  font-family: 'Open Sans', sans-serif;
+	  font-size: 12px;
+	  font-weight: 400;
+	  background-color: #fff;
+	}
+	</style>
+	
+</head>
+<body>
+
+	<svg width="100%" height="900" version="1.1" xmlns="http://www.w3.org/2000/svg">
+	
+		<defs>
+		
+			<filter id="shadow">
+		        <feGaussianBlur in="SourceAlpha" stdDeviation="1" result="blur"></feGaussianBlur>
+		        <feOffset in="blur" dx="1" dy="1" result="offset"></feOffset>
+		        <feMerge>
+		        <feMergeNode in="offset"></feMergeNode>
+		        <feMergeNode in="SourceGraphic"></feMergeNode>
+		        </feMerge>
+	        </filter>
+	        
+	        
+	        <marker id="arrowStart" 
+			                markerUnits="strokerWidth"
+			                markerWidth="12px"
+			                markerHeight="12px"
+			                viewBox="0 0 12 12"
+			                refX="6"
+			                refY="6"
+			                orient="auto">
+				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:#DE783B;" />
+			</marker>
+    		
+		</defs>
+	
+	</svg>
+	
+	<script type="text/javascript">
+	
+	var N         = {width:130 ,height:40 ,lineWidth:1 ,flagWidth:18 };
+	var Colors    = {routeColor:"#6AB975" ,routeRejectColor:"#FF4444"}; 
+	var v_SVG     = d3.select("body").select("svg");
+	var v_Datas   = [{id:"N1" ,name:"选型申请" ,backgroudColor:"white" ,flagColor:"#6AB975" ,lineColor:"black"}
+                    ,{id:"N2" ,name:"审批选型" ,backgroudColor:"white" ,flagColor:"#FF4444" ,lineColor:"black"}
+                    ,{id:"N3" ,name:"选型受理" ,backgroudColor:"white" ,flagColor:"#5687D1" ,lineColor:"black"}];
+
+	var v_Routes  = [{"id":"L1-2" ,"from":"N1" ,"to":"N2" ,"type":"转派"}
+	                ,{"id":"L1-3" ,"from":"N1" ,"to":"N3" ,"type":"转派"}
+	                ,{"id":"L2-3" ,"from":"N2" ,"to":"N3" ,"type":"驳回"}];
+
+	var v_RouteMap  = makeRouteMap (v_Routes);
+	var v_RouteRefs = makeRouteRefs(v_Routes);
+	var v_XOffset = 0;
+	var v_YOffset = 0;
+	var v_Drag    = d3.drag()                                // 创建一个拖曳行为
+    .on("start" ,function()
+    {
+		var v_XY = getGXY(d3.select(this));
+		v_XOffset = d3.event.x - v_XY[0];
+		v_YOffset = d3.event.y - v_XY[1];
+    })
+    .on("drag" ,function(d)
+    {
+    	var v_G        = d3.select(this);
+    	var v_NodeID   = v_G.attr("id");
+    	var v_RouteIDs = v_RouteRefs[v_NodeID];
+    	
+    	v_G.attr("transform" ,"translate(" + (d3.event.x - v_XOffset) + "," + (d3.event.y - v_YOffset) + ")");
+    	
+    	for (var i=0; i<v_RouteIDs.length; i++)
+   		{
+    		var v_RouteData = v_RouteMap.get(v_RouteIDs[i]);
+    		var v_RounteObj = d3.select("#" + v_RouteData.id);
+    		var v_Points    = v_RounteObj.attr("points");
+    		var v_OldXY     = "";
+    		
+    		if ( v_RouteData.from == v_NodeID )
+   			{
+    			v_OldXY = v_Points.split(" ")[0];
+   			}
+    		else if ( v_RouteData.to == v_NodeID )
+   			{
+    			var v_TempArr = v_Points.split(" ");
+    			v_OldXY = v_TempArr[v_TempArr.length - 1];
+   			}
+    		
+    		v_Points = v_Points.replace(v_OldXY ,d3.event.x + "," + d3.event.y);
+    		v_RounteObj.attr("points" ,v_Points);
+   		}
+    });
+	
+	
+	
+	/**
+	 * 绘制流程节点
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2018-09-09
+	 * @version     v1.0
+	 */
+	function drawNode(i_G ,i_Data)
+	{
+		var v_NodeRect = i_G.append("rect")
+		.attr("width"        ,N.width)
+		.attr("height"       ,N.height)
+		.attr("stroke-width" ,N.lineWidth)
+		.attr("id"           ,"NGR" + i_Data.id)
+		.attr("stroke"       ,i_Data.lineColor)
+		.attr("fill"         ,i_Data.backgroudColor);
+		
+		var v_NodeFlag = i_G.append("polygon")
+		.attr("stroke-width" ,N.lineWidth)
+		.attr("id"           ,"NGF" + i_Data.id)
+		.attr("stroke"       ,i_Data.lineColor)
+		.attr("fill"         ,i_Data.flagColor)
+		.attr("points" ,function()
+		{
+			var v_StartX = 7;
+			return v_StartX + ",0 "
+			     + (v_StartX + N.flagWidth) + ",0 "
+			     + (v_StartX + N.flagWidth) + "," + N.height + " "
+			     + (v_StartX + N.flagWidth / 2) + "," + (N.height - N.flagWidth / 2) + " "
+			     + v_StartX + "," + N.height;
+		});
+		
+		var v_NodeName = i_G.append("text")
+		.attr("id"          ,"NGT" + i_Data.id)
+		.attr("x"           ,N.width  / 2)
+		.attr("y"           ,N.height / 2)
+		.attr("dy"          ,"0.35em")
+		.attr("text-anchor" ,"middle")
+		.attr("font-weight" ,"bold")
+		.attr("fill"        ,"black")
+		.text(i_Data.name);
+	}
+	
+	
+	
+	/**
+	 * 用路由数组生成路由Map，可通过路由ID定位路由信息。
+	 *    Map.key   为路由ID
+	 *    Map.value 为路由信息
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2018-09-09
+	 * @version     v1.0
+	 */
+	function makeRouteMap(i_Routes)
+	{
+		var v_Map = d3.map();
+		
+		for (var i=0; i<i_Routes.length; i++)
+		{
+			v_Map.set(i_Routes[i].id ,i_Routes[i]);
+		}
+		
+		return v_Map;
+	}
+	
+	
+	
+	/**
+	 * 用路由数组生成路由节点关系，可通过节点ID定位到所有的路由ID。
+	 *    
+	 *    返回结构为：Object.节点ID1.["路由ID1-2" ,"路由ID1-3"]
+	 *                    .节点ID2.["路由ID1-2" ,"路由ID2-3"]
+	 *                    .节点ID3.["路由ID1-3" ,"路由ID2-3"]
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2018-09-09
+	 * @version     v1.0
+	 */
+	function makeRouteRefs(i_Routes)
+	{
+		var v_Refs = new Object();
+		
+		for (var i=0; i<i_Routes.length; i++)
+		{
+			if ( v_Refs[i_Routes[i].from] == null )
+			{
+				v_Refs[i_Routes[i].from] = new Array();
+			}
+			if ( v_Refs[i_Routes[i].to] == null )
+			{
+				v_Refs[i_Routes[i].to] = new Array();
+			}
+			
+			v_Refs[i_Routes[i].from].push(i_Routes[i].id);
+			v_Refs[i_Routes[i].to  ].push(i_Routes[i].id);
+		}
+		
+		return v_Refs;
+	}
+	
+	
+	
+	/**
+	 * 获取G元素的XY坐标位置
+	 */
+	function getGXY(i_G)
+	{
+		return i_G.attr("transform").replace("translate(" ,"").replace(")" ,"").split(",");
+	}
+	
+	
+	
+	
+	v_SVG.selectAll("g").data(v_Datas)
+	.enter()
+	.append("g")
+	.attr("id" ,function(d ,i)
+	{
+		return d.id; 
+	})
+	.attr("transform", function(d ,i) 
+	{
+	    return "translate(100," + (N.height * i * 3 + N.height) + ")";
+	})
+	.attr("filter" ,"url(#shadow)")
+	.call(v_Drag);
+	
+	v_SVG.selectAll("g").data(v_Datas)
+	.each(function(d ,i)
+	{
+		drawNode(d3.select(this) ,d);
+	});
+	
+	
+	
+	v_SVG.selectAll("polyline").data(v_Routes)
+	.enter()
+	.append("polyline")
+	.attr("id" ,function(d ,i)
+	{
+		return d.id;	
+	})
+	.attr("points" ,function(d ,i)
+	{
+		var v_FromG  = d3.select("#" + d.from);
+		var v_ToG    = d3.select("#" + d.to);
+		var v_FromXY = getGXY(v_FromG);
+		var v_ToXY   = getGXY(v_ToG);
+		
+		return v_FromXY[0] + "," + v_FromXY[1] + " " + v_ToXY[0] + "," + v_ToXY[1];
+	})
+	.attr("stroke-width" ,1)
+	.attr("stroke" ,function(d ,i)
+	{
+		if ( d.type == "驳回" )
+		{
+			return Colors.routeRejectColor;
+		}
+		else
+		{
+			return Colors.routeColor;
+		}
+	});
+	
+	</script>
+	
+</body>
+</html>
