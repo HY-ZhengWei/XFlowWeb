@@ -228,49 +228,83 @@
 	 * @param i_X2  B元素的X坐标
 	 * @param i_Y2  B元素的Y坐标
 	 */
-	function calcPositionRelation(i_X1 ,i_Y1 ,i_X2 ,i_Y2)
+	function calcPositionRelation(i_X1 ,i_Y1 ,i_X2 ,i_Y2 ,i_AWidth ,i_AHeight ,i_BWidth ,i_BHeight)
 	{
 		/* AB两元素，垂直上下关系，A在上，B在下 */
 		if ( i_X1 == i_X2 && i_Y1 < i_Y2 )
 		{
-			console.log(i_Y1 + " S " +  i_Y2);
-			return "S";
+			return ["S" ,""];
 		}
 		/* AB两元素，垂直上下关系，A在下，B在上 */
 		else if ( i_X1 == i_X2 && i_Y1 > i_Y2 )
 		{
-			console.log(i_Y1 + " N " +  i_Y2);
-			return "N";
+			return ["N" ,""];
 		}
 		/* AB两元素，水平左右关系，A在左，B在右 */
 		else if ( i_X1 < i_X2 && i_Y1 == i_Y2 )
 		{
-			return "E";
+			return ["E" ,""];
 		}
 		/* AB两元素，水平左右关系，A在右，B在左 */
 		else if ( i_X1 > i_X2 && i_Y1 == i_Y2 )
 		{
-			return "W";
+			return ["W" ,""];
 		}
 		/* AB两元素，B在A的左下方 */
 		else if ( i_X1 > i_X2 && i_Y1 < i_Y2 )
 		{
-			return "WS";
+			if ( i_X1 > i_X2 + i_BWidth )
+			{
+				/* B全部在A左边 */
+				return ["WS" ,"W"];
+			}
+			else
+			{
+				/* B部分在A左边 */
+				return ["WS" ,"S"];
+			}
 		}
 		/* AB两元素，B在A的右下方 */
 		else if ( i_X1 < i_X2 && i_Y1 < i_Y2 )
 		{
-			return "ES";
+			/* B全部在A右边 */
+			if ( i_X1 + i_AWidth < i_X2 )
+			{
+				return ["ES" ,"E"];
+			}
+			/* B部分在A右边 */
+			else
+			{
+				return ["ES" ,"S"];
+			}
 		}
 		/* AB两元素，B在A的左上方 */
 		else if ( i_X1 > i_X2 && i_Y1 > i_Y2 )
 		{
-			return "WN";
+			if ( i_X1 > i_X2 + i_BWidth )
+			{
+				/* B全部在A左边 */
+				return ["WN" ,"W"];
+			}
+			else
+			{
+				/* B部分在A左边 */
+				return ["WN" ,"N"];
+			}
 		}
 		/* AB两元素，B在A的右上方 */
 		else if ( i_X1 < i_X2 && i_Y1 > i_Y2 )
 		{
-			return "EN";
+			/* B全部在A右边 */
+			if ( i_X1 + i_AWidth < i_X2 )
+			{
+				return ["EN" ,"E"];
+			}
+			/* B部分在A右边 */
+			else
+			{
+				return ["EN" ,"N"];
+			}
 		}
 	}
 	
@@ -280,12 +314,16 @@
 	{
 		var v_FromXY = getGXY(i_FromG);
 		var v_ToXY   = getGXY(i_ToG);
-		var v_PR     = calcPositionRelation(Number(v_FromXY[0]) 
-				                           ,Number(v_FromXY[1]) 
-				                           ,Number(v_ToXY[0]) 
-				                           ,Number(v_ToXY[1]));
+		var v_PR     = calcPositionRelation(Number(v_FromXY[0])
+				                           ,Number(v_FromXY[1])
+				                           ,Number(v_ToXY[0])
+				                           ,Number(v_ToXY[1])
+				                           ,N.width
+				                           ,N.height
+				                           ,N.width
+				                           ,N.height);
 		
-		if ( v_PR == "E" )
+		if ( v_PR[0] == "E" )
 		{
 			v_FromXY[0] = Number(v_FromXY[0]) + N.width;
 			v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
@@ -293,7 +331,7 @@
 			v_ToXY[0] = Number(v_ToXY[0]) + 0;
 			v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
  		}
-		else if ( v_PR == "W" )
+		else if ( v_PR[0] == "W" )
 		{
 			v_FromXY[0] = Number(v_FromXY[0]) + 0;
 			v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
@@ -301,7 +339,7 @@
 			v_ToXY[0] = Number(v_ToXY[0]) + N.width;
 			v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
 		}
-		else if ( v_PR == "N" )
+		else if ( v_PR[0] == "N" )
 		{
 			v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
 			v_FromXY[1] = Number(v_FromXY[1]) + 0;
@@ -309,7 +347,7 @@
 			v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
 			v_ToXY[1] = Number(v_ToXY[1]) + N.height;
 		}
-		else if ( v_PR == "S" )
+		else if ( v_PR[0] == "S" )
 		{
 			v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
 			v_FromXY[1] = Number(v_FromXY[1]) + N.height;
@@ -317,37 +355,81 @@
 			v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
 			v_ToXY[1] = Number(v_ToXY[1]) + 0;
 		}
-		else if ( v_PR == "EN" )
+		else if ( v_PR[0] == "EN" )
 		{
-			v_FromXY[0] = Number(v_FromXY[0]) + N.width;
-			v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
-			
-			v_ToXY[0] = Number(v_ToXY[0]) + 0;
-			v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+			if ( v_PR[1] == "E" )
+			{
+				v_FromXY[0] = Number(v_FromXY[0]) + N.width;
+				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+				
+				v_ToXY[0] = Number(v_ToXY[0]) + 0;
+				v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+			}
+			else if ( v_PR[1] == "N" )
+			{
+				v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
+				v_FromXY[1] = Number(v_FromXY[1]) + 0;
+				
+				v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
+				v_ToXY[1] = Number(v_ToXY[1]) + N.height;
+			}
 		}
-		else if ( v_PR == "ES" )
+		else if ( v_PR[0] == "ES" )
 		{
-			v_FromXY[0] = Number(v_FromXY[0]) + N.width;
-			v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
-			
-			v_ToXY[0] = Number(v_ToXY[0]) + 0;
-			v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+			if ( v_PR[1] == "E" )
+			{
+				v_FromXY[0] = Number(v_FromXY[0]) + N.width;
+				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+				
+				v_ToXY[0] = Number(v_ToXY[0]) + 0;
+				v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+			}
+			else if ( v_PR[1] == "S" )
+			{
+				v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
+				v_FromXY[1] = Number(v_FromXY[1]) + N.height;
+				
+				v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
+				v_ToXY[1] = Number(v_ToXY[1]) + 0;
+			}
 		}
-		else if ( v_PR == "WN" )
+		else if ( v_PR[0] == "WN" )
 		{
-			v_FromXY[0] = Number(v_FromXY[0]) + 0;
-			v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
-			
-			v_ToXY[0] = Number(v_ToXY[0]) + N.width;
-			v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+			if ( v_PR[1] == "W" )
+			{
+				v_FromXY[0] = Number(v_FromXY[0]) + 0;
+				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+				
+				v_ToXY[0] = Number(v_ToXY[0]) + N.width;
+				v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+			}
+			else if ( v_PR[1] == "N" )
+			{
+				v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
+				v_FromXY[1] = Number(v_FromXY[1]) + 0;
+				
+				v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
+				v_ToXY[1] = Number(v_ToXY[1]) + N.height;
+			}
 		}
-		else if ( v_PR == "WS" )
+		else if ( v_PR[0] == "WS" )
 		{
-			v_FromXY[0] = Number(v_FromXY[0]) + 0;
-			v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
-			
-			v_ToXY[0] = Number(v_ToXY[0]) + N.width;
-			v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+			if ( v_PR[1] == "W" )
+			{
+				v_FromXY[0] = Number(v_FromXY[0]) + 0;
+				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+				
+				v_ToXY[0] = Number(v_ToXY[0]) + N.width;
+				v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+			}
+			else if ( v_PR[1] == "S" )
+			{
+				v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
+				v_FromXY[1] = Number(v_FromXY[1]) + N.height;
+				
+				v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
+				v_ToXY[1] = Number(v_ToXY[1]) + 0;
+			}
 		}
 		
 		return v_FromXY[0] + "," + v_FromXY[1] + " " + v_ToXY[0] + "," + v_ToXY[1]; 
