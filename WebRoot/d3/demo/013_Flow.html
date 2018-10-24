@@ -101,7 +101,7 @@
 	var v_RouteRefs = makeRouteRefs(v_Routes);
 	var v_XOffset = 0;
 	var v_YOffset = 0;
-	var v_Drag    = d3.drag()                                // 创建一个拖曳行为
+	var v_Drag    = d3.drag()
     .on("start" ,function()
     {
 		var v_XY = getGXY(d3.select(this));
@@ -125,7 +125,84 @@
     		
     		v_RounteObj.attr("points" ,calcRouteXY(v_FromG ,v_ToG));
    		}
+    })
+    .on("end" ,function(d)
+	{
+    	hideHVLine();
     });
+	
+	/* 水平标线 */
+	var v_HLine = v_SVG.append("line")
+	.attr("stroke" ,"gray")
+	.attr("stroke-width" ,"1")
+	.attr("stroke-dasharray" ,"5,2")
+	.attr("x1" ,0)
+	.attr("y1" ,-99999)
+	.attr("x2" ,v_SVG.attr("width"))
+	.attr("y2" ,-99999);
+	
+	/* 垂直标线 */
+	var v_VLine = v_SVG.append("line")
+	.attr("stroke" ,"gray")
+	.attr("stroke-width" ,"1")
+	.attr("stroke-dasharray" ,"5,2")
+	.attr("x1" ,-99999)
+	.attr("y1" ,0)
+	.attr("x2" ,-99999)
+	.attr("y2" ,v_SVG.attr("height"));
+	
+	
+	
+	/**
+	 * 移动水平标线
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2018-10-24
+	 * @version     v1.0
+	 *
+	 * @param i_HtoY  水平标记的Y坐标值
+	 */
+	function moveHLine(i_HtoY)
+	{
+		v_HLine
+		.attr("y1" ,i_HtoY)
+		.attr("y2" ,i_HtoY);
+	}
+	
+	
+	
+	/**
+	 * 移动垂直标线
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2018-10-24
+	 * @version     v1.0
+	 *
+	 * @param i_VtoX  垂直标记的X坐标值
+	 */
+	function moveVLine(i_VtoX)
+	{
+		v_VLine
+		.attr("x1" ,i_VtoX)
+		.attr("x2" ,i_VtoX);
+	}
+	
+	
+	
+	/**
+	 * 隐藏水平标线及垂直标线
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2018-10-24
+	 * @version     v1.0
+	 *
+	 * @param i_VtoX  垂直标记的X坐标值
+	 */
+	function hideHVLine()
+	{
+		moveHLine(-99999);
+		moveVLine(-99999);
+	}
 	
 	
 	
@@ -350,6 +427,8 @@
 			
 			v_ToXY[0] = Number(v_ToXY[0]) + 0;
 			v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+			
+			moveHLine(v_FromXY[1]);
  		}
 		else if ( v_PR.position == "W" )
 		{
@@ -358,6 +437,8 @@
 			
 			v_ToXY[0] = Number(v_ToXY[0]) + N.width;
 			v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+			
+			moveHLine(v_FromXY[1]);
 		}
 		else if ( v_PR.position == "N" )
 		{
@@ -366,6 +447,8 @@
 			
 			v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
 			v_ToXY[1] = Number(v_ToXY[1]) + N.height;
+			
+			moveVLine(v_FromXY[0]);
 		}
 		else if ( v_PR.position == "S" )
 		{
@@ -374,9 +457,13 @@
 			
 			v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
 			v_ToXY[1] = Number(v_ToXY[1]) + 0;
+			
+			moveVLine(v_FromXY[0]);
 		}
 		else if ( v_PR.position == "EN" )
 		{
+			hideHVLine();
+			
 			/* B全部在A的右边。B全部在A的上边 */
 			if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
 			{
@@ -409,6 +496,8 @@
 		}
 		else if ( v_PR.position == "ES" )
 		{
+			hideHVLine();
+			
 			/* B全部在A的右边。B全部在A的下边 */
 			if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
 			{
@@ -441,6 +530,8 @@
 		}
 		else if ( v_PR.position == "WN" )
 		{
+			hideHVLine();
+			
 			/* B全部在A的左边。B全部在A的上边 */
 			if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
 			{
@@ -473,6 +564,8 @@
 		}
 		else if ( v_PR.position == "WS" )
 		{
+			hideHVLine();
+			
 			/* B全部在A的左边。B全部在A的下边 */
 			if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
 			{
@@ -592,10 +685,13 @@
 		}
 		else
 		{
-			console.log(d.type + v_Flag);
 			return "url(#arrowTo" + v_Flag + ")";
 		}
 	});
+	
+	
+	
+	hideHVLine();
 	
 	</script>
 	
