@@ -99,9 +99,13 @@
 
 	var v_RouteMap  = makeRouteMap (v_Routes);
 	var v_RouteRefs = makeRouteRefs(v_Routes);
-	var v_XOffset = 0;
-	var v_YOffset = 0;
-	var v_Drag    = d3.drag()
+	var v_XOffset   = 0;
+	var v_YOffset   = 0;
+	var v_HLineTMax = 0;       /* 水平标线（上）离移动节点最近的值 */
+	var v_HLineBMin = 99999;   /* 水平标线（下）离移动节点最近的值 */
+	var v_VLineLMax = 0;       /* 垂直标线（左）离移动节点最近的值 */
+	var v_VLineRMin = 99999;   /* 垂直标线（右）离移动节点最近的值 */
+	var v_Drag      = d3.drag()
     .on("start" ,function()
     {
 		var v_XY = getGXY(d3.select(this));
@@ -115,6 +119,10 @@
     	var v_RouteIDs = v_RouteRefs[v_NodeID];
     	var v_X        = d3.event.x - v_XOffset;
     	var v_Y        = d3.event.y - v_YOffset;
+    	v_HLineTMax    = 0;
+    	v_HLineBMin    = 99999;
+    	v_VLineLMax    = 0;
+    	v_VLineRMin    = 99999;
     	
     	v_G.attr("transform" ,"translate(" + v_X + "," + v_Y + ")");
     	
@@ -653,6 +661,7 @@
 			var v_XDiff      = Math.abs(Number(v_FromXY[0]) - Number(v_ToXY[0]));
 			var v_YDiff      = Math.abs(Number(v_FromXY[1]) - Number(v_ToXY[1]));
 			var v_IsMoveFrom = i_MoveG.attr("id") == i_FromG.attr("id");
+			var v_TempValue  = 0;
 			
 			if ( v_XDiff % (N.width / 2) == 0 )
 			{
@@ -660,24 +669,44 @@
 				
 				if ( v_IsMoveFrom )
 				{
+					v_TempValue = Number(v_ToXY[0]) + (N.width / 2);
+					
 					if ( Number(v_ToXY[0]) < Number(v_MoveXY[0]) )
 					{
-						moveVLineL(Number(v_ToXY[0]) + (N.width / 2));
+						if ( v_VLineLMax < v_TempValue )
+						{
+							moveVLineL(v_TempValue);
+							v_VLineLMax = v_TempValue;
+						}
 					}
 					else
 					{
-						moveVLineR(Number(v_ToXY[0]) + (N.width / 2));
+						if ( v_VLineRMin > v_TempValue )
+						{
+							moveVLineR(v_TempValue);
+							v_VLineRMin = v_TempValue;
+						}
 					}
 				}
 				else
 				{
+					v_TempValue = Number(v_FromXY[0]) + (N.width / 2);
+					
 					if ( Number(v_FromXY[0]) < Number(v_MoveXY[0]) )
 					{
-						moveVLineL(Number(v_FromXY[0]) + (N.width / 2));
+						if ( v_VLineLMax < v_TempValue )
+						{
+							moveVLineL(v_TempValue);
+							v_VLineLMax = v_TempValue;
+						}
 					}
 					else
 					{
-						moveVLineR(Number(v_FromXY[0]) + (N.width / 2));
+						if ( v_VLineRMin > v_TempValue )
+						{
+							moveVLineR(v_TempValue);
+							v_VLineRMin = v_TempValue;
+						}
 					}
 				}
 			}
@@ -688,24 +717,44 @@
 				
 				if ( v_IsMoveFrom )
 				{
+					v_TempValue = Number(v_ToXY[1]) + (N.height / 2);
+					
 					if ( Number(v_ToXY[1]) < Number(v_MoveXY[1]) )
 					{
-						moveHLineT(Number(v_ToXY[1]) + (N.height / 2));
+						if ( v_HLineTMax < v_TempValue )
+						{
+							moveHLineT(v_TempValue);
+							v_HLineTMax = v_TempValue;
+						}
 					}
 					else
 					{
-						moveHLineB(Number(v_ToXY[1]) + (N.height / 2));
+						if ( v_HLineBMin > v_TempValue )
+						{
+							moveHLineB(v_TempValue);
+							v_HLineBMin = v_TempValue;
+						}
 					}
 				}
 				else
 				{
+					v_TempValue = Number(v_FromXY[1]) + (N.height / 2);
+					
 					if ( Number(v_FromXY[1]) < Number(v_MoveXY[1]) )
 					{
-						moveHLineT(Number(v_FromXY[1]) + (N.height / 2));
+						if ( v_HLineTMax < v_TempValue )
+						{
+							moveHLineT(v_TempValue);
+							v_HLineTMax = v_TempValue;
+						}
 					}
 					else
 					{
-						moveHLineB(Number(v_FromXY[1]) + (N.height / 2));
+						if ( v_HLineBMin > v_TempValue )
+						{
+							moveHLineB(v_TempValue);
+							v_HLineBMin = v_TempValue;
+						}
 					}
 				}
 			}
