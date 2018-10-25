@@ -128,14 +128,17 @@
     		v_RounteObj.attr("points" ,calcRouteXY(v_FromG ,v_ToG ,v_G));
    		}
     	
-    	/* 计算节点的中心点 */
+    	/* 计算节点的中心点，计算标线状态，计算标线交叉点磁吸效果 */
+    	var v_VtoX    = v_VLine.attr("x1");
+    	var v_HtoY    = v_HLine.attr("y1");
+    	var v_ChangeX = v_X;
+    	var v_ChangeY = v_Y;
+    	var v_IsChage = false;
+    	
     	v_X = v_X + (N.width / 2);
     	v_Y = v_Y + (N.height / 2);
     	
-    	var v_VtoX = v_VLine.attr("x1");
-    	var v_HtoY = v_HLine.attr("y1");
-    	
-    	if ( Math.abs(v_VtoX - v_X) >= 4 )
+    	if ( Math.abs(v_VtoX - v_X) > 5 )
    		{
    			hideVLine();
    		}
@@ -147,12 +150,11 @@
    		}
     	else
    		{
-    		v_VLine .attr("stroke" ,"gray");
-    		v_VLineL.attr("stroke" ,"gray");
-    		v_VLineR.attr("stroke" ,"gray");
+    		v_ChangeX = v_VtoX - (N.width / 2);
+    		v_IsChage = true;
    		}
     	
-    	if ( Math.abs(v_HtoY - v_Y) >= 4 )
+    	if ( Math.abs(v_HtoY - v_Y) > 5 )
    		{
    			hideHLine();
    		}
@@ -164,9 +166,23 @@
    		}
     	else
    		{
-    		v_HLine .attr("stroke" ,"gray");
-    		v_HLineT.attr("stroke" ,"gray");
-    		v_HLineB.attr("stroke" ,"gray");
+    		v_ChangeY = v_HtoY - (N.height / 2);
+    		v_IsChage = true;
+   		}
+    	
+    	if ( v_IsChage )
+   		{
+    		v_G.attr("transform" ,"translate(" + v_ChangeX + "," + v_ChangeY + ")");
+    		
+    		for (var i=0; i<v_RouteIDs.length; i++)
+       		{
+        		var v_RouteData = v_RouteMap.get(v_RouteIDs[i]);
+        		var v_RounteObj = d3.select("#" + v_RouteData.id);
+        		var v_FromG     = d3.select("#" + v_RouteData.from);
+        		var v_ToG       = d3.select("#" + v_RouteData.to);
+        		
+        		v_RounteObj.attr("points" ,calcRouteXY(v_FromG ,v_ToG ,v_G));
+       		}
    		}
     })
     .on("end" ,function(d)
@@ -655,7 +671,7 @@
 				}
 				else
 				{
-					if ( Number(v_FromXY[0]) > Number(v_MoveXY[0]) )
+					if ( Number(v_FromXY[0]) < Number(v_MoveXY[0]) )
 					{
 						moveVLineL(Number(v_FromXY[0]) + (N.width / 2));
 					}
@@ -674,22 +690,22 @@
 				{
 					if ( Number(v_ToXY[1]) < Number(v_MoveXY[1]) )
 					{
-						moveHLineT(Number(v_FromXY[1]) + (N.height / 2));
-					}
-					else
-					{
-						moveHLineB(Number(v_FromXY[1]) + (N.height / 2));
-					}
-				}
-				else
-				{
-					if ( Number(v_FromXY[1]) > Number(v_MoveXY[1]) )
-					{
 						moveHLineT(Number(v_ToXY[1]) + (N.height / 2));
 					}
 					else
 					{
 						moveHLineB(Number(v_ToXY[1]) + (N.height / 2));
+					}
+				}
+				else
+				{
+					if ( Number(v_FromXY[1]) < Number(v_MoveXY[1]) )
+					{
+						moveHLineT(Number(v_FromXY[1]) + (N.height / 2));
+					}
+					else
+					{
+						moveHLineB(Number(v_FromXY[1]) + (N.height / 2));
 					}
 				}
 			}
