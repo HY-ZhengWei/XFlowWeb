@@ -125,7 +125,7 @@
     		var v_FromG     = d3.select("#" + v_RouteData.from);
     		var v_ToG       = d3.select("#" + v_RouteData.to);
     		
-    		v_RounteObj.attr("points" ,calcRouteXY(v_FromG ,v_ToG));
+    		v_RounteObj.attr("points" ,calcRouteXY(v_FromG ,v_ToG ,v_G));
    		}
     	
     	/* 计算节点的中心点 */
@@ -135,13 +135,38 @@
     	var v_VtoX = v_VLine.attr("x1");
     	var v_HtoY = v_HLine.attr("y1");
     	
-    	if ( Math.abs(v_VtoX - v_X) > 5 )
+    	if ( Math.abs(v_VtoX - v_X) >= 4 )
    		{
    			hideVLine();
    		}
-    	if ( Math.abs(v_HtoY - v_Y) > 5 )
+    	else if ( v_VtoX - v_X == 0 )
+   		{
+   			v_VLine .attr("stroke" ,"#0099CC");
+   			v_VLineL.attr("stroke" ,"#0099CC");
+   			v_VLineR.attr("stroke" ,"#0099CC");
+   		}
+    	else
+   		{
+    		v_VLine .attr("stroke" ,"gray");
+    		v_VLineL.attr("stroke" ,"gray");
+    		v_VLineR.attr("stroke" ,"gray");
+   		}
+    	
+    	if ( Math.abs(v_HtoY - v_Y) >= 4 )
    		{
    			hideHLine();
+   		}
+    	else if ( v_HtoY - v_Y == 0 )
+   		{
+   			v_HLine .attr("stroke" ,"#0099CC");
+   			v_HLineT.attr("stroke" ,"#0099CC");
+   			v_HLineB.attr("stroke" ,"#0099CC");
+   		}
+    	else
+   		{
+    		v_HLine .attr("stroke" ,"gray");
+    		v_HLineT.attr("stroke" ,"gray");
+    		v_HLineB.attr("stroke" ,"gray");
    		}
     })
     .on("end" ,function(d)
@@ -152,7 +177,27 @@
 	/* 水平标线 */
 	var v_HLine = v_SVG.append("line")
 	.attr("stroke" ,"gray")
-	.attr("stroke-width" ,"1")
+	.attr("stroke-width" ,"3")
+	.attr("stroke-dasharray" ,"5,2")
+	.attr("x1" ,0)
+	.attr("y1" ,-99999)
+	.attr("x2" ,v_SVG.attr("width"))
+	.attr("y2" ,-99999);
+	
+	/* 水平标线(上)，与水平标线成对出现，水平标线(上)不独立出现 */
+	var v_HLineT = v_SVG.append("line")
+	.attr("stroke" ,"gray")
+	.attr("stroke-width" ,"3")
+	.attr("stroke-dasharray" ,"5,2")
+	.attr("x1" ,0)
+	.attr("y1" ,-99999)
+	.attr("x2" ,v_SVG.attr("width"))
+	.attr("y2" ,-99999);
+	
+	/* 水平标线(下)，与水平标线成对出现，水平标线(下)不独立出现 */
+	var v_HLineB = v_SVG.append("line")
+	.attr("stroke" ,"gray")
+	.attr("stroke-width" ,"3")
 	.attr("stroke-dasharray" ,"5,2")
 	.attr("x1" ,0)
 	.attr("y1" ,-99999)
@@ -162,7 +207,27 @@
 	/* 垂直标线 */
 	var v_VLine = v_SVG.append("line")
 	.attr("stroke" ,"gray")
-	.attr("stroke-width" ,"1")
+	.attr("stroke-width" ,"3")
+	.attr("stroke-dasharray" ,"5,2")
+	.attr("x1" ,-99999)
+	.attr("y1" ,0)
+	.attr("x2" ,-99999)
+	.attr("y2" ,v_SVG.attr("height"));
+	
+	/* 垂直标线(左)，与垂直标线成对出现，垂直标线(左)不独立出现 */
+	var v_VLineL = v_SVG.append("line")
+	.attr("stroke" ,"gray")
+	.attr("stroke-width" ,"3")
+	.attr("stroke-dasharray" ,"5,2")
+	.attr("x1" ,-99999)
+	.attr("y1" ,0)
+	.attr("x2" ,-99999)
+	.attr("y2" ,v_SVG.attr("height"));
+	
+	/* 垂直标线(右)，与垂直标线成对出现，垂直标线(右)不独立出现 */
+	var v_VLineR = v_SVG.append("line")
+	.attr("stroke" ,"gray")
+	.attr("stroke-width" ,"3")
 	.attr("stroke-dasharray" ,"5,2")
 	.attr("x1" ,-99999)
 	.attr("y1" ,0)
@@ -190,6 +255,42 @@
 	
 	
 	/**
+	 * 移动水平标线(上)
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2018-10-25
+	 * @version     v1.0
+	 *
+	 * @param i_HtoY  水平标记的Y坐标值
+	 */
+	function moveHLineT(i_HtoY)
+	{
+		v_HLineT
+		.attr("y1" ,i_HtoY)
+		.attr("y2" ,i_HtoY);
+	}
+	
+	
+	
+	/**
+	 * 移动水平标线(下)
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2018-10-25
+	 * @version     v1.0
+	 *
+	 * @param i_HtoY  水平标记的Y坐标值
+	 */
+	function moveHLineB(i_HtoY)
+	{
+		v_HLineB
+		.attr("y1" ,i_HtoY)
+		.attr("y2" ,i_HtoY);
+	}
+	
+	
+	
+	/**
 	 * 移动垂直标线
 	 *
 	 * @author      ZhengWei(HY)
@@ -201,6 +302,42 @@
 	function moveVLine(i_VtoX)
 	{
 		v_VLine
+		.attr("x1" ,i_VtoX)
+		.attr("x2" ,i_VtoX);
+	}
+	
+	
+	
+	/**
+	 * 移动垂直标线(左)
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2018-10-25
+	 * @version     v1.0
+	 *
+	 * @param i_VtoX  垂直标记的X坐标值
+	 */
+	function moveVLineL(i_VtoX)
+	{
+		v_VLineL
+		.attr("x1" ,i_VtoX)
+		.attr("x2" ,i_VtoX);
+	}
+	
+	
+	
+	/**
+	 * 移动垂直标线(右)
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2018-10-25
+	 * @version     v1.0
+	 *
+	 * @param i_VtoX  垂直标记的X坐标值
+	 */
+	function moveVLineR(i_VtoX)
+	{
+		v_VLineR
 		.attr("x1" ,i_VtoX)
 		.attr("x2" ,i_VtoX);
 	}
@@ -235,7 +372,13 @@
 	 */
 	function hideHLine()
 	{
-		moveHLine(-99999);
+		v_HLine .attr("stroke" ,"gray");
+		v_HLineT.attr("stroke" ,"gray");
+		v_HLineB.attr("stroke" ,"gray");
+		
+		moveHLine (-99999);
+		moveHLineT(-99999);
+		moveHLineB(-99999);
 	}
 	
 	
@@ -251,7 +394,13 @@
 	 */
 	function hideVLine()
 	{
-		moveVLine(-99999);
+		v_VLine .attr("stroke" ,"gray");
+		v_VLineL.attr("stroke" ,"gray");
+		v_VLineR.attr("stroke" ,"gray");
+		
+		moveVLine (-99999);
+		moveVLineL(-99999);
+		moveVLineR(-99999);
 	}
 	
 	
@@ -455,7 +604,18 @@
 	
 	
 	
-	function calcRouteXY(i_FromG ,i_ToG)
+	/**
+	 * 计算两元素间的路由坐标位置
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2018-10-23
+	 * @version     v1.0
+	 *
+	 * @param i_FromG  从哪来的元素节点
+	 * @param i_ToG    到哪去的元素节点
+	 * @param i_MoveG  现在移动的元素节点（可为空）
+	 */
+	function calcRouteXY(i_FromG ,i_ToG ,i_MoveG)
 	{
 		var v_FromXY = getGXY(i_FromG);
 		var v_ToXY   = getGXY(i_ToG);
@@ -469,6 +629,42 @@
 				                           ,N.height
 				                           ,N.width
 				                           ,N.height);
+		
+		/* 移动节点时，绘制的定位对齐标线 */
+		if ( i_MoveG != null )
+		{
+			var v_MoveXY = getGXY(i_MoveG);
+			var v_XDiff  = Math.abs(Number(v_FromXY[0]) - Number(v_ToXY[0]));
+			var v_YDiff  = Math.abs(Number(v_FromXY[1]) - Number(v_ToXY[1]));
+			
+			if ( v_XDiff % (N.width / 2) == 0 )
+			{
+				moveVLine(Number(v_FromXY[0]) + (N.width / 2));
+
+				if ( Number(v_FromXY[0]) < Number(v_MoveXY[0]) )
+				{
+					moveVLineL(Number(v_FromXY[0]) + (N.width / 2));
+				}
+				else
+				{
+					moveVLineR(Number(v_ToXY[0])   + (N.width / 2));
+				}
+			}
+			
+			if ( v_YDiff % N.height == 0 )
+			{
+				moveHLine(Number(v_FromXY[1]) + (N.height / 2));
+				
+				if ( Number(v_FromXY[1]) < Number(v_MoveXY[1]) )
+				{
+					moveHLineT(Number(v_FromXY[1]) + (N.height / 2));
+				}
+				else
+				{
+					moveHLineB(Number(v_ToXY[1])   + (N.height / 2));
+				}
+			}
+		}
 		
 		if ( v_PR.position == "E" )
 		{
@@ -685,7 +881,7 @@
 		var v_FromG  = d3.select("#" + d.from);
 		var v_ToG    = d3.select("#" + d.to);
 		
-		return calcRouteXY(v_FromG ,v_ToG);
+		return calcRouteXY(v_FromG ,v_ToG ,null);
 	})
 	.attr("fill" ,"#00000000")
 	.attr("stroke-width" ,3)
