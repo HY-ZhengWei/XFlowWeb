@@ -113,8 +113,10 @@
     	var v_G        = d3.select(this);
     	var v_NodeID   = v_G.attr("id");
     	var v_RouteIDs = v_RouteRefs[v_NodeID];
+    	var v_X        = d3.event.x - v_XOffset;
+    	var v_Y        = d3.event.y - v_YOffset;
     	
-    	v_G.attr("transform" ,"translate(" + (d3.event.x - v_XOffset) + "," + (d3.event.y - v_YOffset) + ")");
+    	v_G.attr("transform" ,"translate(" + v_X + "," + v_Y + ")");
     	
     	for (var i=0; i<v_RouteIDs.length; i++)
    		{
@@ -124,6 +126,22 @@
     		var v_ToG       = d3.select("#" + v_RouteData.to);
     		
     		v_RounteObj.attr("points" ,calcRouteXY(v_FromG ,v_ToG));
+   		}
+    	
+    	/* 计算节点的中心点 */
+    	v_X = v_X + (N.width / 2);
+    	v_Y = v_Y + (N.height / 2);
+    	
+    	var v_VtoX = v_VLine.attr("x1");
+    	var v_HtoY = v_HLine.attr("y1");
+    	
+    	if ( Math.abs(v_VtoX - v_X) > 5 )
+   		{
+   			hideVLine();
+   		}
+    	if ( Math.abs(v_HtoY - v_Y) > 5 )
+   		{
+   			hideHLine();
    		}
     })
     .on("end" ,function(d)
@@ -200,7 +218,39 @@
 	 */
 	function hideHVLine()
 	{
+		hideHLine();
+		hideVLine();
+	}
+	
+	
+	
+	/**
+	 * 隐藏水平标线
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2018-10-24
+	 * @version     v1.0
+	 *
+	 * @param i_VtoX  垂直标记的X坐标值
+	 */
+	function hideHLine()
+	{
 		moveHLine(-99999);
+	}
+	
+	
+	
+	/**
+	 * 隐藏垂直标线
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2018-10-24
+	 * @version     v1.0
+	 *
+	 * @param i_VtoX  垂直标记的X坐标值
+	 */
+	function hideVLine()
+	{
 		moveVLine(-99999);
 	}
 	
@@ -462,8 +512,6 @@
 		}
 		else if ( v_PR.position == "EN" )
 		{
-			hideHVLine();
-			
 			/* B全部在A的右边。B全部在A的上边 */
 			if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
 			{
@@ -496,8 +544,6 @@
 		}
 		else if ( v_PR.position == "ES" )
 		{
-			hideHVLine();
-			
 			/* B全部在A的右边。B全部在A的下边 */
 			if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
 			{
@@ -530,8 +576,6 @@
 		}
 		else if ( v_PR.position == "WN" )
 		{
-			hideHVLine();
-			
 			/* B全部在A的左边。B全部在A的上边 */
 			if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
 			{
@@ -564,8 +608,6 @@
 		}
 		else if ( v_PR.position == "WS" )
 		{
-			hideHVLine();
-			
 			/* B全部在A的左边。B全部在A的下边 */
 			if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
 			{
@@ -605,7 +647,6 @@
 		{
 			return v_FromXY[0] + "," + v_FromXY[1] + " " + v_MidAXY[0] + "," + v_MidAXY[1] + " " + v_ToXY[0] + "," + v_ToXY[1]; 
 		}
-		
 	}
 	
 	
