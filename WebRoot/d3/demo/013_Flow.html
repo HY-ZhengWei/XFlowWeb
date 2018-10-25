@@ -89,13 +89,26 @@
 	var N         = {width:130 ,height:40 ,lineWidth:1 ,flagWidth:18 };
 	var Colors    = {backgroudColor:"white" ,routeColor:"#6AB975" ,routeRejectColor:"#FF4444" ,markLineColor:"#0099CC"}; 
 	var v_SVG     = d3.select("body").select("svg");
-	var v_Datas   = [{id:"N1" ,name:"选型申请" ,backgroudColor:"white" ,flagColor:"#6AB975" ,lineColor:"black"}
-                    ,{id:"N2" ,name:"审批选型" ,backgroudColor:"white" ,flagColor:"#FF4444" ,lineColor:"black"}
-                    ,{id:"N3" ,name:"选型受理" ,backgroudColor:"white" ,flagColor:"#5687D1" ,lineColor:"black"}];
+	var v_Datas   = [{id:"N1" ,name:"选型申请"    ,backgroudColor:"white" ,flagColor:"#6AB975" ,lineColor:"black"}
+                    ,{id:"N2" ,name:"审批选型"    ,backgroudColor:"white" ,flagColor:"#FF4444" ,lineColor:"black"}
+                    ,{id:"N3" ,name:"选型受理"    ,backgroudColor:"white" ,flagColor:"#5687D1" ,lineColor:"black"}
+                    ,{id:"N4" ,name:"单人选型"    ,backgroudColor:"white" ,flagColor:"#669900" ,lineColor:"black"}
+                    ,{id:"N5" ,name:"选型评审"    ,backgroudColor:"white" ,flagColor:"#AA66CC" ,lineColor:"black"}
+                    ,{id:"N6" ,name:"选型分包"    ,backgroudColor:"white" ,flagColor:"#FF8800" ,lineColor:"black"}
+                    ,{id:"N7" ,name:"选型汇总"    ,backgroudColor:"white" ,flagColor:"yellow"  ,lineColor:"black"}
+                    ,{id:"N8" ,name:"选型结果确认" ,backgroudColor:"white" ,flagColor:"#33B5E5" ,lineColor:"black"}];
 
-	var v_Routes  = [{"id":"L1-2" ,"from":"N1" ,"to":"N2" ,"type":"转派"}
-	                ,{"id":"L1-3" ,"from":"N1" ,"to":"N3" ,"type":"转派"}
-	                ,{"id":"L2-3" ,"from":"N2" ,"to":"N3" ,"type":"驳回"}];
+	var v_Routes  = [{"id":"选型申请-审批选型" ,"from":"N1" ,"to":"N2" ,"type":"转派"}
+	                ,{"id":"审批选型-选型申请" ,"from":"N2" ,"to":"N1" ,"type":"驳回"}
+	                ,{"id":"审批选型-选型受理" ,"from":"N2" ,"to":"N3" ,"type":"转派"}
+	                ,{"id":"选型受理-单人选型" ,"from":"N3" ,"to":"N4" ,"type":"转派"}
+	                ,{"id":"选型受理-选型评审" ,"from":"N3" ,"to":"N5" ,"type":"转派"}
+	                ,{"id":"选型受理-选型分包" ,"from":"N3" ,"to":"N6" ,"type":"转派"}
+	                ,{"id":"选型评审-单人选型" ,"from":"N5" ,"to":"N4" ,"type":"转派"}
+	                ,{"id":"选型评审-选型分包" ,"from":"N5" ,"to":"N6" ,"type":"转派"}
+	                ,{"id":"选型分包-选型汇总" ,"from":"N6" ,"to":"N7" ,"type":"转派"}
+	                ,{"id":"选型汇总-结果确认" ,"from":"N7" ,"to":"N8" ,"type":"转派"}
+	                ,{"id":"单人选型-结果确认" ,"from":"N4" ,"to":"N8" ,"type":"转派"}];
 
 	var v_RouteMap  = makeRouteMap (v_Routes);
 	var v_RouteRefs = makeRouteRefs(v_Routes);
@@ -825,15 +838,15 @@
 			/* B全部在A的右边。B全部在A的下边 */
 			if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
 			{
-				v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
-				v_FromXY[1] = Number(v_FromXY[1]) + N.height;
+				v_FromXY[0] = Number(v_FromXY[0]) + N.width;
+				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 				
-				v_ToXY[0]   = Number(v_ToXY[0]) + 0;
-				v_ToXY[1]   = Number(v_ToXY[1]) + (N.height / 2);
+				v_ToXY[0]   = Number(v_ToXY[0]) + (N.width / 2);
+				v_ToXY[1]   = Number(v_ToXY[1]) + 0;
 				
 				v_MidAXY    = new Array();
-				v_MidAXY[0] = v_FromXY[0];
-				v_MidAXY[1] = v_ToXY[1];
+				v_MidAXY[0] = v_ToXY[0];
+				v_MidAXY[1] = v_FromXY[1];
 			}
 			else if ( v_PR.topBottom >= 0 )
 			{
@@ -938,7 +951,7 @@
 	})
 	.attr("transform", function(d ,i) 
 	{
-	    return "translate(" + (N.width * i * 2 + N.width) + "," + (N.height * i * 3 + N.height) + ")";
+	    return "translate(" + (N.width * i * 1 + N.width) + "," + (N.height * i * 2 + N.height) + ")";
 	})
 	.attr("filter" ,"url(#shadow)")
 	.call(v_Drag);
