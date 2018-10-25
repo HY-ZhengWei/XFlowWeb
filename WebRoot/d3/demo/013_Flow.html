@@ -633,35 +633,64 @@
 		/* 移动节点时，绘制的定位对齐标线 */
 		if ( i_MoveG != null )
 		{
-			var v_MoveXY = getGXY(i_MoveG);
-			var v_XDiff  = Math.abs(Number(v_FromXY[0]) - Number(v_ToXY[0]));
-			var v_YDiff  = Math.abs(Number(v_FromXY[1]) - Number(v_ToXY[1]));
+			var v_MoveXY     = getGXY(i_MoveG);
+			var v_XDiff      = Math.abs(Number(v_FromXY[0]) - Number(v_ToXY[0]));
+			var v_YDiff      = Math.abs(Number(v_FromXY[1]) - Number(v_ToXY[1]));
+			var v_IsMoveFrom = i_MoveG.attr("id") == i_FromG.attr("id");
 			
 			if ( v_XDiff % (N.width / 2) == 0 )
 			{
-				moveVLine(Number(v_FromXY[0]) + (N.width / 2));
-
-				if ( Number(v_FromXY[0]) < Number(v_MoveXY[0]) )
+				moveVLine(Number(v_MoveXY[0]) + (N.width / 2));
+				
+				if ( v_IsMoveFrom )
 				{
-					moveVLineL(Number(v_FromXY[0]) + (N.width / 2));
+					if ( Number(v_ToXY[0]) < Number(v_MoveXY[0]) )
+					{
+						moveVLineL(Number(v_ToXY[0]) + (N.width / 2));
+					}
+					else
+					{
+						moveVLineR(Number(v_ToXY[0]) + (N.width / 2));
+					}
 				}
 				else
 				{
-					moveVLineR(Number(v_ToXY[0])   + (N.width / 2));
+					if ( Number(v_FromXY[0]) > Number(v_MoveXY[0]) )
+					{
+						moveVLineL(Number(v_FromXY[0]) + (N.width / 2));
+					}
+					else
+					{
+						moveVLineR(Number(v_FromXY[0]) + (N.width / 2));
+					}
 				}
 			}
 			
 			if ( v_YDiff % N.height == 0 )
 			{
-				moveHLine(Number(v_FromXY[1]) + (N.height / 2));
+				moveHLine(Number(v_MoveXY[1]) + (N.height / 2));
 				
-				if ( Number(v_FromXY[1]) < Number(v_MoveXY[1]) )
+				if ( v_IsMoveFrom )
 				{
-					moveHLineT(Number(v_FromXY[1]) + (N.height / 2));
+					if ( Number(v_ToXY[1]) < Number(v_MoveXY[1]) )
+					{
+						moveHLineT(Number(v_FromXY[1]) + (N.height / 2));
+					}
+					else
+					{
+						moveHLineB(Number(v_FromXY[1]) + (N.height / 2));
+					}
 				}
 				else
 				{
-					moveHLineB(Number(v_ToXY[1])   + (N.height / 2));
+					if ( Number(v_FromXY[1]) > Number(v_MoveXY[1]) )
+					{
+						moveHLineT(Number(v_ToXY[1]) + (N.height / 2));
+					}
+					else
+					{
+						moveHLineB(Number(v_ToXY[1]) + (N.height / 2));
+					}
 				}
 			}
 		}
