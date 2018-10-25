@@ -87,7 +87,7 @@
 	<script type="text/javascript">
 	
 	var N         = {width:130 ,height:40 ,lineWidth:1 ,flagWidth:18 };
-	var Colors    = {backgroudColor:"white" ,routeColor:"#6AB975" ,routeRejectColor:"#FF4444"}; 
+	var Colors    = {backgroudColor:"white" ,routeColor:"#6AB975" ,routeRejectColor:"#FF4444" ,markLineColor:"#0099CC"}; 
 	var v_SVG     = d3.select("body").select("svg");
 	var v_Datas   = [{id:"N1" ,name:"选型申请" ,backgroudColor:"white" ,flagColor:"#6AB975" ,lineColor:"black"}
                     ,{id:"N2" ,name:"审批选型" ,backgroudColor:"white" ,flagColor:"#FF4444" ,lineColor:"black"}
@@ -152,9 +152,7 @@
    		}
     	else if ( v_VtoX - v_X == 0 )
    		{
-   			v_VLine .attr("stroke" ,"#0099CC");
-   			v_VLineL.attr("stroke" ,"#0099CC");
-   			v_VLineR.attr("stroke" ,"#0099CC");
+    		/* Nothing. */
    		}
     	else
    		{
@@ -168,9 +166,7 @@
    		}
     	else if ( v_HtoY - v_Y == 0 )
    		{
-   			v_HLine .attr("stroke" ,"#0099CC");
-   			v_HLineT.attr("stroke" ,"#0099CC");
-   			v_HLineB.attr("stroke" ,"#0099CC");
+    		/* Nothing. */
    		}
     	else
    		{
@@ -200,7 +196,7 @@
 	
 	/* 水平标线 */
 	var v_HLine = v_SVG.append("line")
-	.attr("stroke" ,"gray")
+	.attr("stroke" ,Colors.markLineColor)
 	.attr("stroke-width" ,"3")
 	.attr("stroke-dasharray" ,"5,2")
 	.attr("x1" ,0)
@@ -210,7 +206,7 @@
 	
 	/* 水平标线(上)，与水平标线成对出现，水平标线(上)不独立出现 */
 	var v_HLineT = v_SVG.append("line")
-	.attr("stroke" ,"gray")
+	.attr("stroke" ,Colors.markLineColor)
 	.attr("stroke-width" ,"3")
 	.attr("stroke-dasharray" ,"5,2")
 	.attr("x1" ,0)
@@ -220,7 +216,7 @@
 	
 	/* 水平标线(下)，与水平标线成对出现，水平标线(下)不独立出现 */
 	var v_HLineB = v_SVG.append("line")
-	.attr("stroke" ,"gray")
+	.attr("stroke" ,Colors.markLineColor)
 	.attr("stroke-width" ,"3")
 	.attr("stroke-dasharray" ,"5,2")
 	.attr("x1" ,0)
@@ -230,7 +226,7 @@
 	
 	/* 垂直标线 */
 	var v_VLine = v_SVG.append("line")
-	.attr("stroke" ,"gray")
+	.attr("stroke" ,Colors.markLineColor)
 	.attr("stroke-width" ,"3")
 	.attr("stroke-dasharray" ,"5,2")
 	.attr("x1" ,-99999)
@@ -240,7 +236,7 @@
 	
 	/* 垂直标线(左)，与垂直标线成对出现，垂直标线(左)不独立出现 */
 	var v_VLineL = v_SVG.append("line")
-	.attr("stroke" ,"gray")
+	.attr("stroke" ,Colors.markLineColor)
 	.attr("stroke-width" ,"3")
 	.attr("stroke-dasharray" ,"5,2")
 	.attr("x1" ,-99999)
@@ -250,7 +246,7 @@
 	
 	/* 垂直标线(右)，与垂直标线成对出现，垂直标线(右)不独立出现 */
 	var v_VLineR = v_SVG.append("line")
-	.attr("stroke" ,"gray")
+	.attr("stroke" ,Colors.markLineColor)
 	.attr("stroke-width" ,"3")
 	.attr("stroke-dasharray" ,"5,2")
 	.attr("x1" ,-99999)
@@ -396,10 +392,6 @@
 	 */
 	function hideHLine()
 	{
-		v_HLine .attr("stroke" ,"gray");
-		v_HLineT.attr("stroke" ,"gray");
-		v_HLineB.attr("stroke" ,"gray");
-		
 		moveHLine (-99999);
 		moveHLineT(-99999);
 		moveHLineB(-99999);
@@ -418,10 +410,6 @@
 	 */
 	function hideVLine()
 	{
-		v_VLine .attr("stroke" ,"gray");
-		v_VLineL.attr("stroke" ,"gray");
-		v_VLineR.attr("stroke" ,"gray");
-		
 		moveVLine (-99999);
 		moveVLineL(-99999);
 		moveVLineR(-99999);
