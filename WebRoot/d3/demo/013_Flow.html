@@ -104,11 +104,15 @@
 	                ,{"id":"选型受理-单人选型" ,"from":"N3" ,"to":"N4" ,"type":"转派"}
 	                ,{"id":"选型受理-选型评审" ,"from":"N3" ,"to":"N5" ,"type":"转派"}
 	                ,{"id":"选型受理-选型分包" ,"from":"N3" ,"to":"N6" ,"type":"转派"}
+	                ,{"id":"选型受理-选型申请" ,"from":"N3" ,"to":"N1" ,"type":"驳回"}
 	                ,{"id":"选型评审-单人选型" ,"from":"N5" ,"to":"N4" ,"type":"转派"}
 	                ,{"id":"选型评审-选型分包" ,"from":"N5" ,"to":"N6" ,"type":"转派"}
+	                ,{"id":"选型评审-选型申请" ,"from":"N5" ,"to":"N1" ,"type":"驳回"}
 	                ,{"id":"选型分包-选型汇总" ,"from":"N6" ,"to":"N7" ,"type":"转派"}
 	                ,{"id":"选型汇总-结果确认" ,"from":"N7" ,"to":"N8" ,"type":"转派"}
-	                ,{"id":"单人选型-结果确认" ,"from":"N4" ,"to":"N8" ,"type":"转派"}];
+	                ,{"id":"单人选型-结果确认" ,"from":"N4" ,"to":"N8" ,"type":"转派"}
+	                ,{"id":"结果确认-单人选型" ,"from":"N8" ,"to":"N4" ,"type":"驳回"}
+	                ,{"id":"结果确认-选型分包" ,"from":"N8" ,"to":"N6" ,"type":"驳回"}];
 
 	var v_RouteMap  = makeRouteMap (v_Routes);
 	var v_RouteRefs = makeRouteRefs(v_Routes);
@@ -146,7 +150,7 @@
     		var v_FromG     = d3.select("#" + v_RouteData.from);
     		var v_ToG       = d3.select("#" + v_RouteData.to);
     		
-    		v_RounteObj.attr("points" ,calcRouteXY(v_FromG ,v_ToG ,v_G));
+    		v_RounteObj.attr("points" ,calcRouteXY(v_FromG ,v_ToG ,v_G ,v_RouteData));
    		}
     	
     	/* 计算节点的中心点，计算标线状态，计算标线交叉点磁吸效果 */
@@ -198,7 +202,7 @@
         		var v_FromG     = d3.select("#" + v_RouteData.from);
         		var v_ToG       = d3.select("#" + v_RouteData.to);
         		
-        		v_RounteObj.attr("points" ,calcRouteXY(v_FromG ,v_ToG ,v_G));
+        		v_RounteObj.attr("points" ,calcRouteXY(v_FromG ,v_ToG ,v_G ,v_RouteData));
        		}
    		}
     })
@@ -636,11 +640,12 @@
 	 * @createDate  2018-10-23
 	 * @version     v1.0
 	 *
-	 * @param i_FromG  从哪来的元素节点
-	 * @param i_ToG    到哪去的元素节点
-	 * @param i_MoveG  现在移动的元素节点（可为空）
+	 * @param i_FromG      从哪来的元素节点
+	 * @param i_ToG        到哪去的元素节点
+	 * @param i_MoveG      现在移动的元素节点（可为空）
+	 * @param i_RouteData  路由信息数据
 	 */
-	function calcRouteXY(i_FromG ,i_ToG ,i_MoveG)
+	function calcRouteXY(i_FromG ,i_ToG ,i_MoveG ,i_RouteData)
 	{
 		var v_FromXY = getGXY(i_FromG);
 		var v_ToXY   = getGXY(i_ToG);
@@ -761,172 +766,249 @@
 			}
 		}
 		
-		if ( v_PR.position == "E" )
+		if ( i_RouteData.type == "驳回" )
 		{
-			v_FromXY[0] = Number(v_FromXY[0]) + N.width;
-			v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
-			
-			v_ToXY[0] = Number(v_ToXY[0]) + 0;
-			v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
-			
-			moveHLine(v_FromXY[1]);
- 		}
-		else if ( v_PR.position == "W" )
-		{
-			v_FromXY[0] = Number(v_FromXY[0]) + 0;
-			v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
-			
-			v_ToXY[0] = Number(v_ToXY[0]) + N.width;
-			v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
-			
-			moveHLine(v_FromXY[1]);
-		}
-		else if ( v_PR.position == "N" )
-		{
-			v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
-			v_FromXY[1] = Number(v_FromXY[1]) + 0;
-			
-			v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
-			v_ToXY[1] = Number(v_ToXY[1]) + N.height;
-			
-			moveVLine(v_FromXY[0]);
-		}
-		else if ( v_PR.position == "S" )
-		{
-			v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
-			v_FromXY[1] = Number(v_FromXY[1]) + N.height;
-			
-			v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
-			v_ToXY[1] = Number(v_ToXY[1]) + 0;
-			
-			moveVLine(v_FromXY[0]);
-		}
-		else if ( v_PR.position == "EN" )
-		{
-			/* B全部在A的右边。B全部在A的上边 */
-			if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
+			if ( v_PR.position == "E" || v_PR.position == "W" )
 			{
-				v_FromXY[0] = Number(v_FromXY[0]) + N.width;
-				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
-				
-				v_ToXY[0]   = Number(v_ToXY[0]) + (N.width / 2);
-				v_ToXY[1]   = Number(v_ToXY[1]) + N.height;
-				
-				v_MidAXY    = new Array();
-				v_MidAXY[0] = v_ToXY[0];
-				v_MidAXY[1] = v_FromXY[1];
-			}
-			else if ( v_PR.topBottom >= 0 )
-			{
+				/* n字型连接线 */
 				v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
 				v_FromXY[1] = Number(v_FromXY[1]) + 0;
 				
-				v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
-				v_ToXY[1] = Number(v_ToXY[1]) + N.height;
+				v_ToXY[0]   = Number(v_ToXY[0]) + (N.width / 2);
+				v_ToXY[1]   = Number(v_ToXY[1]) + 0;
+				
+				v_MidAXY    = new Array();
+				v_MidAXY[0] = v_FromXY[0];
+				v_MidAXY[1] = v_FromXY[1] - N.height;
+				
+				v_MidBXY    = new Array();
+				v_MidBXY[0] = v_ToXY[0];
+				v_MidBXY[1] = v_ToXY[1] - N.height;
+				
+				moveHLine(v_FromXY[1] + (N.height / 2));
 			}
-			else if ( v_PR.leftRight >= 0 )
+			else if ( v_PR.position == "N" || v_PR.position == "S" )
+			{
+				/* C字型连接线 */
+				v_FromXY[0] = Number(v_FromXY[0]) + 0;
+				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+				
+				v_ToXY[0]   = Number(v_ToXY[0]) + 0;
+				v_ToXY[1]   = Number(v_ToXY[1]) + (N.height / 2);
+				
+				v_MidAXY    = new Array();
+				v_MidAXY[0] = v_FromXY[0] - (N.width / 2);
+				v_MidAXY[1] = v_FromXY[1];
+				
+				v_MidBXY    = new Array();
+				v_MidBXY[0] = v_ToXY[0] - (N.width / 2);
+				v_MidBXY[1] = v_ToXY[1];
+				
+				moveVLine(v_FromXY[0] + (N.width / 2));
+			}
+			else if ( v_PR.position == "EN" || v_PR.position == "ES" )
+			{
+				/* 反C字型连接线 */
+				v_FromXY[0] = Number(v_FromXY[0]) + N.width;
+				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+				
+				v_ToXY[0]   = Number(v_ToXY[0]) + N.width;
+				v_ToXY[1]   = Number(v_ToXY[1]) + (N.height / 2);
+				
+				v_MidAXY    = new Array();
+				v_MidAXY[0] = v_ToXY[0] + (N.width / 2);
+				v_MidAXY[1] = v_FromXY[1];
+				
+				v_MidBXY    = new Array();
+				v_MidBXY[0] = v_ToXY[0] + (N.width / 2);
+				v_MidBXY[1] = v_ToXY[1];
+			}
+			else if ( v_PR.position == "WN" || v_PR.position == "WS" )
+			{
+				v_FromXY[0] = Number(v_FromXY[0]) + 0;
+				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+				
+				v_ToXY[0]   = Number(v_ToXY[0]) + 0;
+				v_ToXY[1]   = Number(v_ToXY[1]) + (N.height / 2);
+				
+				v_MidAXY    = new Array();
+				v_MidAXY[0] = v_ToXY[0] - (N.width / 2);
+				v_MidAXY[1] = v_FromXY[1];
+				
+				v_MidBXY    = new Array();
+				v_MidBXY[0] = v_ToXY[0] - (N.width / 2);
+				v_MidBXY[1] = v_ToXY[1];
+			}
+		}
+		else
+		{
+			if ( v_PR.position == "E" )
 			{
 				v_FromXY[0] = Number(v_FromXY[0]) + N.width;
 				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 				
 				v_ToXY[0] = Number(v_ToXY[0]) + 0;
 				v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
-			}
-		}
-		else if ( v_PR.position == "ES" )
-		{
-			/* B全部在A的右边。B全部在A的下边 */
-			if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
-			{
-				v_FromXY[0] = Number(v_FromXY[0]) + N.width;
-				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 				
-				v_ToXY[0]   = Number(v_ToXY[0]) + (N.width / 2);
-				v_ToXY[1]   = Number(v_ToXY[1]) + 0;
-				
-				v_MidAXY    = new Array();
-				v_MidAXY[0] = v_ToXY[0];
-				v_MidAXY[1] = v_FromXY[1];
-			}
-			else if ( v_PR.topBottom >= 0 )
-			{
-				v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
-				v_FromXY[1] = Number(v_FromXY[1]) + N.height;
-				
-				v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
-				v_ToXY[1] = Number(v_ToXY[1]) + 0;
-			}
-			else if ( v_PR.leftRight >= 0 )
-			{
-				v_FromXY[0] = Number(v_FromXY[0]) + N.width;
-				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
-				
-				v_ToXY[0] = Number(v_ToXY[0]) + 0;
-				v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
-			}
-		}
-		else if ( v_PR.position == "WN" )
-		{
-			/* B全部在A的左边。B全部在A的上边 */
-			if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
+				moveHLine(v_FromXY[1]);
+	 		}
+			else if ( v_PR.position == "W" )
 			{
 				v_FromXY[0] = Number(v_FromXY[0]) + 0;
 				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 				
-				v_ToXY[0]   = Number(v_ToXY[0]) + (N.width / 2);
-				v_ToXY[1]   = Number(v_ToXY[1]) + N.height;
+				v_ToXY[0] = Number(v_ToXY[0]) + N.width;
+				v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
 				
-				v_MidAXY    = new Array();
-				v_MidAXY[0] = v_ToXY[0];
-				v_MidAXY[1] = v_FromXY[1];
+				moveHLine(v_FromXY[1]);
 			}
-			else if ( v_PR.topBottom >= 0 )
+			else if ( v_PR.position == "N" )
 			{
 				v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
 				v_FromXY[1] = Number(v_FromXY[1]) + 0;
 				
 				v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
 				v_ToXY[1] = Number(v_ToXY[1]) + N.height;
-			}
-			else if ( v_PR.leftRight >= 0 )
-			{
-				v_FromXY[0] = Number(v_FromXY[0]) + 0;
-				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 				
-				v_ToXY[0] = Number(v_ToXY[0]) + N.width;
-				v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+				moveVLine(v_FromXY[0]);
 			}
-		}
-		else if ( v_PR.position == "WS" )
-		{
-			/* B全部在A的左边。B全部在A的下边 */
-			if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
-			{
-				v_FromXY[0] = Number(v_FromXY[0]) + 0;
-				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
-				
-				v_ToXY[0]   = Number(v_ToXY[0]) + (N.width / 2);
-				v_ToXY[1]   = Number(v_ToXY[1]) + 0;
-				
-				v_MidAXY    = new Array();
-				v_MidAXY[0] = v_ToXY[0];
-				v_MidAXY[1] = v_FromXY[1];
-			}
-			else if ( v_PR.topBottom >= 0 )
+			else if ( v_PR.position == "S" )
 			{
 				v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
 				v_FromXY[1] = Number(v_FromXY[1]) + N.height;
 				
 				v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
 				v_ToXY[1] = Number(v_ToXY[1]) + 0;
-			}
-			else if ( v_PR.leftRight >= 0 )
-			{
-				v_FromXY[0] = Number(v_FromXY[0]) + 0;
-				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 				
-				v_ToXY[0] = Number(v_ToXY[0]) + N.width;
-				v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+				moveVLine(v_FromXY[0]);
+			}
+			else if ( v_PR.position == "EN" )
+			{
+				/* B全部在A的右边。B全部在A的上边 */
+				if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
+				{
+					v_FromXY[0] = Number(v_FromXY[0]) + N.width;
+					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+					
+					v_ToXY[0]   = Number(v_ToXY[0]) + (N.width / 2);
+					v_ToXY[1]   = Number(v_ToXY[1]) + N.height;
+					
+					v_MidAXY    = new Array();
+					v_MidAXY[0] = v_ToXY[0];
+					v_MidAXY[1] = v_FromXY[1];
+				}
+				else if ( v_PR.topBottom >= 0 )
+				{
+					v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
+					v_FromXY[1] = Number(v_FromXY[1]) + 0;
+					
+					v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
+					v_ToXY[1] = Number(v_ToXY[1]) + N.height;
+				}
+				else if ( v_PR.leftRight >= 0 )
+				{
+					v_FromXY[0] = Number(v_FromXY[0]) + N.width;
+					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+					
+					v_ToXY[0] = Number(v_ToXY[0]) + 0;
+					v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+				}
+			}
+			else if ( v_PR.position == "ES" )
+			{
+				/* B全部在A的右边。B全部在A的下边 */
+				if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
+				{
+					v_FromXY[0] = Number(v_FromXY[0]) + N.width;
+					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+					
+					v_ToXY[0]   = Number(v_ToXY[0]) + (N.width / 2);
+					v_ToXY[1]   = Number(v_ToXY[1]) + 0;
+					
+					v_MidAXY    = new Array();
+					v_MidAXY[0] = v_ToXY[0];
+					v_MidAXY[1] = v_FromXY[1];
+				}
+				else if ( v_PR.topBottom >= 0 )
+				{
+					v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
+					v_FromXY[1] = Number(v_FromXY[1]) + N.height;
+					
+					v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
+					v_ToXY[1] = Number(v_ToXY[1]) + 0;
+				}
+				else if ( v_PR.leftRight >= 0 )
+				{
+					v_FromXY[0] = Number(v_FromXY[0]) + N.width;
+					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+					
+					v_ToXY[0] = Number(v_ToXY[0]) + 0;
+					v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+				}
+			}
+			else if ( v_PR.position == "WN" )
+			{
+				/* B全部在A的左边。B全部在A的上边 */
+				if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
+				{
+					v_FromXY[0] = Number(v_FromXY[0]) + 0;
+					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+					
+					v_ToXY[0]   = Number(v_ToXY[0]) + (N.width / 2);
+					v_ToXY[1]   = Number(v_ToXY[1]) + N.height;
+					
+					v_MidAXY    = new Array();
+					v_MidAXY[0] = v_ToXY[0];
+					v_MidAXY[1] = v_FromXY[1];
+				}
+				else if ( v_PR.topBottom >= 0 )
+				{
+					v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
+					v_FromXY[1] = Number(v_FromXY[1]) + 0;
+					
+					v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
+					v_ToXY[1] = Number(v_ToXY[1]) + N.height;
+				}
+				else if ( v_PR.leftRight >= 0 )
+				{
+					v_FromXY[0] = Number(v_FromXY[0]) + 0;
+					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+					
+					v_ToXY[0] = Number(v_ToXY[0]) + N.width;
+					v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+				}
+			}
+			else if ( v_PR.position == "WS" )
+			{
+				/* B全部在A的左边。B全部在A的下边 */
+				if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
+				{
+					v_FromXY[0] = Number(v_FromXY[0]) + 0;
+					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+					
+					v_ToXY[0]   = Number(v_ToXY[0]) + (N.width / 2);
+					v_ToXY[1]   = Number(v_ToXY[1]) + 0;
+					
+					v_MidAXY    = new Array();
+					v_MidAXY[0] = v_ToXY[0];
+					v_MidAXY[1] = v_FromXY[1];
+				}
+				else if ( v_PR.topBottom >= 0 )
+				{
+					v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
+					v_FromXY[1] = Number(v_FromXY[1]) + N.height;
+					
+					v_ToXY[0] = Number(v_ToXY[0]) + (N.width / 2);
+					v_ToXY[1] = Number(v_ToXY[1]) + 0;
+				}
+				else if ( v_PR.leftRight >= 0 )
+				{
+					v_FromXY[0] = Number(v_FromXY[0]) + 0;
+					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+					
+					v_ToXY[0] = Number(v_ToXY[0]) + N.width;
+					v_ToXY[1] = Number(v_ToXY[1]) + (N.height / 2);
+				}
 			}
 		}
 		
@@ -936,9 +1018,70 @@
 		}
 		else if ( v_MidBXY == null )
 		{
-			return v_FromXY[0] + "," + v_FromXY[1] + " " + v_MidAXY[0] + "," + v_MidAXY[1] + " " + v_ToXY[0] + "," + v_ToXY[1]; 
+			return v_FromXY[0] + "," + v_FromXY[1] + " " 
+			     + v_MidAXY[0] + "," + v_MidAXY[1] + " " 
+			     + v_ToXY[0]   + "," + v_ToXY[1]; 
+		}
+		else
+		{
+			return v_FromXY[0] + "," + v_FromXY[1] + " " 
+		         + v_MidAXY[0] + "," + v_MidAXY[1] + " "
+		         + v_MidBXY[0] + "," + v_MidBXY[1] + " "
+		         + v_ToXY[0]   + "," + v_ToXY[1]; 
 		}
 	}
+	
+	
+	
+	v_SVG.selectAll("polyline").data(v_Routes)
+	.enter()
+	.append("polyline")
+	.attr("id" ,function(d ,i)
+	{
+		return d.id;	
+	})
+	.attr("fill" ,"#00000000")
+	.attr("stroke-width" ,3)
+	.attr("stroke" ,function(d ,i)
+	{
+		if ( d.type == "驳回" )
+		{
+			return Colors.routeRejectColor;
+		}
+		else
+		{
+			return Colors.routeColor;
+		}
+	})
+	.attr("stroke-dasharray" ,function(d ,i)
+	{
+		if ( d.type == "驳回" )
+		{
+			return "5,5";
+		}
+		else
+		{
+			return "1,0";
+		}
+	})
+	.attr("marker-end" ,function(d ,i)
+	{
+		var v_Flag = "";
+		if ( d.type == "驳回" )
+		{
+			v_Flag = "_Reject";
+		}
+		
+		var v_UserAgent = navigator.userAgent.toLowerCase();
+		if ( v_UserAgent.indexOf("firefox") >= 0 ) 
+		{
+			return "url(#arrowToFirebox" + v_Flag + ")";
+		}
+		else
+		{
+			return "url(#arrowTo" + v_Flag + ")";
+		}
+	});
 	
 	
 	
@@ -963,62 +1106,14 @@
 	});
 	
 	
-	
+	/* 使节点均在连接线之上，防止出现选不中节点的问题 */
 	v_SVG.selectAll("polyline").data(v_Routes)
-	.enter()
-	.append("polyline")
-	.attr("id" ,function(d ,i)
-	{
-		return d.id;	
-	})
 	.attr("points" ,function(d ,i)
 	{
 		var v_FromG  = d3.select("#" + d.from);
 		var v_ToG    = d3.select("#" + d.to);
 		
-		return calcRouteXY(v_FromG ,v_ToG ,null);
-	})
-	.attr("fill" ,"#00000000")
-	.attr("stroke-width" ,3)
-	.attr("stroke" ,function(d ,i)
-	{
-		if ( d.type == "驳回" )
-		{
-			return Colors.routeRejectColor;
-		}
-		else
-		{
-			return Colors.routeColor;
-		}
-	})
-	.attr("stroke-dasharray" ,function(d ,i)
-	{
-		if ( d.type == "驳回" )
-		{
-			return "5,2";
-		}
-		else
-		{
-			return "1,0";
-		}
-	})
-	.attr("marker-end" ,function(d ,i)
-	{
-		var v_Flag = "";
-		if ( d.type == "驳回" )
-		{
-			v_Flag = "_Reject";
-		}
-		
-		var v_UserAgent = navigator.userAgent.toLowerCase();
-		if ( v_UserAgent.indexOf("firefox") >= 0 ) 
-		{
-			return "url(#arrowToFirebox" + v_Flag + ")";
-		}
-		else
-		{
-			return "url(#arrowTo" + v_Flag + ")";
-		}
+		return calcRouteXY(v_FromG ,v_ToG ,null ,d);
 	});
 	
 	
