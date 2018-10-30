@@ -98,31 +98,31 @@
                     ,{id:"N7" ,name:"选型汇总"    ,backgroudColor:"white" ,flagColor:"yellow"  ,lineColor:"black"}
                     ,{id:"N8" ,name:"选型结果确认" ,backgroudColor:"white" ,flagColor:"#33B5E5" ,lineColor:"black"}];
 
-	var v_Routes  = [{"id":"选型申请-审批选型" ,"from":"N1" ,"to":"N2" ,"type":"转派"}
-	                ,{"id":"审批选型-选型申请" ,"from":"N2" ,"to":"N1" ,"type":"驳回"}
-	                ,{"id":"审批选型-选型受理" ,"from":"N2" ,"to":"N3" ,"type":"转派"}
-	                ,{"id":"选型受理-单人选型" ,"from":"N3" ,"to":"N4" ,"type":"转派"}
-	                ,{"id":"选型受理-选型评审" ,"from":"N3" ,"to":"N5" ,"type":"转派"}
-	                ,{"id":"选型受理-选型分包" ,"from":"N3" ,"to":"N6" ,"type":"转派"}
-	                ,{"id":"选型受理-选型申请" ,"from":"N3" ,"to":"N1" ,"type":"驳回"}
-	                ,{"id":"选型评审-单人选型" ,"from":"N5" ,"to":"N4" ,"type":"转派"}
-	                ,{"id":"选型评审-选型分包" ,"from":"N5" ,"to":"N6" ,"type":"转派"}
-	                ,{"id":"选型评审-选型申请" ,"from":"N5" ,"to":"N1" ,"type":"驳回"}
-	                ,{"id":"选型分包-选型汇总" ,"from":"N6" ,"to":"N7" ,"type":"转派"}
-	                ,{"id":"选型汇总-结果确认" ,"from":"N7" ,"to":"N8" ,"type":"转派"}
-	                ,{"id":"单人选型-结果确认" ,"from":"N4" ,"to":"N8" ,"type":"转派"}
-	                ,{"id":"结果确认-单人选型" ,"from":"N8" ,"to":"N4" ,"type":"驳回"}
-	                ,{"id":"结果确认-选型分包" ,"from":"N8" ,"to":"N6" ,"type":"驳回"}];
+	var v_Routes  = [{"id":"选型申请-审批选型" ,"from":"N1" ,"to":"N2" ,"type":"转派" ,"name":"转向审批"}
+	                ,{"id":"审批选型-选型申请" ,"from":"N2" ,"to":"N1" ,"type":"驳回" ,"name":"审批未通过"}
+	                ,{"id":"审批选型-选型受理" ,"from":"N2" ,"to":"N3" ,"type":"转派" ,"name":"转向受理"}
+	                ,{"id":"选型受理-单人选型" ,"from":"N3" ,"to":"N4" ,"type":"转派" ,"name":"受理转单人选型"}
+	                ,{"id":"选型受理-选型评审" ,"from":"N3" ,"to":"N5" ,"type":"转派" ,"name":"转向评审"}
+	                ,{"id":"选型受理-选型分包" ,"from":"N3" ,"to":"N6" ,"type":"转派" ,"name":"受理转分包"}
+	                ,{"id":"选型受理-选型申请" ,"from":"N3" ,"to":"N1" ,"type":"驳回" ,"name":"受理未通过"}
+	                ,{"id":"选型评审-单人选型" ,"from":"N5" ,"to":"N4" ,"type":"转派" ,"name":"评审转单人选型"}
+	                ,{"id":"选型评审-选型分包" ,"from":"N5" ,"to":"N6" ,"type":"转派" ,"name":"评审转分包"}
+	                ,{"id":"选型评审-选型申请" ,"from":"N5" ,"to":"N1" ,"type":"驳回" ,"name":"评审未通过"}
+	                ,{"id":"选型分包-选型汇总" ,"from":"N6" ,"to":"N7" ,"type":"转派" ,"name":"分包转汇总"}
+	                ,{"id":"选型汇总-结果确认" ,"from":"N7" ,"to":"N8" ,"type":"转派" ,"name":"汇总转结果确认"}
+	                ,{"id":"单人选型-结果确认" ,"from":"N4" ,"to":"N8" ,"type":"转派" ,"name":"单人选型转结果确认"}
+	                ,{"id":"结果确认-单人选型" ,"from":"N8" ,"to":"N4" ,"type":"驳回" ,"name":"结果未通过转单人选型"}
+	                ,{"id":"结果确认-选型分包" ,"from":"N8" ,"to":"N6" ,"type":"驳回" ,"name":"结果未通过转分包"}];
 
-	var v_RouteMap  = makeRouteMap (v_Routes);
-	var v_RouteRefs = makeRouteRefs(v_Routes);
-	var v_XOffset   = 0;
-	var v_YOffset   = 0;
-	var v_HLineTMax = 0;          /* 水平标线（上）离移动节点最近的值 */
-	var v_HLineBMin = 99999;      /* 水平标线（下）离移动节点最近的值 */
-	var v_VLineLMax = 0;          /* 垂直标线（左）离移动节点最近的值 */
-	var v_VLineRMin = 99999;      /* 垂直标线（右）离移动节点最近的值 */
-	var v_ToPoints  = d3.map();   /* 节点链接线的到达点的位置集合信息map.key为XY坐标值，map.value为数量 */
+	var v_RouteMap  = makeRouteMap (v_Routes);  /* 可通过路由ID定位路由信息 */
+	var v_RouteRefs = makeRouteRefs(v_Routes);  /* 可通过节点ID定位到与其有关联的所有路由ID */
+	var v_XOffset   = 0;                        /* 移动时相对鼠标的偏移量X */
+	var v_YOffset   = 0;                        /* 移动时相对鼠标的偏移量Y */
+	var v_HLineTMax = 0;                        /* 水平标线（上）离移动节点最近的值 */
+	var v_HLineBMin = 99999;                    /* 水平标线（下）离移动节点最近的值 */
+	var v_VLineLMax = 0;                        /* 垂直标线（左）离移动节点最近的值 */
+	var v_VLineRMin = 99999;                    /* 垂直标线（右）离移动节点最近的值 */
+	var v_ToPoints  = d3.map();                 /* 节点链接线的到达点的位置集合信息map.key为XY坐标值，map.value为数量 */
 	var v_Drag      = d3.drag()
     .on("start" ,function()
     {
@@ -150,8 +150,10 @@
     		var v_RounteObj = d3.select("#" + v_RouteData.id);
     		var v_FromG     = d3.select("#" + v_RouteData.from);
     		var v_ToG       = d3.select("#" + v_RouteData.to);
+    		var v_XYs       = calcRouteXY(v_FromG ,v_ToG ,v_G ,v_RouteData);
     		
-    		v_RounteObj.attr("points" ,calcRouteXY(v_FromG ,v_ToG ,v_G ,v_RouteData));
+    		v_RounteObj.attr("points" ,v_XYs);
+    		moveLineText(v_RounteObj);
    		}
     	
     	/* 计算节点的中心点，计算标线状态，计算标线交叉点磁吸效果 */
@@ -202,8 +204,10 @@
         		var v_RounteObj = d3.select("#" + v_RouteData.id);
         		var v_FromG     = d3.select("#" + v_RouteData.from);
         		var v_ToG       = d3.select("#" + v_RouteData.to);
+        		var v_XYs       = calcRouteXY(v_FromG ,v_ToG ,v_G ,v_RouteData);
         		
-        		v_RounteObj.attr("points" ,calcRouteXY(v_FromG ,v_ToG ,v_G ,v_RouteData));
+        		v_RounteObj.attr("points" ,v_XYs);
+        		moveLineText(v_RounteObj);
        		}
    		}
     })
@@ -504,7 +508,7 @@
 	
 	
 	/**
-	 * 用路由数组生成路由节点关系，可通过节点ID定位到所有的路由ID。
+	 * 用路由数组生成路由节点关系，可通过节点ID定位到与其有关联的所有路由ID。
 	 *    
 	 *    返回结构为：Object.节点ID1.["路由ID1-2" ,"路由ID1-3"]
 	 *                    .节点ID2.["路由ID1-2" ,"路由ID2-3"]
@@ -548,6 +552,77 @@
 	function getGXY(i_G)
 	{
 		return i_G.attr("transform").replace("translate(" ,"").replace(")" ,"").split(",");
+	}
+	
+	
+	
+	/**
+	 * 移动链接的文字说明信息
+	 * 
+	 * @author      ZhengWei(HY)
+	 * @createDate  2018-10-30
+	 * @version     v1.0
+	 *
+	 * @param i_Line  节点间的链接线对象
+	 */
+	function moveLineText(i_Line)
+	{
+		var v_XYArr   = i_Line.attr("points").split(" ");
+		var v_TextObj = d3.select("#" + i_Line.attr("id") + "_TEXT");
+		var v_FromXY  = new Array();
+		var v_ToXY    = new Array();
+		var v_Type    = "";   /* H水平方向； V垂直方向*/
+		
+		if ( v_XYArr.length <= 1 )
+		{
+			return;
+		}
+		else
+		{
+			var v_Len = 0;
+			
+			for (var i=1; i<v_XYArr.length; i++)
+			{
+				var v_TempFromXY = v_XYArr[i-1].split(",");
+				var v_TempToXY   = v_XYArr[i]  .split(",");
+				var v_TempLen    = 0;
+				var v_TempType   = "";
+				
+				if ( v_TempFromXY[0] == v_TempToXY[0] )
+				{
+					v_TempLen  = Number(v_TempFromXY[1]) - Number(v_TempToXY[1]);
+					v_TempType = "V";
+				}
+				else if ( v_TempFromXY[1] == v_TempToXY[1] )
+				{
+					v_TempLen  = Number(v_TempFromXY[0]) - Number(v_TempToXY[0]);
+					v_TempType = "H";
+				}
+				
+				if ( Math.abs(v_TempLen) > v_Len )
+				{
+					v_FromXY = v_TempFromXY;
+					v_ToXY   = v_TempToXY;
+					v_Len    = Math.abs(v_TempLen); 
+					v_Type   = v_TempType;
+				}
+			}
+		}
+		
+		if ( v_Type == "H" )
+		{
+			v_TextObj
+			.attr("x"  ,Number(v_FromXY[0]) + (Number(v_ToXY[0]) - Number(v_FromXY[0])) / 2)
+			.attr("y"  ,v_FromXY[1])
+			.attr("dy" ,"-0.35em");
+		}
+		else if ( v_Type == "V" )
+		{
+			v_TextObj
+			.attr("x"  ,v_FromXY[0])
+			.attr("y"  ,Number(v_FromXY[1]) + (Number(v_ToXY[1]) - Number(v_FromXY[1])) / 2)
+			.attr("dy" ,"0.35em");
+		}
 	}
 	
 	
@@ -790,6 +865,7 @@
 			}
 			else if ( v_PR.position == "N" || v_PR.position == "S" )
 			{
+				/* 防止同一位置上绘制的链接线过多，分成奇数链接左边、偶数链接右边 */
 				var v_IsDrawLeft = true; 
 				if ( i_MoveG != null )
 				{
@@ -1139,7 +1215,6 @@
 	});
 	
 	
-	
 	v_SVG.selectAll("g").data(v_Datas)
 	.enter()
 	.append("g")
@@ -1171,6 +1246,26 @@
 		return calcRouteXY(v_FromG ,v_ToG ,null ,d);
 	});
 	
+	
+	v_SVG.selectAll(".lineText").data(v_Routes)
+	.enter()
+	.append("text")
+	.attr("id" ,function(d ,i)
+	{
+		return d.id + "_TEXT";	
+	})
+	.attr("class"       ,"lineText")
+	.attr("text-anchor" ,"middle")
+	.attr("font-weight" ,"bold")
+	.attr("fill"        ,"black")
+	.text(function(d ,i)
+	{
+		return d.name;	
+	})
+	.each(function(d ,i)
+	{
+		moveLineText(d3.select("#" + d.id));
+	});
 	
 	
 	hideHVLine();
