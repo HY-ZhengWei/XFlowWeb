@@ -118,10 +118,11 @@
 	var v_RouteRefs = makeRouteRefs(v_Routes);
 	var v_XOffset   = 0;
 	var v_YOffset   = 0;
-	var v_HLineTMax = 0;       /* 水平标线（上）离移动节点最近的值 */
-	var v_HLineBMin = 99999;   /* 水平标线（下）离移动节点最近的值 */
-	var v_VLineLMax = 0;       /* 垂直标线（左）离移动节点最近的值 */
-	var v_VLineRMin = 99999;   /* 垂直标线（右）离移动节点最近的值 */
+	var v_HLineTMax = 0;          /* 水平标线（上）离移动节点最近的值 */
+	var v_HLineBMin = 99999;      /* 水平标线（下）离移动节点最近的值 */
+	var v_VLineLMax = 0;          /* 垂直标线（左）离移动节点最近的值 */
+	var v_VLineRMin = 99999;      /* 垂直标线（右）离移动节点最近的值 */
+	var v_ToPoints  = d3.map();   /* 节点链接线的到达点的位置集合信息map.key为XY坐标值，map.value为数量 */
 	var v_Drag      = d3.drag()
     .on("start" ,function()
     {
@@ -669,7 +670,7 @@
 			var v_IsMoveFrom = i_MoveG.attr("id") == i_FromG.attr("id");
 			var v_TempValue  = 0;
 			
-			if ( v_XDiff % (N.width / 2) == 0 )
+			if ( v_XDiff != 0 && v_XDiff % (N.width / 2) == 0 )
 			{
 				moveVLine(Number(v_MoveXY[0]) + (N.width / 2));
 				
@@ -677,7 +678,7 @@
 				{
 					v_TempValue = Number(v_ToXY[0]) + (N.width / 2);
 					
-					if ( Number(v_ToXY[0]) < Number(v_MoveXY[0]) )
+					if ( Number(v_ToXY[0]) < Number(v_FromXY[0]) )
 					{
 						if ( v_VLineLMax < v_TempValue )
 						{
@@ -698,7 +699,7 @@
 				{
 					v_TempValue = Number(v_FromXY[0]) + (N.width / 2);
 					
-					if ( Number(v_FromXY[0]) < Number(v_MoveXY[0]) )
+					if ( Number(v_FromXY[0]) < Number(v_ToXY[0]) )
 					{
 						if ( v_VLineLMax < v_TempValue )
 						{
@@ -717,7 +718,7 @@
 				}
 			}
 			
-			if ( v_YDiff % N.height == 0 )
+			if ( v_YDiff != 0 && v_YDiff % N.height == 0 )
 			{
 				moveHLine(Number(v_MoveXY[1]) + (N.height / 2));
 				
@@ -789,22 +790,76 @@
 			}
 			else if ( v_PR.position == "N" || v_PR.position == "S" )
 			{
-				/* C字型连接线 */
-				v_FromXY[0] = Number(v_FromXY[0]) + 0;
-				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+				var v_IsDrawLeft = true; 
+				if ( i_MoveG != null )
+				{
+					var v_IsMoveFrom = i_MoveG.attr("id") == i_FromG.attr("id");
+					if ( v_IsMoveFrom )
+					{
+						var v_LeftKey    = (Number(v_ToXY[0]) + 0)       + "," + (Number(v_ToXY[1]) + (N.height / 2));
+						var v_RightKey   = (Number(v_ToXY[0]) + N.width) + "," + (Number(v_ToXY[1]) + (N.height / 2));
+						var v_LeftCount  = v_ToPoints.get(v_LeftKey);
+						var v_RightCount = v_ToPoints.get(v_RightKey);
+						
+						if ( !v_ToPoints.has(v_LeftKey) )
+						{
+							v_IsDrawLeft = true;
+							v_ToPoints.set(v_LeftKey ,1);
+						}
+						else if ( !v_ToPoints.has(v_RightKey) )
+						{
+							v_IsDrawLeft = false;
+							v_ToPoints.set(v_RightKey ,1);
+						}
+						else if ( v_LeftCount > v_RightCount )
+						{
+							v_IsDrawLeft = false;
+							v_ToPoints.set(v_RightKey ,v_RightCount + 1);
+						}
+						else
+						{
+							v_IsDrawLeft = true;
+							v_ToPoints.set(v_LeftKey ,v_LeftCount + 1);
+						}
+					}
+				}
 				
-				v_ToXY[0]   = Number(v_ToXY[0]) + 0;
-				v_ToXY[1]   = Number(v_ToXY[1]) + (N.height / 2);
+				moveVLine(Number(v_FromXY[0]) + (N.width / 2));
 				
-				v_MidAXY    = new Array();
-				v_MidAXY[0] = v_FromXY[0] - (N.width / 2);
-				v_MidAXY[1] = v_FromXY[1];
-				
-				v_MidBXY    = new Array();
-				v_MidBXY[0] = v_ToXY[0] - (N.width / 2);
-				v_MidBXY[1] = v_ToXY[1];
-				
-				moveVLine(v_FromXY[0] + (N.width / 2));
+				if ( v_IsDrawLeft )
+				{
+					/* C字型连接线 */
+					v_FromXY[0] = Number(v_FromXY[0]) + 0;
+					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+					
+					v_ToXY[0]   = Number(v_ToXY[0]) + 0;
+					v_ToXY[1]   = Number(v_ToXY[1]) + (N.height / 2);
+					
+					v_MidAXY    = new Array();
+					v_MidAXY[0] = v_FromXY[0] - (N.width / 2);
+					v_MidAXY[1] = v_FromXY[1];
+					
+					v_MidBXY    = new Array();
+					v_MidBXY[0] = v_ToXY[0] - (N.width / 2);
+					v_MidBXY[1] = v_ToXY[1];
+				}
+				else
+				{
+					/* 反C字型连接线 */
+					v_FromXY[0] = Number(v_FromXY[0]) + N.width;
+					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
+					
+					v_ToXY[0]   = Number(v_ToXY[0]) + N.width;
+					v_ToXY[1]   = Number(v_ToXY[1]) + (N.height / 2);
+					
+					v_MidAXY    = new Array();
+					v_MidAXY[0] = v_FromXY[0] + (N.width / 2);
+					v_MidAXY[1] = v_FromXY[1];
+					
+					v_MidBXY    = new Array();
+					v_MidBXY[0] = v_ToXY[0] + (N.width / 2);
+					v_MidBXY[1] = v_ToXY[1];
+				}
 			}
 			else if ( v_PR.position == "EN" || v_PR.position == "ES" )
 			{
