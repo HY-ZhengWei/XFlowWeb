@@ -56,6 +56,17 @@
 	</filter-mapping> 
 	
 	
+	<!-- 定义struts2 的核心控制器，用于生成ActionMapper ,拦截所有的Action请求-->
+	<filter>
+		<filter-name>struts2</filter-name>
+		<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>struts2</filter-name>
+		<url-pattern>/web/*</url-pattern>
+	</filter-mapping>
+	
+	
 	<!-- Listener contextConfigLocation -->
 	<listener>
 		<listener-class>
@@ -76,7 +87,21 @@
 		</param-value>
 	</context-param>
 	
-	<!-- Listener log4jConfigLocation  org.springframework.web.util.Log4jConfigListener-->
+	
+	<servlet>
+	    <servlet-name>freemarker</servlet-name>
+	    <servlet-class>freemarker.ext.servlet.FreemarkerServlet</servlet-class>
+	    <init-param>
+	        <!-- 配置模板存放的位置 -->
+	        <param-name>TemplatePath</param-name>
+	        <param-value>/pages</param-value>
+	    </init-param>
+	    <load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+	    <servlet-name>freemarker</servlet-name>
+	    <url-pattern>*.ftl</url-pattern>
+	</servlet-mapping>
 	
 	<servlet>
         <servlet-name>AppBaseServlet</servlet-name>
@@ -119,7 +144,7 @@
 	</servlet-mapping>
 	
   
-  <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
-  </welcome-file-list>
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
 </web-app>
