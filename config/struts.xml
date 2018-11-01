@@ -21,8 +21,17 @@
             <exception-mapping exception="java.lang.Exception" result="error"/>
         </global-exception-mappings>
         
+        
+        <!-- 列表显示所有工作流模板 -->
         <action name="showFlowTemplates" class="org.hy.xflow.web.web.FlowAction" method="showFlowTemplates">
             <result name="success" type="freemarker">/pages/showFlowTemplates.ftl</result>
+        </action>
+        
+        
+        <!-- 显示工作流模板流程图 -->
+        <action name="showFlowTemplate"  class="org.hy.xflow.web.web.FlowAction" method="showFlowTemplate">
+            <result name="success" type="freemarker">/pages/showFlowTemplate.ftl</result>
+            <result name="toList"  type="redirect">showFlowTemplates</result>
         </action>
         
     </package>

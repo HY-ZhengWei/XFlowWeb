@@ -94,7 +94,7 @@ body {
 			<div class="Column_labeTag1">${item_index+1}</div>
 			
 			<div class="Column_TemplateName" title="${item.templateName}">
-				<div class="cont_show_TemplateName"><a href="#">${item.templateName}</a></div>
+				<div class="cont_show_TemplateName"><a href="showFlowTemplate?templateID=${item.templateID}">${item.templateName}</a></div>
 			</div>
 			
 			<div class="Column_Version" title="${item.version}">
