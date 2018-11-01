@@ -9,7 +9,7 @@
 	<constant name="struts.enable.DynamicMethodInvocation" value="false" />
     <constant name="struts.devMode" value="true" />
 
-    <package name="default" namespace="/web" extends="struts-default">
+    <package name="default" namespace="/web" extends="struts-default,json-default">
     
 		<default-action-ref name="showFlowTemplates" />
 
@@ -32,6 +32,14 @@
         <action name="showFlowTemplate"  class="org.hy.xflow.web.web.FlowAction" method="showFlowTemplate">
             <result name="success" type="freemarker">/pages/showFlowTemplate.ftl</result>
             <result name="toList"  type="redirect">showFlowTemplates</result>
+        </action>
+        
+        
+        <!-- 保存工作流模板流程图 -->
+        <action name="saveFlowTemplate"  class="org.hy.xflow.web.web.FlowAction" method="saveFlowTemplate">
+            <result type="json">
+            	<param name="root">retJsonData</param>
+            </result>
         </action>
         
     </package>

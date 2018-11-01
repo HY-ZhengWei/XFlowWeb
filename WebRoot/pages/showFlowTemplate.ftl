@@ -19,6 +19,15 @@
 	  background-color: #fff;
 	}
 	
+	#operations {
+		width: 50px; 
+		height: 15px; 
+		position: fixed;
+		right: 10px;
+		top: 10px;
+		font-size: 10px;
+	}
+	
 	#createdBy {
 		width: 135px; 
 		height: 15px; 
@@ -103,6 +112,9 @@
 		</defs>
 	
 	</svg>
+	
+	<div id="operations">
+	</div>
 	
 	<div id="createdBy">
 		<a href="https://github.com/HY-ZhengWei/XFlowWeb" target="_brank">Source code by <b>XFlowWeb</b></a>
@@ -1270,6 +1282,37 @@
 	
 	
 	hideHVLine();
+	
+	
+	d3.select("#operations").append("a")
+	.attr("id" ,"saveTemplate")
+	.attr("class" ,"ui-button ui-widget ui-corner-all")
+	.attr("href" ,"#")
+	.text("保存")
+	.on("click" ,function()
+	{
+		var v_SaveDatas = "";
+		
+		d3.selectAll("g")
+		.each(function()
+		{
+			var v_MyG = d3.select(this);
+			var v_XY  = getGXY(v_MyG);
+			v_SaveDatas += v_MyG.attr("id") + "=" + v_XY[0] + "," + v_XY[1] + "|"
+		});
+		
+		$.ajax(
+		{
+            url: "saveFlowTemplate"
+           ,type: 'post'
+           ,data: {activityXY:v_SaveDatas}
+           ,dataType: "json"
+           ,success: function(data)
+            {
+                alert(data);
+            }
+        });
+	});
 	
 	</script>
 	

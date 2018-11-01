@@ -46,6 +46,12 @@ public class FlowAction extends ActionSupport
     /** 模板的所有路由的Json信息 */
     private String routes;
     
+    /** 用于Json数据的返回，而不是页面跳转 */
+    private String retJsonData;
+    
+    /** 保存活动节点的位置信息 */
+    private String activityXY;
+    
     
     
     /**
@@ -142,6 +148,22 @@ public class FlowAction extends ActionSupport
         }
         
         return "toList";
+    }
+    
+    
+    
+    /**
+     * 保存工作流模板流程图
+     * 
+     * @author      ZhengWei(HY)
+     * @createDate  2018-11-01
+     * @version     v1.0
+     */
+    public String saveFlowTemplate()
+    {
+        System.out.println(this.activityXY);
+        this.retJsonData = "OK";
+        return SUCCESS;
     }
     
     
@@ -262,6 +284,38 @@ public class FlowAction extends ActionSupport
     public void setRoutes(String routes)
     {
         this.routes = routes;
+    }
+
+
+    
+    /**
+     * 获取：用于Json数据的返回，而不是页面跳转
+     */
+    public String getRetJsonData()
+    {
+        return retJsonData;
+    }
+
+
+    
+    /**
+     * 获取：保存活动节点的位置信息
+     */
+    public String getActivityXY()
+    {
+        return activityXY;
+    }
+
+
+    
+    /**
+     * 设置：保存活动节点的位置信息
+     * 
+     * @param activityXY 
+     */
+    public void setActivityXY(String activityXY)
+    {
+        this.activityXY = activityXY;
     }
     
 }
