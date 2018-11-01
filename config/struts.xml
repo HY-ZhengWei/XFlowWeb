@@ -11,7 +11,7 @@
 
     <package name="default" namespace="/web" extends="struts-default">
     
-		<default-action-ref name="index" />
+		<default-action-ref name="showFlowTemplates" />
 
         <global-results>
             <result name="error">/error.jsp</result>
@@ -21,10 +21,10 @@
             <exception-mapping exception="java.lang.Exception" result="error"/>
         </global-exception-mappings>
         
-        <action name="index" class="org.hy.xflow.web.web.FlowAction">
-            <result name="success" type="freemarker">/pages/index.ftl</result>
-            <result name="html">/pages/index.html</result>
+        <action name="showFlowTemplates" class="org.hy.xflow.web.web.FlowAction" method="showFlowTemplates">
+            <result name="success" type="freemarker">/pages/showFlowTemplates.ftl</result>
         </action>
+        
     </package>
 
 </struts>
