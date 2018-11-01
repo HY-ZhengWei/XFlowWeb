@@ -18,12 +18,32 @@
 	  font-weight: 400;
 	  background-color: #fff;
 	}
+	
+	#createdBy {
+		width: 135px; 
+		height: 15px; 
+		position: fixed;
+		right: 10px;
+		bottom: 10px;
+		font-size: 11px;
+	}
+	
+	#createdBy a { 
+		color: #4F4F4F; 
+		text-decoration: none; 
+		outline: none;
+	}
+	
+	#createdBy a:hover {
+		color: #1E90FF;
+		text-decoration: none;
+	}
 	</style>
 	
 </head>
 <body>
 
-	<svg width="100%" height="900" version="1.1" xmlns="http://www.w3.org/2000/svg">
+	<svg width="100%" height="2000" version="1.1" xmlns="http://www.w3.org/2000/svg">
 	
 		<defs>
 		
@@ -83,6 +103,10 @@
 		</defs>
 	
 	</svg>
+	
+	<div id="createdBy">
+		<a href="https://github.com/HY-ZhengWei/XFlowWeb" target="_brank">Source code by <b>XFlowWeb</b></a>
+	</div>
 	
 	<script type="text/javascript">
 	
