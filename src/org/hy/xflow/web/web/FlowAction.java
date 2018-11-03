@@ -95,6 +95,7 @@ public class FlowAction extends ActionSupport
         
         try
         {
+            this.templateID   = v_Template.getTemplateID(); 
             this.templateName = v_Template.getTemplateName();
             this.version      = v_Template.getVersion();
             
@@ -161,8 +162,23 @@ public class FlowAction extends ActionSupport
      */
     public String saveFlowTemplate()
     {
-        System.out.println(this.activityXY);
-        this.retJsonData = "OK";
+        boolean v_Ret = false;
+        
+        try
+        {
+            XJSON v_XJson = new XJSON();
+            
+            List<ActivityInfo> v_Activitys        = v_XJson.toJavaList(this.activityXY ,ActivityInfo.class);
+            ITemplateService   v_ITemplateService = (ITemplateService)XJava.getObject("TemplateService");
+            
+            v_Ret = v_ITemplateService.saves(this.templateID ,v_Activitys);
+        }
+        catch (Exception exce)
+        {
+            exce.printStackTrace();
+        }
+        
+        this.retJsonData = v_Ret ? "OK" : "Error";
         return SUCCESS;
     }
     

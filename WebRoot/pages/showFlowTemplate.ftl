@@ -20,7 +20,7 @@
 	}
 	
 	#operations {
-		width: 50px; 
+		width: 60px; 
 		height: 15px; 
 		position: fixed;
 		right: 10px;
@@ -29,7 +29,7 @@
 	}
 	
 	#createdBy {
-		width: 135px; 
+		width: 155px; 
 		height: 15px; 
 		position: fixed;
 		right: 10px;
@@ -1291,21 +1291,22 @@
 	.text("保存")
 	.on("click" ,function()
 	{
-		var v_SaveDatas = "";
-		
-		d3.selectAll("g")
-		.each(function()
+		for (var i=0; i<v_Datas.length; i++)
 		{
-			var v_MyG = d3.select(this);
-			var v_XY  = getGXY(v_MyG);
-			v_SaveDatas += v_MyG.attr("id") + "=" + v_XY[0] + "," + v_XY[1] + "|"
-		});
+			var v_G  = d3.select("#" + v_Datas[i].activityID);
+			var v_XY = getGXY(v_G);
+			
+			v_Datas[i].x = v_XY[0];
+			v_Datas[i].y = v_XY[1];
+		}
+		
+		var v_Json = JSON.stringify(v_Datas);
 		
 		$.ajax(
 		{
             url: "saveFlowTemplate"
            ,type: 'post'
-           ,data: {activityXY:v_SaveDatas}
+           ,data: {templateID:${templateID} ,activityXY:v_Json}
            ,dataType: "json"
            ,success: function(data)
             {

@@ -37,7 +37,7 @@
         
         <!-- 保存工作流模板流程图 -->
         <action name="saveFlowTemplate"  class="org.hy.xflow.web.web.FlowAction" method="saveFlowTemplate">
-            <result type="json">
+            <result name="success" type="json">
             	<param name="root">retJsonData</param>
             </result>
         </action>
