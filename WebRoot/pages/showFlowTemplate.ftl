@@ -8,8 +8,10 @@
 	<script type="text/javascript" charset="utf-8" src="../d3/d3.min.js"></script>
 	<script type="text/javascript" charset="utf-8" src="../jquery/jquery.min.js" ></script>
 	<script type="text/javascript" charset="utf-8" src="../jquery/jquery-ui.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="../jquery/colpick.js"></script>
 	
 	<link rel="stylesheet" href="../jquery/jquery-ui.min.css" />
+	<link rel="stylesheet" href="../jquery/colpick.css" />
 	
 	<style type="text/css">
 	body {
@@ -26,6 +28,16 @@
 		right: 10px;
 		top: 10px;
 		font-size: 10px;
+	}
+	
+	#colorPicker {
+		background: white;
+	    display: inline-block;
+	    position: absolute;
+	    padding: 0px;
+	    border-radius: 0px;
+	    border: 0px solid #DDD;
+	    z-index: 99999;
 	}
 	
 	#createdBy {
@@ -116,6 +128,9 @@
 	<div id="operations">
 	</div>
 	
+	<div id="colorPicker">
+	</div>
+	
 	<div id="createdBy">
 		<a href="https://github.com/HY-ZhengWei/XFlowWeb" target="_brank">Source code by <b>XFlowWeb</b></a>
 	</div>
@@ -128,16 +143,18 @@
 	var v_Datas   = ${activitys}.datas;
 	var v_Routes  = ${routes}.datas;
 
-	var v_RouteMap  = makeRouteMap (v_Routes);  /* 可通过路由ID定位路由信息 */
-	var v_RouteRefs = makeRouteRefs(v_Routes);  /* 可通过节点ID定位到与其有关联的所有路由ID */
-	var v_XOffset   = 0;                        /* 移动时相对鼠标的偏移量X */
-	var v_YOffset   = 0;                        /* 移动时相对鼠标的偏移量Y */
-	var v_HLineTMax = 0;                        /* 水平标线（上）离移动节点最近的值 */
-	var v_HLineBMin = 99999;                    /* 水平标线（下）离移动节点最近的值 */
-	var v_VLineLMax = 0;                        /* 垂直标线（左）离移动节点最近的值 */
-	var v_VLineRMin = 99999;                    /* 垂直标线（右）离移动节点最近的值 */
-	var v_ToPoints  = d3.map();                 /* 节点链接线的到达点的位置集合信息map.key为XY坐标值，map.value为数量 */
-	var v_Drag      = d3.drag()
+	var v_RouteMap   = makeRouteMap (v_Routes);  /* 可通过路由ID定位路由信息 */
+	var v_RouteRefs  = makeRouteRefs(v_Routes);  /* 可通过节点ID定位到与其有关联的所有路由ID */
+	var v_XOffset    = 0;                        /* 移动时相对鼠标的偏移量X */
+	var v_YOffset    = 0;                        /* 移动时相对鼠标的偏移量Y */
+	var v_ClickFlag  = null;                     /* 当前点击的d3节点标记对象 */
+	var v_ClickColor = null;                     /* 当前点击的d3节点标记的颜色 */
+	var v_HLineTMax  = 0;                        /* 水平标线（上）离移动节点最近的值 */
+	var v_HLineBMin  = 99999;                    /* 水平标线（下）离移动节点最近的值 */
+	var v_VLineLMax  = 0;                        /* 垂直标线（左）离移动节点最近的值 */
+	var v_VLineRMin  = 99999;                    /* 垂直标线（右）离移动节点最近的值 */
+	var v_ToPoints   = d3.map();                 /* 节点链接线的到达点的位置集合信息map.key为XY坐标值，map.value为数量 */
+	var v_Drag       = d3.drag()
     .on("start" ,function()
     {
 		var v_XY = getGXY(d3.select(this));
@@ -229,6 +246,16 @@
 	{
     	hideHVLine();
     });
+	
+	
+	
+	d3.select("body")
+	.on("click" ,function()
+	{
+		// $("#colorPicker").css("opacity" ,0);
+	});
+	
+	
 	
 	/* 水平标线 */
 	var v_HLine = v_SVG.append("line")
@@ -483,6 +510,31 @@
 			     + (v_StartX + N.flagWidth) + "," + N.height + " "
 			     + (v_StartX + N.flagWidth / 2) + "," + (N.height - N.flagWidth / 2) + " "
 			     + v_StartX + "," + N.height;
+		})
+		.on("click" ,function() 
+		{
+			v_ClickFlag  = d3.select(this);
+			v_ClickColor = v_ClickFlag.attr("fill");
+			
+			$("#colorPicker").colpick({
+			    flat: true,
+			    layout: 'full',
+			    colorScheme: 'light',
+			    submit: true,
+			    onSubmit: function(hsb,hex,rgb,el,bySetColor)
+			    {
+			    	$("#colorPicker").css("opacity" ,0);
+			    	v_ClickFlag.attr("fill" ,'#' + hex);
+			    },
+				onChange: function (hsb,hex,rgb,el,bySetColor) 
+				{
+					v_ClickFlag.attr("fill" ,'#' + hex);
+		        }
+			});
+			$("#colorPicker").colpickSetColor(v_ClickColor ,true);
+			$("#colorPicker").css("left" ,(d3.event.pageX + N.width) + "px");
+			$("#colorPicker").css("top"  ,(d3.event.pageY - 20) + "px");
+			$("#colorPicker").css("opacity" ,100); 
 		});
 		
 		var v_NodeName = i_G.append("text")
@@ -1291,13 +1343,17 @@
 	.text("保存")
 	.on("click" ,function()
 	{
+		$("#colorPicker").css("opacity" ,0);
+		
 		for (var i=0; i<v_Datas.length; i++)
 		{
-			var v_G  = d3.select("#" + v_Datas[i].activityID);
-			var v_XY = getGXY(v_G);
+			var v_NodeFlag = d3.select("#NGF" + v_Datas[i].activityID);
+			var v_G        = d3.select("#"    + v_Datas[i].activityID);
+			var v_XY       = getGXY(v_G);
 			
-			v_Datas[i].x = v_XY[0];
-			v_Datas[i].y = v_XY[1];
+			v_Datas[i].x         = v_XY[0];
+			v_Datas[i].y         = v_XY[1];
+			v_Datas[i].flagColor = v_NodeFlag.attr("fill");
 		}
 		
 		var v_Json = JSON.stringify(v_Datas);
@@ -1306,7 +1362,7 @@
 		{
             url: "saveFlowTemplate"
            ,type: 'post'
-           ,data: {templateID:${templateID} ,activityXY:v_Json}
+           ,data: {templateID:"${templateID}" ,activityXY:v_Json}
            ,dataType: "json"
            ,success: function(data)
             {

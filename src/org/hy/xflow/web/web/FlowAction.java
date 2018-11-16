@@ -111,9 +111,9 @@ public class FlowAction extends ActionSupport
                 v_New.setActivityName(           v_Activity.getActivityName());
                 v_New.setX(             Help.NVL(v_Activity.getX()));
                 v_New.setY(             Help.NVL(v_Activity.getY()));
-                v_New.setBackgroudColor(Help.NVL(v_Activity.getBackgroudColor() ,"White"));
-                v_New.setLineColor(     Help.NVL(v_Activity.getLineColor()      ,"Black"));
-                v_New.setFlagColor(     Help.NVL(v_Activity.getFlagColor()      ,"White"));
+                v_New.setBackgroudColor(Help.NVL(v_Activity.getBackgroudColor() ,"#FFFFFF"));
+                v_New.setLineColor(     Help.NVL(v_Activity.getLineColor()      ,"#000000"));
+                v_New.setFlagColor(     Help.NVL(v_Activity.getFlagColor()      ,"#FFFFFF"));
                 
                 v_TempActivitys.add(v_New);
             }
