@@ -1336,6 +1336,8 @@
 	hideHVLine();
 	
 	
+	<#if isShowOperations ??>
+	
 	d3.select("#operations").append("a")
 	.attr("id" ,"saveTemplate")
 	.attr("class" ,"ui-button ui-widget ui-corner-all")
@@ -1370,6 +1372,8 @@
             }
         });
 	});
+	
+	</#if>
 	
 	</script>
 	

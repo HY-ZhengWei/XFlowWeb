@@ -42,6 +42,12 @@
             </result>
         </action>
         
+        
+        <!-- 显示工作流实例的流程图 -->
+        <action name="showFlow"  class="org.hy.xflow.web.web.FlowAction" method="showFlowTemplate">
+            <result name="success" type="freemarker">/pages/showFlowTemplate.ftl</result>
+        </action>
+        
     </package>
 
 </struts>

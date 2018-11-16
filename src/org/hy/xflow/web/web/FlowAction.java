@@ -8,7 +8,9 @@ import org.hy.common.xml.XJSON;
 import org.hy.common.xml.XJava;
 import org.hy.xflow.engine.bean.ActivityInfo;
 import org.hy.xflow.engine.bean.ActivityRoute;
+import org.hy.xflow.engine.bean.FlowProcess;
 import org.hy.xflow.engine.bean.Template;
+import org.hy.xflow.engine.service.IFlowProcessService;
 import org.hy.xflow.engine.service.ITemplateService;
 
 import com.opensymphony.xwork2.ActionSupport;
@@ -51,6 +53,15 @@ public class FlowAction extends ActionSupport
     
     /** 保存活动节点的位置信息 */
     private String activityXY;
+    
+    /** 是否显示操作工具栏（如，保存功能） */
+    private boolean isShowOperations;
+    
+    /** 工作流实例ID */
+    private String workID;
+    
+    /** 第三方使用系统的业务数据ID。即支持用第三方ID也能找到工作流信息 */
+    private String serviceDataID;
     
     
     
@@ -138,8 +149,9 @@ public class FlowAction extends ActionSupport
             XJSON v_XJSON = new XJSON();
             v_XJSON.setReturnNVL(false);
             
-            this.activitys = v_XJSON.toJson(v_TempActivitys ,"datas").toJSONString();
-            this.routes    = v_XJSON.toJson(v_TempRoutes    ,"datas").toJSONString();
+            this.activitys        = v_XJSON.toJson(v_TempActivitys ,"datas").toJSONString();
+            this.routes           = v_XJSON.toJson(v_TempRoutes    ,"datas").toJSONString();
+            this.isShowOperations = true;
             
             return SUCCESS;
         }
@@ -180,6 +192,99 @@ public class FlowAction extends ActionSupport
         
         this.retJsonData = v_Ret ? "OK" : "Error";
         return SUCCESS;
+    }
+    
+    
+    
+    /**
+     * 显示工作流实例的流程图
+     * 
+     * @author      ZhengWei(HY)
+     * @createDate  2018-11-16
+     * @version     v1.0
+     */
+    public String showFlow()
+    {
+        IFlowProcessService v_ProcessService = (IFlowProcessService)XJava.getObject("FlowProcessService");
+        List<FlowProcess>   v_Processes      = null;
+        
+        if ( !Help.isNull(this.workID) )
+        {
+            v_Processes = v_ProcessService.queryByWorkID(this.workID);
+        }
+        else if ( !Help.isNull(this.serviceDataID) )
+        {
+            v_Processes = v_ProcessService.queryByServiceDataID(this.serviceDataID);
+        }
+        else
+        {
+            return "error";
+        }
+        
+        ITemplateService v_ITemplateService = (ITemplateService)XJava.getObject("TemplateService");
+        Template         v_Template         = v_ITemplateService.queryByID(this.templateID);
+        if ( v_Template == null )
+        {
+            return "error";
+        }
+        
+        try
+        {
+            this.templateID   = v_Template.getTemplateID(); 
+            this.templateName = v_Template.getTemplateName();
+            this.version      = v_Template.getVersion();
+            
+            List<ActivityInfo> v_Activitys     = Help.toList(v_Template.getActivityRouteTree().getActivitys());
+            List<ActivityInfo> v_TempActivitys = new ArrayList<ActivityInfo>();
+            
+            for (ActivityInfo v_Activity : v_Activitys)
+            {
+                ActivityInfo v_New = new ActivityInfo();
+                
+                v_New.setActivityID(             v_Activity.getActivityID());
+                v_New.setActivityCode(           v_Activity.getActivityCode());
+                v_New.setActivityName(           v_Activity.getActivityName());
+                v_New.setX(             Help.NVL(v_Activity.getX()));
+                v_New.setY(             Help.NVL(v_Activity.getY()));
+                v_New.setBackgroudColor(Help.NVL(v_Activity.getBackgroudColor() ,"#FFFFFF"));
+                v_New.setLineColor(     Help.NVL(v_Activity.getLineColor()      ,"#000000"));
+                v_New.setFlagColor(     Help.NVL(v_Activity.getFlagColor()      ,"#FFFFFF"));
+                
+                v_TempActivitys.add(v_New);
+            }
+            
+            List<ActivityRoute> v_Routes     = Help.toList(v_Template.getActivityRouteTree().getActivityRoutes());
+            List<ActivityRoute> v_TempRoutes = new ArrayList<ActivityRoute>();
+            
+            for (ActivityRoute v_Route : v_Routes)
+            {
+                ActivityRoute v_New = new ActivityRoute();
+                
+                v_New.setActivityRouteID  (v_Route.getActivityRouteID());
+                v_New.setActivityRouteCode(v_Route.getActivityRouteCode());
+                v_New.setActivityRouteName(v_Route.getActivityRouteName());
+                v_New.setActivityID(       v_Route.getActivityID());
+                v_New.setNextActivityID(   v_Route.getNextActivityID());
+                v_New.setRouteType(        v_Route.getRouteType());
+                
+                v_TempRoutes.add(v_New);
+            }
+            
+            XJSON v_XJSON = new XJSON();
+            v_XJSON.setReturnNVL(false);
+            
+            this.activitys        = v_XJSON.toJson(v_TempActivitys ,"datas").toJSONString();
+            this.routes           = v_XJSON.toJson(v_TempRoutes    ,"datas").toJSONString();
+            this.isShowOperations = true;
+            
+            return SUCCESS;
+        }
+        catch (Exception exce)
+        {
+            exce.printStackTrace();
+        }
+        
+        return "toList";
     }
     
     
@@ -332,6 +437,72 @@ public class FlowAction extends ActionSupport
     public void setActivityXY(String activityXY)
     {
         this.activityXY = activityXY;
+    }
+
+
+    
+    /**
+     * 获取：是否显示操作工具栏（如，保存功能）
+     */
+    public boolean isShowOperations()
+    {
+        return isShowOperations;
+    }
+
+
+    
+    /**
+     * 设置：是否显示操作工具栏（如，保存功能）
+     * 
+     * @param isShowOperations 
+     */
+    public void setShowOperations(boolean isShowOperations)
+    {
+        this.isShowOperations = isShowOperations;
+    }
+
+
+    
+    /**
+     * 获取：工作流实例ID
+     */
+    public String getWorkID()
+    {
+        return workID;
+    }
+
+
+    
+    /**
+     * 设置：工作流实例ID
+     * 
+     * @param workID 
+     */
+    public void setWorkID(String workID)
+    {
+        this.workID = workID;
+    }
+
+
+    
+    /**
+     * 获取：第三方使用系统的业务数据ID。即支持用第三方ID也能找到工作流信息
+     */
+    public String getServiceDataID()
+    {
+        return serviceDataID;
+    }
+
+
+    
+    /**
+     * 设置：第三方使用系统的业务数据ID。即支持用第三方ID也能找到工作流信息
+     * 
+     * @param serviceDataID 
+     */
+    public void setServiceDataID(String serviceDataID)
+    {
+        this.serviceDataID = serviceDataID;
     }
     
 }
