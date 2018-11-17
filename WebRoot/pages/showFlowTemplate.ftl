@@ -22,7 +22,7 @@
 	}
 	
 	#operations {
-		width: 60px; 
+		width: 120px; 
 		height: 15px; 
 		position: fixed;
 		right: 10px;
@@ -138,7 +138,7 @@
 	<script type="text/javascript">
 	
 	var N         = {width:130 ,height:40 ,lineWidth:1 ,flagWidth:18 };
-	var Colors    = {backgroudColor:"white" ,routeColor:"#6AB975" ,routeRejectColor:"#FF4444" ,markLineColor:"#0099CC"}; 
+	var Colors    = {backgroudColor:"#FFFFFF" ,routeColor:"#6AB975" ,routeRejectColor:"#FF4444" ,markLineColor:"#0099CC"}; 
 	var v_SVG     = d3.select("body").select("svg");
 	var v_Datas   = ${activitys}.datas;
 	var v_Routes  = ${routes}.datas;
@@ -523,7 +523,7 @@
 			    submit: true,
 			    onSubmit: function(hsb,hex,rgb,el,bySetColor)
 			    {
-			    	$("#colorPicker").css("opacity" ,0);
+			    	hideColorPicker();
 			    	v_ClickFlag.attr("fill" ,'#' + hex);
 			    },
 				onChange: function (hsb,hex,rgb,el,bySetColor) 
@@ -1230,6 +1230,22 @@
 	
 	
 	
+	/**
+	 * 隐藏颜色选择器
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2018-11-17
+	 * @version     v1.0
+	 */
+	function hideColorPicker()
+	{
+		$("#colorPicker").css("opacity" ,0);
+		$("#colorPicker").css("left" ,"-99999px");
+		$("#colorPicker").css("top"  ,"-99999px");
+	}
+	
+	
+	
 	v_SVG.selectAll("polyline").data(v_Routes)
 	.enter()
 	.append("polyline")
@@ -1241,13 +1257,20 @@
 	.attr("stroke-width" ,3)
 	.attr("stroke" ,function(d ,i)
 	{
-		if ( d.routeType.routeType == "驳回" )
+		if ( d.lineColor == null || d.lineColor == "" )
 		{
-			return Colors.routeRejectColor;
+			if ( d.routeType.routeType == "驳回" )
+			{
+				return Colors.routeRejectColor;
+			}
+			else
+			{
+				return Colors.routeColor;
+			}
 		}
 		else
 		{
-			return Colors.routeColor;
+			return d.lineColor;
 		}
 	})
 	.attr("stroke-dasharray" ,function(d ,i)
@@ -1336,7 +1359,7 @@
 	hideHVLine();
 	
 	
-	<#if isShowOperations ??>
+	<#if showOperations == "1" >
 	
 	d3.select("#operations").append("a")
 	.attr("id" ,"saveTemplate")
@@ -1345,9 +1368,10 @@
 	.text("保存")
 	.on("click" ,function()
 	{
-		$("#colorPicker").css("opacity" ,0);
+		hideColorPicker();
 		
-		for (var i=0; i<v_Datas.length; i++)
+		var i = 0;
+		for (i = 0; i<v_Datas.length; i++)
 		{
 			var v_NodeFlag = d3.select("#NGF" + v_Datas[i].activityID);
 			var v_G        = d3.select("#"    + v_Datas[i].activityID);
@@ -1358,17 +1382,61 @@
 			v_Datas[i].flagColor = v_NodeFlag.attr("fill");
 		}
 		
-		var v_Json = JSON.stringify(v_Datas);
+		for (i=0; i<v_Routes.length; i++)
+		{
+			var v_Route = d3.select("#" + v_Routes[i].activityRouteID);
+			
+			v_Routes[i].lineColor = v_Route.attr("stroke");
+		}
+		
+		var v_ActivitysJson = JSON.stringify(v_Datas);
+		var v_RoutesJson    = JSON.stringify(v_Routes);
 		
 		$.ajax(
 		{
             url: "saveFlowTemplate"
            ,type: 'post'
-           ,data: {templateID:"${templateID}" ,activityXY:v_Json}
+           ,data: {templateID:"${templateID}" ,activitys:v_ActivitysJson ,routes:v_RoutesJson}
            ,dataType: "json"
            ,success: function(data)
             {
-                alert(data);
+				if ( data == "OK" )
+				{
+					alert("保存成功。");
+              	}
+				else
+              	{
+               		alert("保存异常，请查看服务日志。");
+              	}
+            }
+        });
+	});
+	
+	
+	d3.select("#operations").append("a")
+	.attr("id" ,"refreshTemplateCache")
+	.attr("class" ,"ui-button ui-widget ui-corner-all")
+	.attr("href" ,"#")
+	.text("刷新缓存")
+	.on("click" ,function()
+	{
+		$.ajax(
+		{
+            url: "refreshTemplateCache"
+           ,type: 'post'
+           ,data: {templateID:"${templateID}"}
+           ,dataType: "json"
+           ,success: function(data)
+            {
+				if ( data == "OK" )
+               	{
+               		alert("刷新缓存成功。");
+               		window.location.href = "showFlowTemplate?templateID=${templateID}";
+               	}
+                else
+               	{
+                	alert("刷新缓存异常，请查看服务日志。");
+               	}
             }
         });
 	});

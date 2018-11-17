@@ -43,8 +43,16 @@
         </action>
         
         
+        <!-- 刷新缓存，重新从数据库中加载工作流模板的信息 -->
+        <action name="refreshTemplateCache"  class="org.hy.xflow.web.web.FlowAction" method="refreshTemplateCache">
+            <result name="success" type="json">
+            	<param name="root">retJsonData</param>
+            </result>
+        </action>
+        
+        
         <!-- 显示工作流实例的流程图 -->
-        <action name="showFlow"  class="org.hy.xflow.web.web.FlowAction" method="showFlowTemplate">
+        <action name="showFlow"  class="org.hy.xflow.web.web.FlowAction" method="showFlow">
             <result name="success" type="freemarker">/pages/showFlowTemplate.ftl</result>
         </action>
         

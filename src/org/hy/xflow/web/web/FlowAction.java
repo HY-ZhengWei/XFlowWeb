@@ -51,11 +51,8 @@ public class FlowAction extends ActionSupport
     /** 用于Json数据的返回，而不是页面跳转 */
     private String retJsonData;
     
-    /** 保存活动节点的位置信息 */
-    private String activityXY;
-    
     /** 是否显示操作工具栏（如，保存功能） */
-    private boolean isShowOperations;
+    private String showOperations;
     
     /** 工作流实例ID */
     private String workID;
@@ -142,6 +139,7 @@ public class FlowAction extends ActionSupport
                 v_New.setActivityID(       v_Route.getActivityID());
                 v_New.setNextActivityID(   v_Route.getNextActivityID());
                 v_New.setRouteType(        v_Route.getRouteType());
+                v_New.setLineColor(        v_Route.getLineColor());
                 
                 v_TempRoutes.add(v_New);
             }
@@ -149,9 +147,9 @@ public class FlowAction extends ActionSupport
             XJSON v_XJSON = new XJSON();
             v_XJSON.setReturnNVL(false);
             
-            this.activitys        = v_XJSON.toJson(v_TempActivitys ,"datas").toJSONString();
-            this.routes           = v_XJSON.toJson(v_TempRoutes    ,"datas").toJSONString();
-            this.isShowOperations = true;
+            this.activitys      = v_XJSON.toJson(v_TempActivitys ,"datas").toJSONString();
+            this.routes         = v_XJSON.toJson(v_TempRoutes    ,"datas").toJSONString();
+            this.showOperations = "1";
             
             return SUCCESS;
         }
@@ -180,10 +178,39 @@ public class FlowAction extends ActionSupport
         {
             XJSON v_XJson = new XJSON();
             
-            List<ActivityInfo> v_Activitys        = v_XJson.toJavaList(this.activityXY ,ActivityInfo.class);
-            ITemplateService   v_ITemplateService = (ITemplateService)XJava.getObject("TemplateService");
+            List<ActivityInfo>  v_Activitys        = v_XJson.toJavaList(this.activitys ,ActivityInfo.class);
+            List<ActivityRoute> v_Routes           = v_XJson.toJavaList(this.routes    ,ActivityRoute.class);
+            ITemplateService    v_ITemplateService = (ITemplateService)XJava.getObject("TemplateService");
             
-            v_Ret = v_ITemplateService.saves(this.templateID ,v_Activitys);
+            v_Ret = v_ITemplateService.saves(this.templateID ,v_Activitys ,v_Routes);
+        }
+        catch (Exception exce)
+        {
+            exce.printStackTrace();
+        }
+        
+        this.retJsonData = v_Ret ? "OK" : "Error";
+        return SUCCESS;
+    }
+    
+    
+    
+    /**
+     * 刷新缓存，重新从数据库中加载工作流模板的信息
+     * 
+     * @author      ZhengWei(HY)
+     * @createDate  2018-11-17
+     * @version     v1.0
+     */
+    public String refreshTemplateCache()
+    {
+        boolean v_Ret = false;
+        
+        try
+        {
+            ITemplateService v_ITemplateService = (ITemplateService)XJava.getObject("TemplateService");
+            
+            v_Ret = v_ITemplateService.refreshCache(this.templateID);
         }
         catch (Exception exce)
         {
@@ -273,9 +300,9 @@ public class FlowAction extends ActionSupport
             XJSON v_XJSON = new XJSON();
             v_XJSON.setReturnNVL(false);
             
-            this.activitys        = v_XJSON.toJson(v_TempActivitys ,"datas").toJSONString();
-            this.routes           = v_XJSON.toJson(v_TempRoutes    ,"datas").toJSONString();
-            this.isShowOperations = true;
+            this.activitys      = v_XJSON.toJson(v_TempActivitys ,"datas").toJSONString();
+            this.routes         = v_XJSON.toJson(v_TempRoutes    ,"datas").toJSONString();
+            this.showOperations = "0";
             
             return SUCCESS;
         }
@@ -420,33 +447,11 @@ public class FlowAction extends ActionSupport
 
     
     /**
-     * 获取：保存活动节点的位置信息
-     */
-    public String getActivityXY()
-    {
-        return activityXY;
-    }
-
-
-    
-    /**
-     * 设置：保存活动节点的位置信息
-     * 
-     * @param activityXY 
-     */
-    public void setActivityXY(String activityXY)
-    {
-        this.activityXY = activityXY;
-    }
-
-
-    
-    /**
      * 获取：是否显示操作工具栏（如，保存功能）
      */
-    public boolean isShowOperations()
+    public String getShowOperations()
     {
-        return isShowOperations;
+        return showOperations;
     }
 
 
@@ -454,11 +459,11 @@ public class FlowAction extends ActionSupport
     /**
      * 设置：是否显示操作工具栏（如，保存功能）
      * 
-     * @param isShowOperations 
+     * @param showOperations 
      */
-    public void setShowOperations(boolean isShowOperations)
+    public void setShowOperations(String showOperations)
     {
-        this.isShowOperations = isShowOperations;
+        this.showOperations = showOperations;
     }
 
 
