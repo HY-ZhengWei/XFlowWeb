@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hy.common.Help;
+import org.hy.common.TablePartition;
 import org.hy.common.xml.XJSON;
 import org.hy.common.xml.XJava;
 import org.hy.xflow.engine.bean.ActivityInfo;
@@ -255,6 +256,12 @@ public class FlowAction extends ActionSupport
             return "error";
         }
         
+        TablePartition<String  ,FlowProcess> v_ProcessRoutes = new TablePartition<String  ,FlowProcess>();
+        for (FlowProcess v_Process : v_Processes)
+        {
+            v_ProcessRoutes.putRow(Help.NVL(v_Process.getCurrentActivityID()) + "-" + Help.NVL(v_Process.getNextActivityID()) ,v_Process);
+        }
+        
         try
         {
             this.templateID   = v_Template.getTemplateID(); 
@@ -293,6 +300,27 @@ public class FlowAction extends ActionSupport
                 v_New.setActivityID(       v_Route.getActivityID());
                 v_New.setNextActivityID(   v_Route.getNextActivityID());
                 v_New.setRouteType(        v_Route.getRouteType());
+                
+                List<FlowProcess> v_NodeProcess = v_ProcessRoutes.get(v_Route.getActivityRouteID() + "-" + v_Route.getNextActivityID());
+                if ( !Help.isNull(v_NodeProcess) )
+                {
+                    if ( !Help.isNull(v_Route.getLineColor()) )
+                    {
+                        v_New.setLineColor(v_Route.getLineColor());
+                    }
+                    if ( "驳回".equals(v_Route.getRouteType().getRouteType()) )
+                    {
+                        v_New.setLineColor("#FF4444");
+                    }
+                    else
+                    {
+                        v_New.setLineColor("#6AB975");
+                    }
+                }
+                else
+                {
+                    v_New.setLineColor("#888");
+                }
                 
                 v_TempRoutes.add(v_New);
             }

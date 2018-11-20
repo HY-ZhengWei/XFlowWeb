@@ -85,7 +85,7 @@
 					refX="9"
 					refY="6"
 					orient="auto">
-				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:#6AB975;" />
+				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:#6AB975;"></path>
 			</marker>
 			
 			<marker id="arrowTo_Reject" 
@@ -96,7 +96,29 @@
 					refX="9"
 					refY="6"
 					orient="auto">
-				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:#FF4444;" />
+				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:#FF4444;"></path>
+			</marker>
+	        
+	        <marker id="arrowToIE" 
+					markerUnits="strokerWidth"
+					markerWidth="4"
+					markerHeight="4"
+					viewBox="0 0 12 12"
+					refX="9"
+					refY="6"
+					orient="auto">
+				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:#6AB975; stroke-dasharray:1,0;"></path>
+			</marker>
+			
+			<marker id="arrowToIE_Reject" 
+					markerUnits="strokerWidth"
+					markerWidth="4"
+					markerHeight="4"
+					viewBox="0 0 12 12"
+					refX="9"
+					refY="6"
+					orient="auto">
+				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:#FF4444; stroke-dasharray:1,0;"></path>
 			</marker>
 			
 			<marker id="arrowToFirebox" 
@@ -107,7 +129,7 @@
 					refX="9"
 					refY="6"
 					orient="auto">
-				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:#6AB975;" />
+				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:#6AB975;"></path>
 			</marker>
 			
 			<marker id="arrowToFirebox_Reject" 
@@ -118,7 +140,7 @@
 					refX="9"
 					refY="6"
 					orient="auto">
-				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:#FF4444;" />
+				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:#FF4444;"></path>
 			</marker>
     		
 		</defs>
@@ -495,13 +517,15 @@
 		.attr("stroke-width" ,N.lineWidth)
 		.attr("id"           ,"NGR" + i_Data.activityID)
 		.attr("stroke"       ,i_Data.lineColor)
-		.attr("fill"         ,i_Data.backgroudColor);
+		.attr("fill"         ,i_Data.backgroudColor)
+		.style("cursor"      ,"move");
 		
 		var v_NodeFlag = i_G.append("polygon")
 		.attr("stroke-width" ,N.lineWidth)
 		.attr("id"           ,"NGF" + i_Data.activityID)
 		.attr("stroke"       ,i_Data.lineColor)
 		.attr("fill"         ,i_Data.flagColor)
+		.style("cursor"      ,"pointer")
 		.attr("points" ,function()
 		{
 			var v_StartX = 7;
@@ -545,6 +569,7 @@
 		.attr("text-anchor" ,"middle")
 		.attr("font-weight" ,"bold")
 		.attr("fill"        ,"black")
+		.style("cursor"     ,"move")
 		.text(i_Data.activityName);
 	}
 	
@@ -617,7 +642,21 @@
 	 */
 	function getGXY(i_G)
 	{
-		return i_G.attr("transform").replace("translate(" ,"").replace(")" ,"").split(",");
+		var v_Ret = i_G.attr("transform").replace("translate(" ,"").replace(")" ,"");
+		
+		if ( v_Ret.indexOf(",") >= 0 )
+		{
+			return v_Ret.split(",");
+		}
+		else if ( v_Ret.indexOf(" ") >= 0 )
+		{
+			/* IE浏览器有用空格分割位置XY的情况 */
+			return v_Ret.split(" ");
+		}
+		else
+		{
+			return (v_Ret + ",0").split(",");
+		}
 	}
 	
 	
@@ -1253,7 +1292,7 @@
 	{
 		return d.activityRouteID;	
 	})
-	.attr("fill" ,"#00000000")
+	.attr("fill" ,"none")
 	.attr("stroke-width" ,3)
 	.attr("stroke" ,function(d ,i)
 	{
@@ -1293,7 +1332,11 @@
 		}
 		
 		var v_UserAgent = navigator.userAgent.toLowerCase();
-		if ( v_UserAgent.indexOf("firefox") >= 0 ) 
+		if ( v_UserAgent.indexOf("window") >= 0 || v_UserAgent.indexOf("ie") >= 0 )
+		{
+			return "url(#arrowToIE" + v_Flag + ")";
+		}
+		else if ( v_UserAgent.indexOf("firefox") >= 0 ) 
 		{
 			return "url(#arrowToFirebox" + v_Flag + ")";
 		}
@@ -1301,6 +1344,12 @@
 		{
 			return "url(#arrowTo" + v_Flag + ")";
 		}
+	})
+	.attr("points" ,function(d ,i)
+	{
+		/* 后面的代码再设置位置：使节点均在连接线之上，防止出现选不中节点的问题 */
+		
+		return "0,0 0,0";
 	});
 	
 	
