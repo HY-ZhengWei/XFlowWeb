@@ -1,0 +1,514 @@
+<!--
+  @author      ZhengWei(HY)
+  @createDate  2019-01-29
+  @version     v1.0
+-->
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>时间进度页面</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	
+	<script type="text/javascript" charset="utf-8" src="../../d3/d3.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="../../jquery/jquery.min.js" ></script>
+	<script type="text/javascript" charset="utf-8" src="../../jquery/jquery-ui.min.js"></script>
+	
+	<link rel="stylesheet" href="../../jquery/jquery-ui.min.css" />
+	
+	<style type="text/css">
+	body {
+	  font-family: 'Open Sans', sans-serif;
+	  font-size: 12px;
+	  font-weight: 400;
+	  background-color: #fff;
+	}
+	
+	#workingTimesTooltip {
+		background: white;
+	    display: inline-block;
+	    position: absolute;
+	    padding: 0px 0px;
+	    border-radius: 5px;
+	    border: 1px solid #CCC;
+	    z-index: 99999;
+		opacity: 0;
+	}
+	
+	#videoTooltip {
+		background: white;
+	    display: inline-block;
+	    position: absolute;
+	    padding: 5px 5px;
+	    margin: 0px;
+	    border-radius: 5px;
+	    border: 1px solid #DDD;
+	   	z-index: 99999;
+		opacity: 0;
+	}
+	
+	#openVideo {
+		background: white;
+	    display: inline-block;
+	    position: absolute;
+	    padding: 5px 5px;
+	    margin: 0px;
+	   	z-index: 99999;
+		opacity: 0;
+	}
+	
+	.frameClass {
+		padding: 0px; 
+		margin: 0px;
+	}
+	
+	#progressbar .ui-progressbar {
+    	position: relative;
+	}
+	
+	.ui-progressbar-value {
+		background: #6AB975;
+	}
+	
+	.progress-label {
+		position: absolute;
+		left: 25%;
+		top: 1px;
+		text-shadow: 1px 1px 0 #fff;
+	}
+	</style>
+	
+</head>
+<body>
+
+	<svg width="2000" height="1000" version="1.1" xmlns="http://www.w3.org/2000/svg">
+	
+		<defs>
+		
+			<filter id="shadow">
+		        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur"></feGaussianBlur>
+		        <feOffset in="blur" dx="2" dy="2" result="offset"></feOffset>
+		        <feMerge>
+		        <feMergeNode in="offset"></feMergeNode>
+		        <feMergeNode in="SourceGraphic"></feMergeNode>
+		        </feMerge>
+	        </filter>
+	        
+		</defs>
+		
+	</svg>
+	
+	<div id="workingTimesTooltip"></div>
+	<div id="videoTooltip"></div>
+	
+
+<script type="text/javascript">
+
+var v_Images = {
+				 "合同评审" : "node001.png"
+				,"排产确认" : "node002.png"
+				,"商品计划" : "node003.png"
+				,"产品设计" : "node004.png"
+				,"工艺设计" : "node005.png"
+				,"零件计划" : "node006.png"
+				,"生产计划" : "node014.png"
+				,"外购件"   : "node007.png"
+				,"外购阀门" : "node008.png"
+				,"铸造"    : "node015.png"
+				,"零件精加" : "node009.png"
+				,"装配"    : "node010.png"
+				,"入库"    : "node011.png"
+				,"采机加件" : "node012.png"
+			    ,"采装配件" : "node013.png"
+				,"入库"    : "node011.png"
+				,"包装发运" : "node999.png"
+               };
+var v_Colors = {
+				"finish":  "#6AB975",
+				"working": "#FFB941",
+				"timeout": "#FF4444",
+				"wait":    "#BBBBBB"
+		       };
+var v_Schedules = [{name:"合同评审" ,finishPercentage:100}
+                  ,{name:"排产确认" ,finishPercentage:90}
+                  ,{name:"商品计划" ,finishPercentage:80}
+                  ,{name:"产品设计" ,finishPercentage:70}
+                  ,{name:"工艺设计" ,finishPercentage:60}
+                  ,{name:"零件计划" ,finishPercentage:50}
+                  ,{name:"生产计划" ,finishPercentage:40}
+                  ,{name:"外购阀门" ,finishPercentage:30}
+                  ,{name:"铸造" ,finishPercentage:20}
+                  ,{name:"装配" ,finishPercentage:10}
+                  ,{name:"包装发运" ,finishPercentage:0}
+                  ];
+var v_MaxWidth  = 500;             /* 舞台最大宽度 */
+var v_MaxHeight = 500;             /* 舞台最大高度 */
+var v_CX        = v_MaxWidth  / 2; /* 圆心的X坐标 */
+var v_CY        = v_MaxHeight / 2; /* 圆心的Y坐标 */
+var v_SVG       = d3.select("body").select("svg").attr("width" ,v_MaxWidth).attr("height" ,v_MaxHeight);
+var v_GEnter    = v_SVG.selectAll("g").data(v_Schedules).enter();
+var v_OldData   = null;
+var v_OldG      = null;
+
+
+
+function getNodeName(i_NodeName)
+{
+	var v_Ret = i_NodeName;
+	
+	if ( v_Ret == "商品计划下达" )
+	{
+		v_Ret = "商品计划";
+	}
+	else if ( v_Ret == "零件计划下达" )
+	{
+		v_Ret = "零件计划";
+	}
+	else if ( v_Ret == "零件加工" )
+	{
+		v_Ret = "零件精加";
+	}
+	else if ( v_Ret == "零件精加工" )
+	{
+		v_Ret = "零件精加";
+	}
+	else if ( v_Ret == "采购_1" )
+	{
+		v_Ret = "采机加件";
+	}
+	else if ( v_Ret == "采购_2" )
+	{
+		v_Ret = "采装配件";
+	}
+	
+	return v_Ret;
+}
+
+
+
+function getNodeImage(i_NodeName)
+{
+	var v_Ret = v_Images[i_NodeName];
+	
+	if ( v_Ret == null )
+	{
+		v_Ret = "node000.png";
+	}
+	
+	return v_Ret;
+}
+
+
+
+/**
+ * 计算圆上任意角度圆周上点的XY位置。
+ *
+ * @param i_CircleX  圆心的X坐标
+ * @param i_CircleY  圆心的Y坐标
+ * @param i_Radius   圆的半径
+ * @param i_Angle    角度
+ * @return [x ,y]
+ */
+function calcCirclePoint(i_CircleX ,i_CircleY ,i_Radius ,i_Angle)
+{
+	return [calcCirclePointX(i_CircleX ,i_Radius ,i_Angle) 
+		   ,calcCirclePointY(i_CircleY ,i_Radius ,i_Angle)];
+}
+
+
+
+/**
+ * 计算圆上任意角度圆周上点的X坐标位置。
+ *
+ * @param i_CircleX  圆心的X坐标
+ * @param i_Radius   圆的半径
+ * @param i_Angle    角度
+ * @return           X
+ */
+function calcCirclePointX(i_CircleX ,i_Radius ,i_Angle)
+{
+	return i_CircleX + Math.cos(i_Angle * 2 * Math.PI / 360) * i_Radius;
+}
+
+
+
+/**
+ * 计算圆上任意角度圆周上点的Y坐标位置。
+ *
+ * @param i_CircleY  圆心的Y坐标
+ * @param i_Radius   圆的半径
+ * @param i_Angle    角度
+ * @return [x ,y]
+ */
+function calcCirclePointY(i_CircleY ,i_Radius ,i_Angle)
+{
+	return i_CircleY + Math.sin(i_Angle * 2 * Math.PI / 360) * i_Radius;
+}
+
+
+
+/* 绘制多个圆 */
+var v_Circles = d3.range(5);
+var v_MinR    = Math.min(v_MaxWidth ,v_MaxHeight) / 2 / (v_Circles.length + 2);  /* 圆的最小半径 */
+var v_MaxR    = v_MinR * v_Circles.length;
+v_SVG.selectAll(".CircleInfo").data(v_Circles).enter()
+.append("circle")
+.attr("class" ,"CircleInfo")
+.attr("cx" ,v_CX)
+.attr("cy" ,v_CY)
+.attr("r"  ,function(d ,i)
+{
+	return v_MinR * (i + 1);
+})
+.style("fill" ,"none")
+.style("stroke" ,function(d ,i)
+{
+	return ((i + 1) == v_Circles.length) ? "#000000" : "#CCCCCC";	
+})
+.style("stroke-width" ,1);
+
+
+
+/* 绘制圆形及方形的外场 */
+v_SVG.append("path")
+.attr("d" ,function()
+{
+	var v_BG = d3.path();
+	
+	v_BG.arc(v_CX ,v_CY ,v_MaxR ,0 ,2*Math.PI);
+	v_BG.lineTo(v_MaxWidth ,v_MaxHeight/2);
+	v_BG.lineTo(v_MaxWidth ,0);
+	v_BG.lineTo(0 ,0);
+	v_BG.lineTo(0 ,v_MaxHeight);
+	v_BG.lineTo(v_MaxWidth ,v_MaxHeight);
+	v_BG.lineTo(v_MaxWidth ,v_MaxHeight/2);
+	v_BG.closePath();
+	
+	return v_BG.toString();
+})
+.attr("fill" ,"white")
+.attr("stroke-width" ,0)
+.on("mouseenter" ,function(d ,i)
+{
+	hideTooltips();
+});
+
+
+
+/* 绘制圆刻度 */
+var v_R2       = v_MaxR + 7;                    /* 刻度所在圆的半径。此圆是隐性存在的 */
+var v_Dividing = v_Schedules.length;            /* 将圆分成多少份 */
+var v_Angle    = 360 / v_Dividing;              /* 分割角度 */
+var v_AOffer   = 270;                           /* 修正角度。确认以90度为起点 */
+v_SVG.selectAll(".Dividing").data(v_Schedules).enter()
+.append("line")
+.attr("class" ,"Dividing")
+.attr("x1" ,function(d ,i)
+{
+	return calcCirclePointX(v_CX  ,v_MaxR ,(i + 1) * v_Angle + v_AOffer);
+})
+.attr("y1" ,function(d ,i)
+{
+	return calcCirclePointY(v_CY ,v_MaxR ,(i + 1) * v_Angle + v_AOffer);
+})
+.attr("x2" ,function(d ,i)
+{
+	return calcCirclePointX(v_CX ,v_R2   ,(i + 1) * v_Angle + v_AOffer);
+})
+.attr("y2" ,function(d ,i)
+{
+	return calcCirclePointY(v_CY ,v_R2  ,(i + 1) * v_Angle + v_AOffer);
+})
+.style("stroke" ,"#000000")
+.style("stroke-width" ,1);
+
+
+
+/* 绘制圆刻度的标题 */
+var v_R3       = v_MaxR + 30;                   /* 标题所在圆的半径。此圆是隐性存在的 */
+var v_Dividing = v_Schedules.length;            /* 将圆分成多少份 */
+var v_Angle    = 360 / v_Dividing;              /* 分割角度 */
+var v_AOffer   = 270 - v_Angle / 2;             /* 修正角度。确认以90度为起点 */
+v_SVG.selectAll(".TitleG").data(v_Schedules).enter()
+.append("g")
+.attr("class" ,"TitleG")
+.attr("transform", function(d ,i) 
+{
+	var v_XY = calcCirclePoint(v_CX ,v_CY + 10 ,v_R3 ,(i + 1) * v_Angle + v_AOffer);
+    return "translate(" + v_XY[0] + "," + v_XY[1] + ")";
+})
+.style("cursor" ,"pointer")
+.on("click" ,function(d ,i)
+{
+	alert("点击了 " + d.name);
+});
+
+v_SVG.selectAll(".TitleG").data(v_Schedules).each(function(d ,i)
+{
+	/* 阶段标题 */
+	var v_MyG = d3.select(this);
+	v_MyG.append("text")
+	.attr("font-size" ,11)
+	.attr("fill" ,"#4E72B8")
+	.attr("dx" ,function()
+	{
+		return -22;	
+	})
+	.text(function(d ,i)
+	{
+		return d.name;	
+	});
+	
+	/* 阶段图标 */
+	v_MyG.append("image")
+	.attr("xlink:href" ,function()
+	{
+		return "./images/" + getNodeImage(getNodeName(d.name));		
+	})
+	.attr("x" ,-10)
+	.attr("y" ,-27)
+	.attr("height" ,"18px")
+	.attr("width"  ,"18px");
+});
+
+
+
+var v_RateInfo = v_SVG.append("text")
+.attr("font-size" ,15)
+.attr("font-weight" ,"bold")
+.attr("fill" ,"#4E72B8")
+.attr("x" ,v_CX)
+.attr("y" ,v_CY)
+.attr("dx" ,-12)
+.attr("dy" ,7);
+
+
+
+/* 绘制进度扇形 */
+var v_AngleSpace = 1;  /* 角度缩边的角度（或角度间的间隔） */
+var v_AColor     = d3.interpolate(d3.rgb("#99CC00") ,d3.rgb("#FFBB33"));
+var v_MarkLines  = [25 ,50 ,75];
+v_SVG.selectAll(".ArcInfo").data(v_Schedules).enter()
+.append("path")
+.attr("class" ,"ArcInfo")
+.attr("d" ,function(d ,i)
+{
+	var v_AngleS   = i     * v_Angle + v_AngleSpace + 270;
+	var v_AngleE   = (i+1) * v_Angle - v_AngleSpace + 270;
+	var v_ArcPath  = d3.path();
+	var v_FPRadius = (v_MaxR - v_MinR) * d.finishPercentage / 100 + v_MinR;
+	
+	v_ArcPath.arc(v_CX ,v_CY ,v_FPRadius ,(v_AngleS/360)*2*Math.PI ,(v_AngleE/360)*2*Math.PI);
+	v_ArcPath.arc(v_CX ,v_CY ,v_MinR     ,(v_AngleE/360)*2*Math.PI ,(v_AngleS/360)*2*Math.PI ,1);
+	v_ArcPath.closePath();
+	
+	/* 扇形百分比分段 */
+	for (var i=0; i<v_MarkLines.length; i++)
+	{
+		if ( d.finishPercentage > v_MarkLines[i] )
+		{
+			v_SVG.append("path")
+			.attr("d" ,function()
+			{
+				var v_P = d3.path();
+				var v_MarkLine = (v_MaxR - v_MinR) * v_MarkLines[i] / 100 + v_MinR
+				
+				v_P.arc(v_CX ,v_CY ,v_MarkLine ,(v_AngleS/360)*2*Math.PI ,(v_AngleE/360)*2*Math.PI);
+				
+				return v_P.toString();
+			})
+			.attr("fill" ,"none")
+			.attr("stroke" ,"white")
+			.attr("stroke-width" ,1);
+		}
+	}
+	
+	return v_ArcPath.toString();	
+})
+.style("fill" ,function(d ,i)
+{
+	return v_AColor(i/v_Schedules.length);	
+})
+.on("mouseenter" ,function(d ,i) 
+{
+	d3.select(this).style("fill" ,"#33B5E5");
+	if ( d.finishPercentage >= 100 )
+	{
+		v_RateInfo.attr("dx" ,-16);
+	}
+	else
+	{
+		v_RateInfo.attr("dx" ,-12);
+	}
+	v_RateInfo.text(d.finishPercentage + "%");
+	
+	showTooltips(d);
+})
+.on("mouseleave" ,function(d ,i) 
+{
+	d3.select(this).style("fill" ,v_AColor(i/v_Schedules.length));
+	v_RateInfo.text("");
+})
+.on("click" ,function(d ,i)
+{
+	alert("点击了 " + d.name);
+});
+
+
+
+/**
+ * 隐藏提示
+ */
+function hideTooltips()
+{
+	$("#workingTimesTooltip").html("");
+	$("#workingTimesTooltip").css("left" ,"-10000px");    
+	$("#workingTimesTooltip").css("top"  ,"-10000px");
+	$("#workingTimesTooltip").css("opacity" ,0);
+}
+
+
+
+/**
+ * 显示提示
+ */
+function showTooltips(d ,i)
+{
+	$("#workingTimesTooltip").html(makeWorkingTimesTooltipText(d));
+	$("#workingTimesTooltip").css("left" ,(d3.event.pageX + 10) + "px");    
+	$("#workingTimesTooltip").css("top"  ,(d3.event.pageY + 0 ) + "px");
+	$("#workingTimesTooltip").css("opacity" ,0.8);
+}
+
+
+
+/**
+ * 生成提示内容
+ */
+function makeWorkingTimesTooltipText(d)
+{
+	var v_Text = "";
+	
+	v_Text += "<table width='140px'>";
+	
+	v_Text += "<tr>";
+	v_Text += "<td><font color='gray'>计划开始：</font></td>";
+	v_Text += "<td>2000-01-01</td>";
+	v_Text += "<td>&nbsp;</td>";
+	v_Text += "</tr>";
+	
+	v_Text += "<tr>";
+	v_Text += "<td><font color='gray'>实际开始：</font></td>";
+	v_Text += "<td>2000-01-01</td>";
+	v_Text += "<td>&nbsp;</td>";
+	v_Text += "</tr>";
+	
+	v_Text += "</table>";
+	
+	return v_Text
+}
+
+</script>
+
+</body>
+</html>
