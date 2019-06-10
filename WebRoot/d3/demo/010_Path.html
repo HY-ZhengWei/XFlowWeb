@@ -37,6 +37,14 @@
                  Q190,20 270,100
                  T450,100" 
             style="fill:#FAFAFA; stroke:black; stroke-width:3" />
+        
+        <!--
+        <path d="M30,481 C485,481 485,200 940,200 L940,360 C485,360 485,641 30,641Z" 
+            style="fill:#FAFAFA; stroke:black; stroke-width:3" />
+          
+        <path d="M30,27 C485,27 485,261 940,261 L940,462 C485,462 485,227 30,227Z" 
+            style="fill:#FAFAFA; stroke:black; stroke-width:3" />
+        -->
 	</svg>
 	
 	<div id="createdBy">
@@ -61,6 +69,155 @@
 		.attr("fill" ,"#333")
 		.attr("stroke" ,"yellow")
 		.attr("stroke-width" ,"3");
+		
+		
+		
+		/*
+		 * 从P1点到P2点绘制柔性连接线
+		 *
+		 * i_P1      点1的XY坐标，如[x ,y]
+		 * i_P2      点2的XY坐标，如[x ,y]
+		 *
+		 * ZhengWei(HY) Add 2019-06-10
+		 */
+		function drawLink(i_P1 ,i_P2)
+		{
+			var v_Width = i_P2[0] - i_P1[0];
+			
+			/* 降低绘制 */
+			if ( i_P1[1] < i_P2[1] )
+			{
+				var v_C1 = [i_P1[0] + v_Width / 2 ,i_P1[1]];
+				var v_C2 = [i_P1[0] + v_Width / 2 ,i_P2[1]];
+				var v_C3 = [i_P2[0] ,i_P2[1]];
+				
+				return "M" + i_P1[0] + "," +  i_P1[1] + " "
+				     + "C" + v_C1[0] + "," +  v_C1[1] + " "
+				     +       v_C2[0] + "," +  v_C2[1] + " "
+				     +       v_C3[0] + "," +  v_C3[1] + " ";
+			}
+			/* 抬高绘制 */
+			else if ( i_P1[1] > i_P2[1] )
+			{
+				var v_C1 = [i_P1[0] + v_Width / 2 ,i_P1[1]];
+				var v_C2 = [i_P1[0] + v_Width / 2 ,i_P2[1]];
+				var v_C3 = [i_P2[0] ,i_P2[1]];
+				
+				return "M" + i_P1[0] + "," +  i_P1[1] + " "
+				     + "C" + v_C1[0] + "," +  v_C1[1] + " "
+				     +       v_C2[0] + "," +  v_C2[1] + " "
+				     +       v_C3[0] + "," +  v_C3[1] + " ";
+			}
+			/* 平行线 */
+			else
+			{
+				return "M" + i_P1[0] + "," +  i_P1[1] + " "
+					 + "L" + i_P2[0] + "," +  i_P2[1] ;
+			}
+		}
+		
+		
+		
+		/*
+		 * 从P1点到P2点绘制柔性连接线段块
+		 *
+		 * i_P1      点1的XY坐标，如[x ,y]
+		 * i_P2      点2的XY坐标，如[x ,y]
+		 * i_HightR  线段块的右侧高度。
+		 * i_HightL  线段块的左侧高度，当为NULL时，取右侧高度。
+		 *
+		 * ZhengWei(HY) Add 2019-06-10
+		 */
+		function drawLinkBlock(i_P1 ,i_P2 ,i_HightR ,i_HightL)
+		{
+			var v_Width  = i_P2[0] - i_P1[0];
+			var v_HightL = i_HightL == null ? i_HightR : i_HightL;
+			
+			/* 降低绘制 */
+			if ( i_P1[1] < i_P2[1] )
+			{
+				var v_C1 = [i_P1[0] + v_Width / 2 ,i_P1[1]];
+				var v_C2 = [i_P1[0] + v_Width / 2 ,i_P2[1]];
+				var v_C3 = [i_P2[0] ,i_P2[1]];
+				var v_C4 = [v_C1[0] ,v_C3[1] + i_HightR];
+				var v_C5 = [v_C1[0] ,v_C1[1] + v_HightL];
+				
+				return "M" + i_P1[0] + "," +  i_P1[1] + " "
+				     + "C" + v_C1[0] + "," +  v_C1[1] + " "
+				     +       v_C2[0] + "," +  v_C2[1] + " "
+				     +       v_C3[0] + "," +  v_C3[1] + " "
+				     + "L" + v_C3[0] + "," + (v_C3[1] + i_HightR) + " "
+				     + "C" + v_C4[0] + "," +  v_C4[1] + " "
+				     +       v_C5[0] + "," +  v_C5[1] + " "
+				     +       i_P1[0] + "," + (i_P1[1] + v_HightL)
+				     + "Z";
+			}
+			/* 抬高绘制 */
+			else if ( i_P1[1] > i_P2[1] )
+			{
+				var v_C1 = [i_P1[0] + v_Width / 2 ,i_P1[1]];
+				var v_C2 = [i_P1[0] + v_Width / 2 ,i_P2[1]];
+				var v_C3 = [i_P2[0] ,i_P2[1]];
+				var v_C4 = [v_C1[0] ,v_C3[1] + i_HightR];
+				var v_C5 = [v_C1[0] ,v_C1[1] + v_HightL];
+				
+				return "M" + i_P1[0] + "," +  i_P1[1] + " "
+				     + "C" + v_C1[0] + "," +  v_C1[1] + " "
+				     +       v_C2[0] + "," +  v_C2[1] + " "
+				     +       v_C3[0] + "," +  v_C3[1] + " "
+				     + "L" + v_C3[0] + "," + (v_C3[1] + i_HightR) + " "
+				     + "C" + v_C4[0] + "," +  v_C4[1] + " "
+				     +       v_C5[0] + "," +  v_C5[1] + " "
+				     +       i_P1[0] + "," + (i_P1[1] + v_HightL)
+				     + "Z";
+			}
+			/* 平行线 */
+			else
+			{
+				return "M" + i_P1[0] + "," +  i_P1[1] + " "
+					 + "L" + i_P2[0] + "," +  i_P2[1] + " "
+				     + "L" + i_P2[0] + "," + (i_P2[1] + i_HightR) + " "
+				     + "L" + i_P1[0] + "," + (i_P1[1] + v_HightL) + " "
+				     + "Z";
+			}
+		}
+		
+		
+		v_SVG.append("path")
+		.attr("fill" ,"none")
+		.attr("stroke" ,"#E5E5E5")
+		.attr("stroke-width" ,"2")
+		.attr("d" ,function ()
+		{
+			return drawLink([100 ,130] ,[600 ,240]);
+		});
+		
+		v_SVG.append("path")
+		.attr("fill" ,"yellow")
+		.attr("stroke" ,"black")
+		.attr("stroke-width" ,"2")
+		.attr("d" ,function ()
+		{
+			return drawLinkBlock([100 ,150] ,[600 ,300] ,50 ,10);
+		});
+		
+		v_SVG.append("path")
+		.attr("fill" ,"yellow")
+		.attr("stroke" ,"black")
+		.attr("stroke-width" ,"2")
+		.attr("d" ,function ()
+		{
+			return drawLinkBlock([100 ,500] ,[600 ,400] ,50);
+		});
+		
+		v_SVG.append("path")
+		.attr("fill" ,"yellow")
+		.attr("stroke" ,"black")
+		.attr("stroke-width" ,"2")
+		.attr("d" ,function ()
+		{
+			return drawLinkBlock([100 ,700] ,[600 ,700] ,50);
+		});
 		
 	</script>
 
