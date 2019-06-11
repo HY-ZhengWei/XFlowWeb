@@ -1,7 +1,8 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<script src="../../d3/d3.min.js" charset="utf-8"></script>
+	<script type="text/javascript" charset="utf-8" src="../../d3/d3.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="../../jquery/jquery.min.js"></script>
 	
 	<style type="text/css">
 	body { 
@@ -30,7 +31,12 @@
 	}
 	</style>
 </head>
-<body>
+<body oncontextmenu="return false">
+
+	<div>
+		数据连接池组：
+		<select id="DSGIDs"></select>
+	</div>
 
 	<svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg">
 	</svg>
@@ -40,8 +46,21 @@
 	</div>
 	
 	<script type="text/javascript">
-		var v_SVG = d3.select("body").select("svg");
-
+		var v_SVG = d3.select("body").select("svg")
+		.on("contextmenu" ,function()
+		{
+			if ( v_ClickTable != "" )
+			{
+				tableNameOnMouseout(v_ClickTable);
+				v_ClickTable = "";
+			}
+			if ( v_ClickXSQL != "" )
+			{
+				xsqlOnMouseout(v_ClickXSQL);
+				v_ClickXSQL = "";
+			}
+		});
+		
 		
 		
 		/**
@@ -103,6 +122,8 @@
 		var v_LeftX       = 50;
 		var v_RightX      = 1280 - v_BlockWidth - 50;
 		var v_FontSize    = 12;
+		var v_DSGID       = "DSG_02";
+		var v_DSGs        = ["DSG_01" ,"DSG_02"];
 		var v_Tables      = [{tableName:"A1234567890" ,xsqls:["XSQL_001" ,"XSQL_002"]}
 		                    ,{tableName:"B1234567890" ,xsqls:["XSQL_001" ,"XSQL_002"]}
 		                    ,{tableName:"C1234567890" ,xsqls:["XSQL_001" ,"XSQL_002"]}
@@ -127,6 +148,28 @@
 		var v_TableRefs   = {};   /* 格式如，{"表名称":["XSQLID01" ,"XSQLID02"]} */
 		var v_XSQLRefs    = {};   /* 格式如，{"XSQLID":["表名称01" ,"表名称02"]} */
 		var v_XSQLIndexes = {};   /* 格式如，{"XSQLID01":位置索引} */
+		var v_ClickTable  = "";
+		var v_ClickXSQL   = "";
+		
+		
+		
+		for (var i=0; i<v_DSGs.length; i++)
+		{
+			if ( v_DSGs[i] == v_DSGID )
+			{
+				$("#DSGIDs").append("<option value='" + v_DSGs[i] + "' selected>" + v_DSGs[i] + "</option>");
+			}
+			else
+			{
+				$("#DSGIDs").append("<option value='" + v_DSGs[i] + "'>" + v_DSGs[i] + "</option>");
+			}
+		}
+		
+		$("#DSGIDs").change(function (data) 
+		{
+	        var v_DSGID = $("#DSGIDs option:selected").attr("value");
+	        window.location.href = "analyseObject?dsgid=" + v_DSGID;
+	    });
 		
 		
 		
@@ -192,11 +235,39 @@
 		})
 		.on("mouseover" ,function(d ,i)
 		{
-			tableNameOnMouseover(d.tableName);
+			if ( v_ClickTable == "" && v_ClickXSQL == "" )
+			{
+				tableNameOnMouseover(d.tableName);
+			}
 		})
 		.on("mouseout" ,function(d ,i)
 		{
-			tableNameOnMouseout(d.tableName);
+			if ( v_ClickTable == "" && v_ClickXSQL == "" )
+			{
+				tableNameOnMouseout(d.tableName);
+			}
+		})
+		.on("click" ,function(d ,i)
+		{
+			if ( v_ClickTable == d.tableName )
+			{
+				tableNameOnMouseout(v_ClickTable);
+				v_ClickTable = "";
+				return;
+			}
+			if ( v_ClickTable != "" )
+			{
+				tableNameOnMouseout(v_ClickTable);
+				v_ClickTable = "";
+			}
+			if ( v_ClickXSQL != "" )
+			{
+				xsqlOnMouseout(v_ClickXSQL);
+				v_ClickXSQL = "";
+			}
+			
+			v_ClickTable = d.tableName;
+			tableNameOnMouseover(v_ClickTable);
 		});
 		
 		
@@ -224,11 +295,39 @@
 		})
 		.on("mouseover" ,function(d ,i)
 		{
-			tableNameOnMouseover(d.tableName);
+			if ( v_ClickTable == "" && v_ClickXSQL == "" )
+			{
+				tableNameOnMouseover(d.tableName);
+			}
 		})
 		.on("mouseout" ,function(d ,i)
 		{
-			tableNameOnMouseout(d.tableName);
+			if ( v_ClickTable == "" && v_ClickXSQL == "" )
+			{
+				tableNameOnMouseout(d.tableName);
+			}
+		})
+		.on("click" ,function(d ,i)
+		{
+			if ( v_ClickTable == d.tableName )
+			{
+				tableNameOnMouseout(v_ClickTable);
+				v_ClickTable = "";
+				return;
+			}
+			if ( v_ClickTable != "" )
+			{
+				tableNameOnMouseout(v_ClickTable);
+				v_ClickTable = "";
+			}
+			if ( v_ClickXSQL != "" )
+			{
+				xsqlOnMouseout(v_ClickXSQL);
+				v_ClickXSQL = "";
+			}
+			
+			v_ClickTable = d.tableName;
+			tableNameOnMouseover(v_ClickTable);
 		});
 		
 		
@@ -402,11 +501,39 @@
 		})
 		.on("mouseover" ,function(d ,i)
 		{
-			xsqlOnMouseover(d.xsql);
+			if ( v_ClickTable == "" && v_ClickXSQL == "" )
+			{
+				xsqlOnMouseover(d.xsql);
+			}
 		})
 		.on("mouseout" ,function(d ,i)
 		{
-			xsqlOnMouseout(d.xsql);
+			if ( v_ClickTable == "" && v_ClickXSQL == "" )
+			{
+				xsqlOnMouseout(d.xsql);
+			}
+		})
+		.on("click" ,function(d ,i)
+		{
+			if ( v_ClickXSQL == d.xsql )
+			{
+				xsqlOnMouseout(v_ClickXSQL);
+				v_ClickXSQL = "";
+				return;
+			}
+			if ( v_ClickTable != "" )
+			{
+				tableNameOnMouseout(v_ClickTable);
+				v_ClickTable = "";
+			}
+			if ( v_ClickXSQL != "" )
+			{
+				xsqlOnMouseout(v_ClickXSQL);
+				v_ClickXSQL = "";
+			}
+			
+			v_ClickXSQL = d.xsql;
+			xsqlOnMouseover(v_ClickXSQL);
 		});
 		
 		
@@ -438,11 +565,39 @@
 		})
 		.on("mouseover" ,function(d ,i)
 		{
-			xsqlOnMouseover(d.xsql);
+			if ( v_ClickTable == "" && v_ClickXSQL == "" )
+			{
+				xsqlOnMouseover(d.xsql);
+			}
 		})
 		.on("mouseout" ,function(d ,i)
 		{
-			xsqlOnMouseout(d.xsql);
+			if ( v_ClickTable == "" && v_ClickXSQL == "" )
+			{
+				xsqlOnMouseout(d.xsql);
+			}
+		})
+		.on("click" ,function(d ,i)
+		{
+			if ( v_ClickXSQL == d.xsql )
+			{
+				xsqlOnMouseout(v_ClickXSQL);
+				v_ClickXSQL = "";
+				return;
+			}
+			if ( v_ClickTable != "" )
+			{
+				tableNameOnMouseout(v_ClickTable);
+				v_ClickTable = "";
+			}
+			if ( v_ClickXSQL != "" )
+			{
+				xsqlOnMouseout(v_ClickXSQL);
+				v_ClickXSQL = "";
+			}
+			
+			v_ClickXSQL = d.xsql;
+			xsqlOnMouseover(v_ClickXSQL);
 		});
 		
 		
