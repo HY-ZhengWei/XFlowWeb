@@ -49,6 +49,18 @@
 		</dataSource>
 		
 		
+		<!-- SQL Server数据库 -->
+		<dataSource id="DS_XFlow_01" if="SQLSERVER == DataSourceType.getValue">
+			<driverClass>net.sourceforge.jtds.jdbc.Driver</driverClass>
+			<jdbcUrl>jdbc:jtds:sqlserver://10.1.1.18:1433;DatabaseName=workFlow</jdbcUrl>
+			<user>sa</user>
+			<password>sa123SA$%^</password>
+			<maxPoolSize>100</maxPoolSize>
+			<initialPoolSize>2</initialPoolSize>
+			<checkoutTimeout>30000</checkoutTimeout>
+		</dataSource>
+		
+		
 		
 		<!-- 数据库连接池组 -->
 		<dataSourceGroup id="DSG_XFlow">
