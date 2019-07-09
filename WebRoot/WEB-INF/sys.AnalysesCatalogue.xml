@@ -4,7 +4,7 @@
 
 	<import name="xconfig"         class="java.util.ArrayList" />
 	<import name="xparam"          class="java.util.ArrayList" />
-	<import name="item"            class="org.hy.common.app.Param" />
+	<import name="app"             class="org.hy.common.xml.plugins.analyse.data.WindowsApp" />
 	
 	
 	
@@ -13,12 +13,19 @@
 		
 	    <xparam id="AnalysesCatalogue" this="AnalysesCatalogue">
 	    
-	    	<item>
-	            <name>工作流模板列表</name>
-				<comment></comment>
-				<value><![CDATA[ /../web/showFlowTemplates ]]></value>
-	        </item>
-	    
+	        <app>
+	    		<level>1</level>
+	    		<appID>MA101</appID>
+	    		<appName>工作流模板</appName>
+	    		<icon>:HttpBasePath/windows/images/xFlowWeb.png</icon>
+	    		<backgroundColor>#5ad190</backgroundColor>
+	    		<url>:HttpBasePath/web/showFlowTemplates</url>
+	    		<x>830</x>
+	    		<y>390</y>
+	    		<desktopShow>true</desktopShow>
+	    		<sizeType>max</sizeType>
+	    	</app>
+	    	
 		</xparam>
 		
 	</xconfig>
