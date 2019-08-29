@@ -159,7 +159,7 @@
 	
 	<script type="text/javascript">
 	
-	var N         = {width:130 ,height:40 ,lineWidth:1 ,flagWidth:18 };
+	var N         = {width:160 ,height:40 ,lineWidth:1 ,flagWidth:18 };
 	var Colors    = {backgroudColor:"#FFFFFF" ,routeColor:"#6AB975" ,routeRejectColor:"#FF4444" ,markLineColor:"#0099CC"}; 
 	var v_SVG     = d3.select("body").select("svg");
 	var v_Datas   = ${activitys}.datas;
@@ -219,7 +219,7 @@
     	v_X = v_X + (N.width / 2);
     	v_Y = v_Y + (N.height / 2);
     	
-    	if ( Math.abs(v_VtoX - v_X) > 5 )
+    	if ( Math.abs(v_VtoX - v_X) > 20 )
    		{
    			hideVLine();
    		}
@@ -233,7 +233,7 @@
     		v_IsChage = true;
    		}
     	
-    	if ( Math.abs(v_HtoY - v_Y) > 5 )
+    	if ( Math.abs(v_HtoY - v_Y) > 20 )
    		{
    			hideHLine();
    		}
@@ -568,7 +568,7 @@
 		.attr("dy"          ,"0.35em")
 		.attr("text-anchor" ,"middle")
 		.attr("font-weight" ,"bold")
-		.attr("fill"        ,"black")
+		.attr("fill"        ,i_Data.fontColor)
 		.style("cursor"     ,"move")
 		.text(i_Data.activityName);
 	}
@@ -1394,7 +1394,10 @@
 	})
 	.attr("class"       ,"lineText")
 	.attr("text-anchor" ,"middle")
-	.attr("fill"        ,"black")
+	.attr("fill" ,function(d ,i)
+	{
+		return d.fontColor;
+	})
 	.text(function(d ,i)
 	{
 		return d.activityRouteName;	
@@ -1422,13 +1425,18 @@
 		var i = 0;
 		for (i = 0; i<v_Datas.length; i++)
 		{
+			var v_NodeRect = d3.select("NGR"  + v_Datas[i].activityID);
 			var v_NodeFlag = d3.select("#NGF" + v_Datas[i].activityID);
+			var v_NodeName = d3.select("NGT"  + v_Datas[i].activityID);
 			var v_G        = d3.select("#"    + v_Datas[i].activityID);
 			var v_XY       = getGXY(v_G);
 			
-			v_Datas[i].x         = v_XY[0];
-			v_Datas[i].y         = v_XY[1];
-			v_Datas[i].flagColor = v_NodeFlag.attr("fill");
+			v_Datas[i].x              = v_XY[0];
+			v_Datas[i].y              = v_XY[1];
+			v_Datas[i].backgroudColor = v_NodeRect.attr("fill");
+			v_Datas[i].lineColor      = v_NodeRect.attr("stroke");
+			v_Datas[i].flagColor      = v_NodeFlag.attr("fill");
+			v_Datas[i].fontColor      = v_NodeName.attr("fill");
 		}
 		
 		for (i=0; i<v_Routes.length; i++)
@@ -1436,6 +1444,7 @@
 			var v_Route = d3.select("#" + v_Routes[i].activityRouteID);
 			
 			v_Routes[i].lineColor = v_Route.attr("stroke");
+			v_Routes[i].fontColor = v_Route.attr("fill");
 		}
 		
 		var v_ActivitysJson = JSON.stringify(v_Datas);

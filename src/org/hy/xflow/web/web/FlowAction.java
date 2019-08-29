@@ -9,8 +9,10 @@ import org.hy.common.xml.XJSON;
 import org.hy.common.xml.XJava;
 import org.hy.xflow.engine.bean.ActivityInfo;
 import org.hy.xflow.engine.bean.ActivityRoute;
+import org.hy.xflow.engine.bean.FlowInfo;
 import org.hy.xflow.engine.bean.FlowProcess;
 import org.hy.xflow.engine.bean.Template;
+import org.hy.xflow.engine.service.IFlowInfoService;
 import org.hy.xflow.engine.service.IFlowProcessService;
 import org.hy.xflow.engine.service.ITemplateService;
 
@@ -33,6 +35,8 @@ public class FlowAction extends ActionSupport
     private static final long serialVersionUID = 1206259536207222380L;
     
     private List<Template> templates;
+    
+    private List<FlowInfo> flows;
     
     /** 模板ID */
     private String templateID;
@@ -123,6 +127,7 @@ public class FlowAction extends ActionSupport
                 v_New.setBackgroudColor(Help.NVL(v_Activity.getBackgroudColor() ,"#FFFFFF"));
                 v_New.setLineColor(     Help.NVL(v_Activity.getLineColor()      ,"#000000"));
                 v_New.setFlagColor(     Help.NVL(v_Activity.getFlagColor()      ,"#FFFFFF"));
+                v_New.setFontColor(     Help.NVL(v_Activity.getFontColor()      ,"#000000"));
                 
                 v_TempActivitys.add(v_New);
             }
@@ -134,13 +139,14 @@ public class FlowAction extends ActionSupport
             {
                 ActivityRoute v_New = new ActivityRoute();
                 
-                v_New.setActivityRouteID  (v_Route.getActivityRouteID());
-                v_New.setActivityRouteCode(v_Route.getActivityRouteCode());
-                v_New.setActivityRouteName(v_Route.getActivityRouteName());
-                v_New.setActivityID(       v_Route.getActivityID());
-                v_New.setNextActivityID(   v_Route.getNextActivityID());
-                v_New.setRouteType(        v_Route.getRouteType());
-                v_New.setLineColor(        v_Route.getLineColor());
+                v_New.setActivityRouteID  ( v_Route.getActivityRouteID());
+                v_New.setActivityRouteCode( v_Route.getActivityRouteCode());
+                v_New.setActivityRouteName( v_Route.getActivityRouteName());
+                v_New.setActivityID(        v_Route.getActivityID());
+                v_New.setNextActivityID(    v_Route.getNextActivityID());
+                v_New.setRouteType(         v_Route.getRouteType());
+                v_New.setLineColor(         v_Route.getLineColor());
+                v_New.setFontColor(Help.NVL(v_Route.getFontColor() ,"#000000"));
                 
                 v_TempRoutes.add(v_New);
             }
@@ -225,6 +231,31 @@ public class FlowAction extends ActionSupport
     
     
     /**
+     * 列表显示所有工作流实例
+     * 
+     * @author      ZhengWei(HY)
+     * @createDate  2019-08-29
+     * @version     v1.0
+     */
+    public String showFlows()
+    {
+        IFlowInfoService v_FlowInfoService = (IFlowInfoService)XJava.getObject("FlowInfoService");
+        
+        if ( Help.isNull(this.templateID) )
+        {
+            this.flows = new ArrayList<FlowInfo>();
+        }
+        else
+        {
+            this.flows = v_FlowInfoService.queryActivitys(this.templateID);
+        }
+        
+        return SUCCESS;
+    }
+    
+    
+    
+    /**
      * 显示工作流实例的流程图
      * 
      * @author      ZhengWei(HY)
@@ -256,10 +287,12 @@ public class FlowAction extends ActionSupport
             return "error";
         }
         
-        TablePartition<String  ,FlowProcess> v_ProcessRoutes = new TablePartition<String  ,FlowProcess>();
+        TablePartition<String  ,FlowProcess> v_ProcessRoutes    = new TablePartition<String  ,FlowProcess>();
+        TablePartition<String  ,FlowProcess> v_ProcessActivitys = new TablePartition<String  ,FlowProcess>();
         for (FlowProcess v_Process : v_Processes)
         {
-            v_ProcessRoutes.putRow(Help.NVL(v_Process.getCurrentActivityID()) + "-" + Help.NVL(v_Process.getNextActivityID()) ,v_Process);
+            v_ProcessActivitys.putRow(Help.NVL(v_Process.getCurrentActivityID()) ,v_Process);
+            v_ProcessRoutes   .putRow(Help.NVL(v_Process.getCurrentActivityID()) + "-" + Help.NVL(v_Process.getNextActivityID()) ,v_Process);
         }
         
         try
@@ -268,9 +301,10 @@ public class FlowAction extends ActionSupport
             this.templateName = v_Template.getTemplateName();
             this.version      = v_Template.getVersion();
             
+            
+            // 设置活动的样式
             List<ActivityInfo> v_Activitys     = Help.toList(v_Template.getActivityRouteTree().getActivitys());
             List<ActivityInfo> v_TempActivitys = new ArrayList<ActivityInfo>();
-            
             for (ActivityInfo v_Activity : v_Activitys)
             {
                 ActivityInfo v_New = new ActivityInfo();
@@ -280,16 +314,37 @@ public class FlowAction extends ActionSupport
                 v_New.setActivityName(           v_Activity.getActivityName());
                 v_New.setX(             Help.NVL(v_Activity.getX()));
                 v_New.setY(             Help.NVL(v_Activity.getY()));
-                v_New.setBackgroudColor(Help.NVL(v_Activity.getBackgroudColor() ,"#FFFFFF"));
-                v_New.setLineColor(     Help.NVL(v_Activity.getLineColor()      ,"#000000"));
-                v_New.setFlagColor(     Help.NVL(v_Activity.getFlagColor()      ,"#FFFFFF"));
+                
+                List<FlowProcess> v_NodeProcess = v_ProcessActivitys.get(v_Activity.getActivityID());
+                if ( !Help.isNull(v_NodeProcess) )
+                {
+                    FlowProcess v_LastProcess = v_NodeProcess.get(v_NodeProcess.size() - 1);
+                    
+                    v_New.setBackgroudColor(Help.NVL(v_Activity.getBackgroudColor() ,"#FFFFFF"));
+                    v_New.setLineColor(     Help.NVL(v_Activity.getLineColor()      ,"#000000"));
+                    v_New.setFlagColor(     Help.NVL(v_Activity.getFlagColor()      ,"#FFFFFF"));
+                    v_New.setFontColor(     Help.NVL(v_Activity.getFontColor()      ,"#000000"));
+                    
+                    if ( Help.isNull(v_LastProcess.getNextActivityID()) )
+                    {
+                        v_New.setActivityName("《 " + v_New.getActivityName() + " 》");
+                    }
+                }
+                else
+                {
+                    v_New.setBackgroudColor("#FFFFFF");
+                    v_New.setLineColor(     "#000000");
+                    v_New.setFlagColor(     "#FFFFFF");
+                    v_New.setFontColor(     "gainsboro");
+                }
                 
                 v_TempActivitys.add(v_New);
             }
             
+            
+            // 设置路由的样式
             List<ActivityRoute> v_Routes     = Help.toList(v_Template.getActivityRouteTree().getActivityRoutes());
             List<ActivityRoute> v_TempRoutes = new ArrayList<ActivityRoute>();
-            
             for (ActivityRoute v_Route : v_Routes)
             {
                 ActivityRoute v_New = new ActivityRoute();
@@ -301,9 +356,11 @@ public class FlowAction extends ActionSupport
                 v_New.setNextActivityID(   v_Route.getNextActivityID());
                 v_New.setRouteType(        v_Route.getRouteType());
                 
-                List<FlowProcess> v_NodeProcess = v_ProcessRoutes.get(v_Route.getActivityRouteID() + "-" + v_Route.getNextActivityID());
+                List<FlowProcess> v_NodeProcess = v_ProcessRoutes.get(v_Route.getActivityID() + "-" + v_Route.getNextActivityID());
                 if ( !Help.isNull(v_NodeProcess) )
                 {
+                    FlowProcess v_LastProcess = v_NodeProcess.get(v_NodeProcess.size() - 1);
+                    
                     if ( !Help.isNull(v_Route.getLineColor()) )
                     {
                         v_New.setLineColor(v_Route.getLineColor());
@@ -316,14 +373,19 @@ public class FlowAction extends ActionSupport
                     {
                         v_New.setLineColor("#6AB975");
                     }
+                    
+                    v_New.setFontColor(Help.NVL(v_Route.getFontColor() ,"#000000"));
+                    v_New.setActivityRouteName(v_New.getActivityRouteName() + "（" + Help.NVL(v_LastProcess.getOperateUser() ,v_LastProcess.getOperateUserID()) + "）");
                 }
                 else
                 {
-                    v_New.setLineColor("#888");
+                    v_New.setLineColor("gainsboro");
+                    v_New.setFontColor("gainsboro");
                 }
                 
                 v_TempRoutes.add(v_New);
             }
+            
             
             XJSON v_XJSON = new XJSON();
             v_XJSON.setReturnNVL(false);
@@ -536,6 +598,16 @@ public class FlowAction extends ActionSupport
     public void setServiceDataID(String serviceDataID)
     {
         this.serviceDataID = serviceDataID;
+    }
+
+
+    
+    /**
+     * 获取：工作流实例
+     */
+    public List<FlowInfo> getFlows()
+    {
+        return flows;
     }
     
 }

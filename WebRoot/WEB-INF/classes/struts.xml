@@ -51,6 +51,15 @@
         </action>
         
         
+        
+        
+        
+        <!-- 列表显示工作流实例 -->
+        <action name="showFlows" class="org.hy.xflow.web.web.FlowAction" method="showFlows">
+            <result name="success" type="freemarker">/pages/showFlows.ftl</result>
+        </action>
+        
+        
         <!-- 显示工作流实例的流程图 -->
         <action name="showFlow"  class="org.hy.xflow.web.web.FlowAction" method="showFlow">
             <result name="success" type="freemarker">/pages/showFlowTemplate.ftl</result>
