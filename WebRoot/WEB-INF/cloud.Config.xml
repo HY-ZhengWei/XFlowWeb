@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+
+	<import name="xconfig"         class="java.util.ArrayList" />
+	<import name="item"            class="org.hy.common.app.Param" />
+	
+	
+	
+	<!-- 云计算服务器配置信息 -->
+	<xconfig>
+		
+		<!-- 监控云计算的服务列表 -->
+		<!-- 10.1.50.44  服务器专用于：智能选型的工作流服务 -->
+		<!-- 10.1.50.77  服务器专用于：变更管理的工作流服务 -->
+		<item id="ClusterServers">
+            <name>ClusterServers</name>
+			<value>
+			   ,10.1.50.44:1921
+			   ,10.1.50.77:1921
+			</value>
+			<comment>全部集群服务器列表(用逗号分隔)</comment>
+        </item>
+		
+	</xconfig>
+	
+</config>

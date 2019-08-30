@@ -20,6 +20,14 @@
 	    	<item>
 				<value>sys.DB.Config.xml</value>
 			</item>
+			
+			<item>
+				<value>cloud.Config.xml</value>
+			</item>
+			
+			<item>
+				<value>sys.ServerConfig.xml</value>
+			</item>
 
 		</startupConfig>
 		

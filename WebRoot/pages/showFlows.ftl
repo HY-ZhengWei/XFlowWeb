@@ -143,7 +143,7 @@ body {
 			
 			<div class="Column_Operate">
 				<div class="cont_show_Operate">
-					<a href="showFlow?templateID=${item.flowTemplateID}&workID=${item.workID}" target="_blank">查看流程图</a>
+					<a href="showFlow?templateID=${item.flowTemplateID}&workID=${item.workID}" target="_blank">流程图</a>
 				</div>
 			</div>
 		</div>

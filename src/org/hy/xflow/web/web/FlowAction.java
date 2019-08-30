@@ -343,8 +343,9 @@ public class FlowAction extends ActionSupport
             
             
             // 设置路由的样式
-            List<ActivityRoute> v_Routes     = Help.toList(v_Template.getActivityRouteTree().getActivityRoutes());
-            List<ActivityRoute> v_TempRoutes = new ArrayList<ActivityRoute>();
+            List<ActivityRoute> v_Routes      = Help.toList(v_Template.getActivityRouteTree().getActivityRoutes());
+            List<ActivityRoute> v_TempRoutes  = new ArrayList<ActivityRoute>();
+            List<ActivityRoute> v_ValidRoutes = new ArrayList<ActivityRoute>();
             for (ActivityRoute v_Route : v_Routes)
             {
                 ActivityRoute v_New = new ActivityRoute();
@@ -376,16 +377,18 @@ public class FlowAction extends ActionSupport
                     
                     v_New.setFontColor(Help.NVL(v_Route.getFontColor() ,"#000000"));
                     v_New.setActivityRouteName(v_New.getActivityRouteName() + "（" + Help.NVL(v_LastProcess.getOperateUser() ,v_LastProcess.getOperateUserID()) + "）");
+                    v_ValidRoutes.add(v_New);
                 }
                 else
                 {
                     v_New.setLineColor("gainsboro");
                     v_New.setFontColor("gainsboro");
+                    v_TempRoutes.add(v_New);
                 }
-                
-                v_TempRoutes.add(v_New);
             }
             
+            
+            v_TempRoutes.addAll(v_ValidRoutes);  // 确保有效的路由在最上层显示
             
             XJSON v_XJSON = new XJSON();
             v_XJSON.setReturnNVL(false);

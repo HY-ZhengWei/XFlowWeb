@@ -137,7 +137,7 @@ body {
 			
 			<div class="Column_Operate">
 				<div class="cont_show_Operate">
-					<a href='showFlows?templateID=${item.templateID}'>活动实例</a>
+					<a href='showFlows?templateID=${item.templateID}' target="_blank">活动实例</a>
 				</div>
 			</div>
 		</div>
