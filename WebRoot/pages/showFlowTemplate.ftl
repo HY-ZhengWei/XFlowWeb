@@ -77,72 +77,6 @@
 		        </feMerge>
 	        </filter>
 	        
-	        <marker id="arrowTo" 
-					markerUnits="strokerWidth"
-					markerWidth="6"
-					markerHeight="6"
-					viewBox="0 0 12 12"
-					refX="9"
-					refY="6"
-					orient="auto">
-				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:#6AB975;"></path>
-			</marker>
-			
-			<marker id="arrowTo_Reject" 
-					markerUnits="strokerWidth"
-					markerWidth="6"
-					markerHeight="6"
-					viewBox="0 0 12 12"
-					refX="9"
-					refY="6"
-					orient="auto">
-				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:#FF4444;"></path>
-			</marker>
-	        
-	        <marker id="arrowToIE" 
-					markerUnits="strokerWidth"
-					markerWidth="4"
-					markerHeight="4"
-					viewBox="0 0 12 12"
-					refX="9"
-					refY="6"
-					orient="auto">
-				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:#6AB975; stroke-dasharray:1,0;"></path>
-			</marker>
-			
-			<marker id="arrowToIE_Reject" 
-					markerUnits="strokerWidth"
-					markerWidth="4"
-					markerHeight="4"
-					viewBox="0 0 12 12"
-					refX="9"
-					refY="6"
-					orient="auto">
-				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:#FF4444; stroke-dasharray:1,0;"></path>
-			</marker>
-			
-			<marker id="arrowToFirebox" 
-					markerUnits="strokerWidth"
-					markerWidth="18"
-					markerHeight="18"
-					viewBox="0 0 12 12"
-					refX="9"
-					refY="6"
-					orient="auto">
-				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:#6AB975;"></path>
-			</marker>
-			
-			<marker id="arrowToFirebox_Reject" 
-					markerUnits="strokerWidth"
-					markerWidth="18"
-					markerHeight="18"
-					viewBox="0 0 12 12"
-					refX="9"
-					refY="6"
-					orient="auto">
-				<path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill:#FF4444;"></path>
-			</marker>
-    		
 		</defs>
 	
 	</svg>
@@ -952,6 +886,8 @@
 			if ( v_PR.position == "E" || v_PR.position == "W" )
 			{
 				/* n字型连接线 */
+				v_PR.arrow = "ToS";
+				
 				v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
 				v_FromXY[1] = Number(v_FromXY[1]) + 0;
 				
@@ -1010,6 +946,8 @@
 				if ( v_IsDrawLeft )
 				{
 					/* C字型连接线 */
+					v_PR.arrow = "ToE";
+					
 					v_FromXY[0] = Number(v_FromXY[0]) + 0;
 					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 					
@@ -1027,6 +965,8 @@
 				else
 				{
 					/* 反C字型连接线 */
+					v_PR.arrow = "ToW";
+					
 					v_FromXY[0] = Number(v_FromXY[0]) + N.width;
 					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 					
@@ -1045,6 +985,8 @@
 			else if ( v_PR.position == "EN" || v_PR.position == "ES" )
 			{
 				/* 反C字型连接线 */
+				v_PR.arrow = "ToW";
+				
 				v_FromXY[0] = Number(v_FromXY[0]) + N.width;
 				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 				
@@ -1061,6 +1003,9 @@
 			}
 			else if ( v_PR.position == "WN" || v_PR.position == "WS" )
 			{
+				/* C字型连接线 */
+				v_PR.arrow = "ToE";
+			
 				v_FromXY[0] = Number(v_FromXY[0]) + 0;
 				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 				
@@ -1080,6 +1025,8 @@
 		{
 			if ( v_PR.position == "E" )
 			{
+				v_PR.arrow = "ToE";
+				
 				v_FromXY[0] = Number(v_FromXY[0]) + N.width;
 				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 				
@@ -1090,6 +1037,8 @@
 	 		}
 			else if ( v_PR.position == "W" )
 			{
+				v_PR.arrow = "ToW";
+			
 				v_FromXY[0] = Number(v_FromXY[0]) + 0;
 				v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 				
@@ -1100,6 +1049,8 @@
 			}
 			else if ( v_PR.position == "N" )
 			{
+				v_PR.arrow = "ToN";
+			
 				v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
 				v_FromXY[1] = Number(v_FromXY[1]) + 0;
 				
@@ -1110,6 +1061,8 @@
 			}
 			else if ( v_PR.position == "S" )
 			{
+				v_PR.arrow = "ToS";
+			
 				v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
 				v_FromXY[1] = Number(v_FromXY[1]) + N.height;
 				
@@ -1123,6 +1076,8 @@
 				/* B全部在A的右边。B全部在A的上边 */
 				if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
 				{
+					v_PR.arrow = "ToN";
+					
 					v_FromXY[0] = Number(v_FromXY[0]) + N.width;
 					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 					
@@ -1135,6 +1090,8 @@
 				}
 				else if ( v_PR.topBottom >= 0 )
 				{
+					v_PR.arrow = "ToN";
+					
 					v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
 					v_FromXY[1] = Number(v_FromXY[1]) + 0;
 					
@@ -1143,6 +1100,8 @@
 				}
 				else if ( v_PR.leftRight >= 0 )
 				{
+					v_PR.arrow = "ToE";
+				
 					v_FromXY[0] = Number(v_FromXY[0]) + N.width;
 					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 					
@@ -1155,6 +1114,8 @@
 				/* B全部在A的右边。B全部在A的下边 */
 				if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
 				{
+					v_PR.arrow = "ToS";
+					
 					v_FromXY[0] = Number(v_FromXY[0]) + N.width;
 					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 					
@@ -1167,6 +1128,8 @@
 				}
 				else if ( v_PR.topBottom >= 0 )
 				{
+					v_PR.arrow = "ToS";
+					
 					v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
 					v_FromXY[1] = Number(v_FromXY[1]) + N.height;
 					
@@ -1175,6 +1138,8 @@
 				}
 				else if ( v_PR.leftRight >= 0 )
 				{
+					v_PR.arrow = "ToE";
+					
 					v_FromXY[0] = Number(v_FromXY[0]) + N.width;
 					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 					
@@ -1187,6 +1152,8 @@
 				/* B全部在A的左边。B全部在A的上边 */
 				if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
 				{
+					v_PR.arrow = "ToN";
+					
 					v_FromXY[0] = Number(v_FromXY[0]) + 0;
 					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 					
@@ -1199,6 +1166,8 @@
 				}
 				else if ( v_PR.topBottom >= 0 )
 				{
+					v_PR.arrow = "ToN";
+					
 					v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
 					v_FromXY[1] = Number(v_FromXY[1]) + 0;
 					
@@ -1207,6 +1176,8 @@
 				}
 				else if ( v_PR.leftRight >= 0 )
 				{
+					v_PR.arrow = "ToW";
+					
 					v_FromXY[0] = Number(v_FromXY[0]) + 0;
 					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 					
@@ -1219,6 +1190,8 @@
 				/* B全部在A的左边。B全部在A的下边 */
 				if ( v_PR.leftRight >= 0 && v_PR.topBottom >= 0 )
 				{
+					v_PR.arrow = "ToS";
+					
 					v_FromXY[0] = Number(v_FromXY[0]) + 0;
 					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 					
@@ -1231,6 +1204,8 @@
 				}
 				else if ( v_PR.topBottom >= 0 )
 				{
+					v_PR.arrow = "ToS";
+					
 					v_FromXY[0] = Number(v_FromXY[0]) + (N.width / 2);
 					v_FromXY[1] = Number(v_FromXY[1]) + N.height;
 					
@@ -1239,6 +1214,8 @@
 				}
 				else if ( v_PR.leftRight >= 0 )
 				{
+					v_PR.arrow = "ToW";
+					
 					v_FromXY[0] = Number(v_FromXY[0]) + 0;
 					v_FromXY[1] = Number(v_FromXY[1]) + (N.height / 2);
 					
@@ -1247,6 +1224,8 @@
 				}
 			}
 		}
+		
+		calcRouteYArrow(i_FromG ,i_ToG ,i_RouteData ,v_ToXY ,v_PR);
 		
 		if ( v_MidAXY == null )
 		{
@@ -1270,6 +1249,60 @@
 	
 	
 	/**
+	 * 计算两元素间的路由Y点坐标上的箭头形状及位置坐标
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2019-08-30
+	 * @version     v1.0
+	 *
+	 * @param i_FromG             从哪来的元素节点
+	 * @param i_ToG               到哪去的元素节点
+	 * @param i_RouteData         路由信息数据
+	 * @param i_ToXY              到哪去的元素节点的位置坐标
+	 * @param i_PositionRelation  位置关系
+	 */
+	function calcRouteYArrow(i_FromG ,i_ToG ,i_RouteData ,i_ToXY ,i_PositionRelation)
+	{
+		var v_RSize = 6;  /* 圆的半径 */ 
+		var v_Ret   = "";
+		
+		/* 向下箭头 */
+		if ( i_PositionRelation.arrow == "ToS" )
+		{
+			v_Ret += "M" + (i_ToXY[0] - v_RSize) + " " + i_ToXY[1] + " ";
+			v_Ret += "A" + v_RSize + "," + v_RSize + ",0,0,1,";
+			v_Ret += (i_ToXY[0] + v_RSize) + "," + i_ToXY[1];
+		}
+		/* 向上箭头 */
+		else if ( i_PositionRelation.arrow == "ToN" )
+		{
+			v_Ret += "M" + (i_ToXY[0] + v_RSize) + " " + i_ToXY[1] + " ";
+			v_Ret += "A" + v_RSize + "," + v_RSize + ",0,0,1,";
+			v_Ret += (i_ToXY[0] - v_RSize) + "," + i_ToXY[1];
+		}
+		/* 向右箭头 */
+		else if ( i_PositionRelation.arrow == "ToE" )
+		{
+			v_Ret += "M" + i_ToXY[0] + " " + (i_ToXY[1] + v_RSize) + " ";
+			v_Ret += "A" + v_RSize + "," + v_RSize + ",0,0,1,";
+			v_Ret += i_ToXY[0] + "," + (i_ToXY[1] - v_RSize);
+		}
+		/* 向左箭头 */
+		else if ( i_PositionRelation.arrow == "ToW" )
+		{
+			v_Ret += "M" + i_ToXY[0] + " " + (i_ToXY[1] - v_RSize) + " ";
+			v_Ret += "A" + v_RSize + "," + v_RSize + ",0,0,1,";
+			v_Ret += i_ToXY[0] + "," + (i_ToXY[1] + v_RSize);
+		}
+				
+		d3.select("#ArrowY_" + i_RouteData.activityID + "_" + i_RouteData.nextActivityID).attr("d" ,v_Ret);	
+		
+		return v_Ret;
+	}
+	
+	
+	
+	/**
 	 * 隐藏颜色选择器
 	 *
 	 * @author      ZhengWei(HY)
@@ -1285,6 +1318,7 @@
 	
 	
 	
+	/* 绘制路由 */
 	v_SVG.selectAll("polyline").data(v_Routes)
 	.enter()
 	.append("polyline")
@@ -1323,34 +1357,39 @@
 			return "1,0";
 		}
 	})
-	.attr("marker-end" ,function(d ,i)
-	{
-		var v_Flag = "";
-		if ( d.routeType.routeType == "驳回" )
-		{
-			v_Flag = "_Reject";
-		}
-		
-		var v_UserAgent = navigator.userAgent.toLowerCase();
-		if ( v_UserAgent.indexOf("window") >= 0 || v_UserAgent.indexOf("ie") >= 0 )
-		{
-			return "url(#arrowToIE" + v_Flag + ")";
-		}
-		else if ( v_UserAgent.indexOf("firefox") >= 0 ) 
-		{
-			return "url(#arrowToFirebox" + v_Flag + ")";
-		}
-		else
-		{
-			return "url(#arrowTo" + v_Flag + ")";
-		}
-	})
 	.attr("points" ,function(d ,i)
 	{
 		/* 后面的代码再设置位置：使节点均在连接线之上，防止出现选不中节点的问题 */
 		
 		return "0,0 0,0";
 	});
+	
+	
+	
+	/* 绘制路由上的箭头 */
+	v_SVG.selectAll("path").data(v_Routes)
+	.enter()
+	.append("path")
+	.attr("id" ,function(d ,i)
+	{
+		return "ArrowY_" + d.activityID + "_" + d.nextActivityID;	
+	})
+	.attr("fill" ,function(d ,i)
+	{
+		return d.lineColor;
+	})
+	.attr("stroke" ,function(d ,i)
+	{
+		return d.lineColor;
+	})
+	.attr("stroke-width" ,1)
+	.attr("d" ,function(d ,i)
+	{
+		/* 后面的代码再设置位置：使节点均在连接线之上，防止出现选不中节点的问题 */
+		
+		return "0,0 0,0";
+	});
+	
 	
 	
 	v_SVG.selectAll("g").data(v_Datas)
