@@ -1290,9 +1290,10 @@
 		/* 向左箭头 */
 		else if ( i_PositionRelation.arrow == "ToW" )
 		{
-			v_Ret += "M" + i_ToXY[0] + " " + (i_ToXY[1] - v_RSize) + " ";
+			var v_Offset = 2;  /* 因为节点元素有阴影，偏移2个像素才能显示原大小，否则会为阴影盖住 */
+			v_Ret += "M" + (i_ToXY[0] + v_Offset) + " " + (i_ToXY[1] - v_RSize) + " ";
 			v_Ret += "A" + v_RSize + "," + v_RSize + ",0,0,1,";
-			v_Ret += i_ToXY[0] + "," + (i_ToXY[1] + v_RSize);
+			v_Ret += (i_ToXY[0] + v_Offset) + "," + (i_ToXY[1] + v_RSize);
 		}
 				
 		d3.select("#ArrowY_" + i_RouteData.activityID + "_" + i_RouteData.nextActivityID).attr("d" ,v_Ret);	

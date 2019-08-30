@@ -58,3 +58,62 @@ function getGXY(i_G)
 		return (v_Ret + ",0").split(",");
 	}
 }
+
+
+
+/**
+ * 计算圆上任意角度圆周上点的XY位置。
+ * 
+ * @author      ZhengWei(HY)
+ * @createDate  2019-102-21
+ * @version     v1.0
+ *
+ * @param i_CircleX  圆心的X坐标
+ * @param i_CircleY  圆心的Y坐标
+ * @param i_Radius   圆的半径
+ * @param i_Angle    角度
+ * @return [x ,y]
+ */
+function calcCirclePoint(i_CircleX ,i_CircleY ,i_Radius ,i_Angle)
+{
+	return [calcCirclePointX(i_CircleX ,i_Radius ,i_Angle) 
+		   ,calcCirclePointY(i_CircleY ,i_Radius ,i_Angle)];
+}
+
+
+
+/**
+ * 计算圆上任意角度圆周上点的X坐标位置。
+ *
+ * @author      ZhengWei(HY)
+ * @createDate  2019-102-21
+ * @version     v1.0
+ *
+ * @param i_CircleX  圆心的X坐标
+ * @param i_Radius   圆的半径
+ * @param i_Angle    角度
+ * @return           X
+ */
+function calcCirclePointX(i_CircleX ,i_Radius ,i_Angle)
+{
+	return i_CircleX + Math.cos(i_Angle * 2 * Math.PI / 360) * i_Radius;
+}
+
+
+
+/**
+ * 计算圆上任意角度圆周上点的Y坐标位置。
+ *
+ * @author      ZhengWei(HY)
+ * @createDate  2019-102-21
+ * @version     v1.0
+ *
+ * @param i_CircleY  圆心的Y坐标
+ * @param i_Radius   圆的半径
+ * @param i_Angle    角度
+ * @return [x ,y]
+ */
+function calcCirclePointY(i_CircleY ,i_Radius ,i_Angle)
+{
+	return i_CircleY + Math.sin(i_Angle * 2 * Math.PI / 360) * i_Radius;
+}
