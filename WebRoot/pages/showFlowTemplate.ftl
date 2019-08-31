@@ -99,18 +99,18 @@
 	var v_SVG           = d3.select("body").select("svg");
 	var v_Datas         = ${activitys}.datas;
 	var v_Routes        = ${routes}.datas;
-
 	var v_RouteMap      = makeRouteMap (v_Routes);  /* 可通过路由ID定位路由信息 */
 	var v_RouteRefs     = makeRouteRefs(v_Routes);  /* 可通过节点ID定位到与其有关联的所有路由ID */
 	var v_XOffset       = 0;                        /* 移动时相对鼠标的偏移量X */
 	var v_YOffset       = 0;                        /* 移动时相对鼠标的偏移量Y */
-	var v_ClickFlag     = null;                     /* 当前点击的d3节点标记对象 */
-	var v_ClickColor    = null;                     /* 当前点击的d3节点标记的颜色 */
 	var v_HLineTMax     = 0;                        /* 水平标线（上）离移动节点最近的值 */
 	var v_HLineBMin     = 99999;                    /* 水平标线（下）离移动节点最近的值 */
 	var v_VLineLMax     = 0;                        /* 垂直标线（左）离移动节点最近的值 */
 	var v_VLineRMin     = 99999;                    /* 垂直标线（右）离移动节点最近的值 */
 	var v_ToPoints      = d3.map();                 /* 节点链接线的到达点的位置集合信息map.key为XY坐标值，map.value为数量 */
+	var v_SelectedG     = null;                     /* 当前选择的活动所在的 G 对象 */
+	var v_ColorSettings = null;                     /* 当前颜色选择器设置的对象的数组 */
+	var v_ColorAttrName = null;                     /* 当前颜色选择器设置的对象的具体属性名称 */
 	var v_Drag          = d3.drag()
     .on("start" ,function()
     {
@@ -209,8 +209,7 @@
 	d3.select("body")
 	.on("click" ,function()
 	{
-		/* $("#colorPicker").css("opacity" ,0); */
-		v_AMenus.attr("transform", "translate(-99999,-99999)")
+		hideAMenus();
 	});
 	
 	
@@ -439,6 +438,53 @@
 	
 	
 	/**
+	 * 显示颜色设置对话框
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2019-08-31
+	 * @version     v1.0
+	 *
+	 * @param i_SettingObjects   被设置的d3对象的数组
+	 * @param i_SettingAttrName  被设置的d3对象的属性名称
+	 */
+	function showColorDialog(i_SettingObjects ,i_SettingAttrName)
+	{
+		v_ColorSettings = i_SettingObjects;
+		v_ColorAttrName = i_SettingAttrName;
+		var v_ClickColor = v_ColorSettings[0].attr(v_ColorAttrName);
+		
+		$("#colorPicker").colpick(
+		{
+		    flat: true,
+		    layout: 'full',
+		    colorScheme: 'light',
+		    submit: true,
+		    onSubmit: function(hsb,hex,rgb,el,bySetColor)
+		    {
+		    	hideColorPicker();
+		    	for (var i=0; i<v_ColorSettings.length; i++)
+		    	{
+		    		v_ColorSettings[i].attr(v_ColorAttrName ,'#' + hex);
+		    	}
+		    },
+			onChange: function(hsb,hex,rgb,el,bySetColor) 
+			{
+				for (var i=0; i<v_ColorSettings.length; i++)
+		    	{
+		    		v_ColorSettings[i].attr(v_ColorAttrName ,'#' + hex);
+		    	}
+	        }
+		});
+		
+		$("#colorPicker").colpickSetColor(v_ClickColor ,true);
+		$("#colorPicker").css("left" ,(d3.event.x + N.width) + "px");
+		$("#colorPicker").css("top"  ,(d3.event.y - 20) + "px");
+		$("#colorPicker").css("opacity" ,100); 
+	}
+	
+	
+	
+	/**
 	 * 绘制流程节点
 	 *
 	 * @author      ZhengWei(HY)
@@ -460,7 +506,9 @@
 		.style("cursor"      ,"move")
 		.on("contextmenu" ,function()
 		{
-			v_AMenus.attr("transform", "translate(" + (i_Data.x - v_AMenusOffsetX) + "," + (i_Data.y - v_AMenusOffsetY) + ")");
+			var v_XY = getGXY(i_G);
+			v_SelectedG = i_G;
+			v_AMenus.attr("transform", "translate(" + (v_XY[0] - v_AMenusOffsetX) + "," + (v_XY[1] - v_AMenusOffsetY) + ")");
 		});
 		
 		var v_NodeFlag = i_G.append("polygon")
@@ -468,7 +516,6 @@
 		.attr("id"           ,"NGF" + i_Data.activityID)
 		.attr("stroke"       ,i_Data.lineColor)
 		.attr("fill"         ,i_Data.flagColor)
-		.style("cursor"      ,"pointer")
 		.attr("points" ,function()
 		{
 			var v_StartX = 7;
@@ -478,30 +525,11 @@
 			     + (v_StartX + N.flagWidth / 2) + "," + (N.height - N.flagWidth / 2) + " "
 			     + v_StartX + "," + N.height;
 		})
-		.on("click" ,function() 
+		.on("contextmenu" ,function()
 		{
-			v_ClickFlag  = d3.select(this);
-			v_ClickColor = v_ClickFlag.attr("fill");
-			
-			$("#colorPicker").colpick({
-			    flat: true,
-			    layout: 'full',
-			    colorScheme: 'light',
-			    submit: true,
-			    onSubmit: function(hsb,hex,rgb,el,bySetColor)
-			    {
-			    	hideColorPicker();
-			    	v_ClickFlag.attr("fill" ,'#' + hex);
-			    },
-				onChange: function (hsb,hex,rgb,el,bySetColor) 
-				{
-					v_ClickFlag.attr("fill" ,'#' + hex);
-		        }
-			});
-			$("#colorPicker").colpickSetColor(v_ClickColor ,true);
-			$("#colorPicker").css("left" ,(d3.event.pageX + N.width) + "px");
-			$("#colorPicker").css("top"  ,(d3.event.pageY - 20) + "px");
-			$("#colorPicker").css("opacity" ,100); 
+			var v_XY = getGXY(i_G);
+			v_SelectedG = i_G;
+			v_AMenus.attr("transform", "translate(" + (v_XY[0] - v_AMenusOffsetX) + "," + (v_XY[1] - v_AMenusOffsetY) + ")");
 		});
 		
 		var v_NodeName = i_G.append("text")
@@ -516,7 +544,9 @@
 		.text(i_Data.activityName)
 		.on("contextmenu" ,function()
 		{
-			v_AMenus.attr("transform", "translate(" + (i_Data.x - v_AMenusOffsetX) + "," + (i_Data.y - v_AMenusOffsetY) + ")");
+			var v_XY = getGXY(i_G);
+			v_SelectedG = i_G;
+			v_AMenus.attr("transform", "translate(" + (v_XY[0] - v_AMenusOffsetX) + "," + (v_XY[1] - v_AMenusOffsetY) + ")");
 		});
 	}
 	
@@ -1473,12 +1503,105 @@
 		console.log("菜单 " + d.name + " 被点击");
 	}
 	
-	var v_AMenus        = v_SVG.append("g").attr("id" ,"ActivityMenus").attr("transform", "translate(-99999,-99999)");
-	var v_ActivityMenus = [{bgColor:"#E45D5C"    ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"white" ,fontColorMouse:"white" ,fontSize:14 ,onClick:menuOnClick ,name:"编辑"} 
-	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClick ,name:"活动颜色"} 
-	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClick ,name:"文字颜色"} 
-	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClick ,name:"页签颜色"} 
-	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClick ,name:"边框颜色"}];
+	
+	
+	var v_AMenus = v_SVG.append("g").attr("id" ,"ActivityMenus").attr("transform", "translate(-99999,-99999)");
+	function hideAMenus()
+	{
+		v_AMenus.attr("transform", "translate(-99999,-99999)");
+	}
+	
+	
+	
+	/**
+	 * 设置活动颜色选择器
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2019-08-31
+	 * @version     v1.0
+	 */
+	function menuOnClickActivityColor(d ,i)
+	{
+		hideAMenus();
+		
+		if ( v_SelectedG == null )
+		{
+			return;
+		}
+		
+		showColorDialog([v_SelectedG.select("rect")] ,"fill");
+	}
+	
+	
+	
+	/**
+	 * 设置活动颜色选择器
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2019-08-31
+	 * @version     v1.0
+	 */
+	function menuOnClickActivityNameColor(d ,i)
+	{
+		hideAMenus();
+		
+		if ( v_SelectedG == null )
+		{
+			return;
+		}
+		
+		showColorDialog([v_SelectedG.select("text")] ,"fill");
+	}
+	
+	
+	
+	/**
+	 * 设置活动页签颜色选择器
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2019-08-31
+	 * @version     v1.0
+	 */
+	function menuOnClickActivityFlagColor(d ,i)
+	{
+		hideAMenus();
+		
+		if ( v_SelectedG == null )
+		{
+			return;
+		}
+		
+		showColorDialog([v_SelectedG.select("polygon")] ,"fill");
+	}
+	
+	
+	
+	/**
+	 * 设置活动页签颜色选择器
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2019-08-31
+	 * @version     v1.0
+	 */
+	function menuOnClickActivityBorderColor(d ,i)
+	{
+		hideAMenus();
+		
+		if ( v_SelectedG == null )
+		{
+			return;
+		}
+		
+		showColorDialog([v_SelectedG.select("rect") ,v_SelectedG.select("polygon")] ,"stroke");
+	}
+	
+	
+	
+	var v_ActivityMenus = [{bgColor:"#E45D5C"    ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"white" ,fontColorMouse:"white" ,fontSize:14 ,onClick:menuOnClick                    ,name:"编辑"} 
+	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickActivityColor       ,name:"活动颜色"} 
+	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickActivityNameColor   ,name:"文字颜色"} 
+	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickActivityFlagColor   ,name:"页签颜色"} 
+	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickActivityBorderColor ,name:"边框颜色"}];
 	createSmartContextMenu(v_AMenus ,30 ,v_ActivityMenus);
 	
 	
@@ -1497,9 +1620,9 @@
 		var i = 0;
 		for (i = 0; i<v_Datas.length; i++)
 		{
-			var v_NodeRect = d3.select("NGR"  + v_Datas[i].activityID);
+			var v_NodeRect = d3.select("#NGR" + v_Datas[i].activityID);
 			var v_NodeFlag = d3.select("#NGF" + v_Datas[i].activityID);
-			var v_NodeName = d3.select("NGT"  + v_Datas[i].activityID);
+			var v_NodeName = d3.select("#NGT" + v_Datas[i].activityID);
 			var v_G        = d3.select("#"    + v_Datas[i].activityID);
 			var v_XY       = getGXY(v_G);
 			

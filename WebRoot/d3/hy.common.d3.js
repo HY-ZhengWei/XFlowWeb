@@ -169,6 +169,8 @@ function calcSuperRadius(i_MenuItemSize ,i_MenuSize)
  *                         i_Menus[i].fontColorMouse  菜单文字颜色，鼠标放在上面时
  *                         i_Menus[i].onClick         菜单被点击后执行方法的引用
  *                         首元素为最中间的菜单，之后的元素按顺时针环绕。
+ *                         
+ * 注：如果外部定义了 id="shadow" 的过滤器，则会自动启用。并用于菜单按钮的阴影样式。
  */
 function createSmartContextMenu(i_Super ,i_MenuItemSize ,i_Menus)
 {
@@ -186,7 +188,7 @@ function createSmartContextMenu(i_Super ,i_MenuItemSize ,i_Menus)
 	.attr("r"  ,v_SuperRadius + i_MenuItemSize / 3)
 	.attr("fill" ,"none")
 	.attr("stroke-width" ,i_MenuItemSize / 4 * 3)
-	.attr("stroke" ,"gray")
+	.attr("stroke" ,"#363636")
 	.attr("opacity" ,0.5);
 	
 	
@@ -236,6 +238,17 @@ function createSmartContextMenu(i_Super ,i_MenuItemSize ,i_Menus)
 	.attr("fill" ,function(d ,i)
 	{
 		return d.bgColor;
+	})
+	.attr("filter" ,function(d ,i)
+	{
+		if ( d3.select("#shadow").empty() )
+		{
+			return "";
+		}
+		else
+		{
+			return "url(#shadow)";
+		}
 	})
 	.on("mouseover" ,function(d ,i)
 	{
