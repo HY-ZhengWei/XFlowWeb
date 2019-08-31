@@ -6,6 +6,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	
 	<script type="text/javascript" charset="utf-8" src="../d3/d3.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="../d3/hy.common.d3.js"></script>
 	<script type="text/javascript" charset="utf-8" src="../jquery/jquery.min.js" ></script>
 	<script type="text/javascript" charset="utf-8" src="../jquery/jquery-ui.min.js"></script>
 	<script type="text/javascript" charset="utf-8" src="../jquery/colpick.js"></script>
@@ -62,7 +63,7 @@
 	</style>
 	
 </head>
-<body>
+<body oncontextmenu="return false">
 
 	<svg width="100%" height="2000" version="1.1" xmlns="http://www.w3.org/2000/svg">
 	
@@ -93,24 +94,24 @@
 	
 	<script type="text/javascript">
 	
-	var N         = {width:160 ,height:40 ,lineWidth:1 ,flagWidth:18 };
-	var Colors    = {backgroudColor:"#FFFFFF" ,routeColor:"#6AB975" ,routeRejectColor:"#FF4444" ,markLineColor:"#0099CC"}; 
-	var v_SVG     = d3.select("body").select("svg");
-	var v_Datas   = ${activitys}.datas;
-	var v_Routes  = ${routes}.datas;
+	var N               = {width:160 ,height:40 ,lineWidth:1 ,flagWidth:18 };
+	var Colors          = {backgroudColor:"#FFFFFF" ,routeColor:"#6AB975" ,routeRejectColor:"#FF4444" ,markLineColor:"#0099CC"}; 
+	var v_SVG           = d3.select("body").select("svg");
+	var v_Datas         = ${activitys}.datas;
+	var v_Routes        = ${routes}.datas;
 
-	var v_RouteMap   = makeRouteMap (v_Routes);  /* 可通过路由ID定位路由信息 */
-	var v_RouteRefs  = makeRouteRefs(v_Routes);  /* 可通过节点ID定位到与其有关联的所有路由ID */
-	var v_XOffset    = 0;                        /* 移动时相对鼠标的偏移量X */
-	var v_YOffset    = 0;                        /* 移动时相对鼠标的偏移量Y */
-	var v_ClickFlag  = null;                     /* 当前点击的d3节点标记对象 */
-	var v_ClickColor = null;                     /* 当前点击的d3节点标记的颜色 */
-	var v_HLineTMax  = 0;                        /* 水平标线（上）离移动节点最近的值 */
-	var v_HLineBMin  = 99999;                    /* 水平标线（下）离移动节点最近的值 */
-	var v_VLineLMax  = 0;                        /* 垂直标线（左）离移动节点最近的值 */
-	var v_VLineRMin  = 99999;                    /* 垂直标线（右）离移动节点最近的值 */
-	var v_ToPoints   = d3.map();                 /* 节点链接线的到达点的位置集合信息map.key为XY坐标值，map.value为数量 */
-	var v_Drag       = d3.drag()
+	var v_RouteMap      = makeRouteMap (v_Routes);  /* 可通过路由ID定位路由信息 */
+	var v_RouteRefs     = makeRouteRefs(v_Routes);  /* 可通过节点ID定位到与其有关联的所有路由ID */
+	var v_XOffset       = 0;                        /* 移动时相对鼠标的偏移量X */
+	var v_YOffset       = 0;                        /* 移动时相对鼠标的偏移量Y */
+	var v_ClickFlag     = null;                     /* 当前点击的d3节点标记对象 */
+	var v_ClickColor    = null;                     /* 当前点击的d3节点标记的颜色 */
+	var v_HLineTMax     = 0;                        /* 水平标线（上）离移动节点最近的值 */
+	var v_HLineBMin     = 99999;                    /* 水平标线（下）离移动节点最近的值 */
+	var v_VLineLMax     = 0;                        /* 垂直标线（左）离移动节点最近的值 */
+	var v_VLineRMin     = 99999;                    /* 垂直标线（右）离移动节点最近的值 */
+	var v_ToPoints      = d3.map();                 /* 节点链接线的到达点的位置集合信息map.key为XY坐标值，map.value为数量 */
+	var v_Drag          = d3.drag()
     .on("start" ,function()
     {
 		var v_XY = getGXY(d3.select(this));
@@ -202,13 +203,14 @@
 	{
     	hideHVLine();
     });
-	
-	
-	
+    
+    
+    
 	d3.select("body")
 	.on("click" ,function()
 	{
-		// $("#colorPicker").css("opacity" ,0);
+		/* $("#colorPicker").css("opacity" ,0); */
+		v_AMenus.attr("transform", "translate(-99999,-99999)")
 	});
 	
 	
@@ -445,6 +447,9 @@
 	 */
 	function drawNode(i_G ,i_Data)
 	{
+		var v_AMenusOffsetX = 32;
+		var v_AMenusOffsetY = 94;
+	
 		var v_NodeRect = i_G.append("rect")
 		.attr("width"        ,N.width)
 		.attr("height"       ,N.height)
@@ -452,7 +457,11 @@
 		.attr("id"           ,"NGR" + i_Data.activityID)
 		.attr("stroke"       ,i_Data.lineColor)
 		.attr("fill"         ,i_Data.backgroudColor)
-		.style("cursor"      ,"move");
+		.style("cursor"      ,"move")
+		.on("contextmenu" ,function()
+		{
+			v_AMenus.attr("transform", "translate(" + (i_Data.x - v_AMenusOffsetX) + "," + (i_Data.y - v_AMenusOffsetY) + ")");
+		});
 		
 		var v_NodeFlag = i_G.append("polygon")
 		.attr("stroke-width" ,N.lineWidth)
@@ -504,7 +513,11 @@
 		.attr("font-weight" ,"bold")
 		.attr("fill"        ,i_Data.fontColor)
 		.style("cursor"     ,"move")
-		.text(i_Data.activityName);
+		.text(i_Data.activityName)
+		.on("contextmenu" ,function()
+		{
+			v_AMenus.attr("transform", "translate(" + (i_Data.x - v_AMenusOffsetX) + "," + (i_Data.y - v_AMenusOffsetY) + ")");
+		});
 	}
 	
 	
@@ -1320,13 +1333,14 @@
 	
 	
 	/* 绘制路由 */
-	v_SVG.selectAll("polyline").data(v_Routes)
+	v_SVG.selectAll(".Route").data(v_Routes)
 	.enter()
 	.append("polyline")
 	.attr("id" ,function(d ,i)
 	{
 		return d.activityRouteID;	
 	})
+	.attr("class" ,"Route")
 	.attr("fill" ,"none")
 	.attr("stroke-width" ,3)
 	.attr("stroke" ,function(d ,i)
@@ -1368,13 +1382,14 @@
 	
 	
 	/* 绘制路由上的箭头 */
-	v_SVG.selectAll("path").data(v_Routes)
+	v_SVG.selectAll(".RouteYArrow").data(v_Routes)
 	.enter()
 	.append("path")
 	.attr("id" ,function(d ,i)
 	{
 		return "ArrowY_" + d.activityID + "_" + d.nextActivityID;	
 	})
+	.attr("class" ,"RouteYArrow")
 	.attr("fill" ,function(d ,i)
 	{
 		return d.lineColor;
@@ -1393,13 +1408,14 @@
 	
 	
 	
-	v_SVG.selectAll("g").data(v_Datas)
+	v_SVG.selectAll(".Activity").data(v_Datas)
 	.enter()
 	.append("g")
 	.attr("id" ,function(d ,i)
 	{
 		return d.activityID; 
 	})
+	.attr("class" ,"Activity")
 	.attr("transform", function(d ,i) 
 	{
 	    return "translate(" + d.x + "," + d.y + ")";
@@ -1407,7 +1423,7 @@
 	.attr("filter" ,"url(#shadow)")
 	.call(v_Drag);
 	
-	v_SVG.selectAll("g").data(v_Datas)
+	v_SVG.selectAll(".Activity").data(v_Datas)
 	.each(function(d ,i)
 	{
 		drawNode(d3.select(this) ,d);
@@ -1415,7 +1431,7 @@
 	
 	
 	/* 使节点均在连接线之上，防止出现选不中节点的问题 */
-	v_SVG.selectAll("polyline").data(v_Routes)
+	v_SVG.selectAll(".Route").data(v_Routes)
 	.attr("points" ,function(d ,i)
 	{
 		var v_FromG  = d3.select("#" + d.activityID);
@@ -1449,6 +1465,22 @@
 	
 	
 	hideHVLine();
+	
+	
+	
+	function menuOnClick(d ,i)
+	{
+		console.log("菜单 " + d.name + " 被点击");
+	}
+	
+	var v_AMenus        = v_SVG.append("g").attr("id" ,"ActivityMenus").attr("transform", "translate(-99999,-99999)");
+	var v_ActivityMenus = [{bgColor:"#E45D5C"    ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"white" ,fontColorMouse:"white" ,fontSize:14 ,onClick:menuOnClick ,name:"编辑"} 
+	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClick ,name:"活动颜色"} 
+	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClick ,name:"文字颜色"} 
+	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClick ,name:"页签颜色"} 
+	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClick ,name:"边框颜色"}];
+	createSmartContextMenu(v_AMenus ,30 ,v_ActivityMenus);
+	
 	
 	
 	<#if showOperations == "1" >
