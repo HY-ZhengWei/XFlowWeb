@@ -210,6 +210,7 @@
 	.on("click" ,function()
 	{
 		hideAMenus();
+		hideRMenus();
 	});
 	
 	
@@ -506,6 +507,8 @@
 		.style("cursor"      ,"move")
 		.on("contextmenu" ,function()
 		{
+			hideRMenus();
+			
 			var v_XY = getGXY(i_G);
 			v_SelectedG = i_G;
 			v_AMenus.attr("transform", "translate(" + (v_XY[0] - v_AMenusOffsetX) + "," + (v_XY[1] - v_AMenusOffsetY) + ")");
@@ -527,6 +530,8 @@
 		})
 		.on("contextmenu" ,function()
 		{
+			hideRMenus();
+			
 			var v_XY = getGXY(i_G);
 			v_SelectedG = i_G;
 			v_AMenus.attr("transform", "translate(" + (v_XY[0] - v_AMenusOffsetX) + "," + (v_XY[1] - v_AMenusOffsetY) + ")");
@@ -544,6 +549,8 @@
 		.text(i_Data.activityName)
 		.on("contextmenu" ,function()
 		{
+			hideRMenus();
+			
 			var v_XY = getGXY(i_G);
 			v_SelectedG = i_G;
 			v_AMenus.attr("transform", "translate(" + (v_XY[0] - v_AMenusOffsetX) + "," + (v_XY[1] - v_AMenusOffsetY) + ")");
@@ -1468,6 +1475,16 @@
 		var v_ToG    = d3.select("#" + d.nextActivityID);
 		
 		return calcRouteXY(v_FromG ,v_ToG ,null ,d);
+	})
+	.on("contextmenu" ,function(d ,i)
+	{
+		hideAMenus();
+		
+		var v_Route         = d3.select("#" + d.activityRouteID + "_TEXT");
+		var v_RMenusOffsetX = 105;
+		var v_RMenusOffsetY = 110;
+		
+		v_RMenus.attr("transform", "translate(" + (v_Route.attr("x") - v_RMenusOffsetX) + "," + (v_Route.attr("y") - v_RMenusOffsetY) + ")");
 	});
 	
 	
@@ -1488,6 +1505,16 @@
 	{
 		return d.activityRouteName;	
 	})
+	.on("contextmenu" ,function(d ,i)
+	{
+		hideAMenus();
+		
+		var v_Route         = d3.select(this);
+		var v_RMenusOffsetX = 105;
+		var v_RMenusOffsetY = 110;
+		
+		v_RMenus.attr("transform", "translate(" + (v_Route.attr("x") - v_RMenusOffsetX) + "," + (v_Route.attr("y") - v_RMenusOffsetY) + ")");
+	})
 	.each(function(d ,i)
 	{
 		moveLineText(d3.select("#" + d.activityRouteID));
@@ -1506,9 +1533,34 @@
 	
 	
 	var v_AMenus = v_SVG.append("g").attr("id" ,"ActivityMenus").attr("transform", "translate(-99999,-99999)");
+	var v_RMenus = v_SVG.append("g").attr("id" ,"RouteMenus")   .attr("transform", "translate(-99999,-99999)");
+	
+	
+	
+	/**
+	 * 隐藏活动的右击菜单
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2019-09-01
+	 * @version     v1.0
+	 */
 	function hideAMenus()
 	{
 		v_AMenus.attr("transform", "translate(-99999,-99999)");
+	}
+	
+	
+	
+	/**
+	 * 隐藏路由的右击菜单
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2019-09-01
+	 * @version     v1.0
+	 */
+	function hideRMenus()
+	{
+		v_RMenus.attr("transform", "translate(-99999,-99999)");
 	}
 	
 	
@@ -1602,7 +1654,13 @@
 	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickActivityNameColor   ,name:"文字颜色"} 
 	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickActivityFlagColor   ,name:"页签颜色"} 
 	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickActivityBorderColor ,name:"边框颜色"}];
+	                      
+	var v_RounteMenus   = [{bgColor:"#E45D5C"    ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"white" ,fontColorMouse:"white" ,fontSize:14 ,onClick:menuOnClick                    ,name:"编辑"} 
+	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickActivityColor       ,name:"路由颜色"} 
+	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickActivityNameColor   ,name:"文字颜色"}];
+	                      
 	createSmartContextMenu(v_AMenus ,30 ,v_ActivityMenus);
+	createSmartContextMenu(v_RMenus ,30 ,v_RounteMenus);
 	
 	
 	
