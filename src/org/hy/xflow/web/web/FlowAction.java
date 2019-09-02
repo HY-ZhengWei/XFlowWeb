@@ -318,7 +318,7 @@ public class FlowAction extends ActionSupport
                 List<FlowProcess> v_NodeProcess = v_ProcessActivitys.get(v_Activity.getActivityID());
                 if ( !Help.isNull(v_NodeProcess) )
                 {
-                    FlowProcess v_LastProcess = v_NodeProcess.get(v_NodeProcess.size() - 1);
+                    FlowProcess v_LastProcess = v_NodeProcess.get(0);
                     
                     v_New.setBackgroudColor(Help.NVL(v_Activity.getBackgroudColor() ,"#FFFFFF"));
                     v_New.setLineColor(     Help.NVL(v_Activity.getLineColor()      ,"#000000"));
@@ -366,13 +366,16 @@ public class FlowAction extends ActionSupport
                     {
                         v_New.setLineColor(v_Route.getLineColor());
                     }
-                    if ( "驳回".equals(v_Route.getRouteType().getRouteType()) )
-                    {
-                        v_New.setLineColor("#FF4444");
-                    }
                     else
                     {
-                        v_New.setLineColor("#6AB975");
+                        if ( "驳回".equals(v_Route.getRouteType().getRouteType()) )
+                        {
+                            v_New.setLineColor("#FF4444");
+                        }
+                        else
+                        {
+                            v_New.setLineColor("#6AB975");
+                        }
                     }
                     
                     v_New.setFontColor(Help.NVL(v_Route.getFontColor() ,"#000000"));

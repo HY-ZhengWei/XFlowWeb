@@ -26,6 +26,18 @@
 
 	<svg width="100%" height="900" version="1.1" xmlns="http://www.w3.org/2000/svg">
 	
+		<defs>
+		
+			<filter id="shadow">
+		        <feGaussianBlur in="SourceAlpha" stdDeviation="1" result="blur"></feGaussianBlur>
+		        <feOffset in="blur" dx="1" dy="1" result="offset"></feOffset>
+		        <feMerge>
+		        <feMergeNode in="offset"></feMergeNode>
+		        <feMergeNode in="SourceGraphic"></feMergeNode>
+		        </feMerge>
+	        </filter>
+	        
+		</defs>
 
 	</svg>
 	
@@ -40,14 +52,24 @@
 	
 	
 	var v_SVG        = d3.select("svg").style("background" ,"LightSteelBlue");
-	var v_Menus      = [{bgColor:"#E45D5C"    ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"white" ,fontColorMouse:"white" ,fontSize:18 ,onClick:menuOnClick ,name:"编辑"} 
-	                   ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:14 ,onClick:menuOnClick ,name:"活动颜色"} 
-	                   ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:14 ,onClick:menuOnClick ,name:"文字颜色"} 
-	                   ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:14 ,onClick:menuOnClick ,name:"页签颜色"} 
-	                   ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:14 ,onClick:menuOnClick ,name:"边框颜色"}];
+	var v_Menus01    = [{bgColor:"#E45D5C"    ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"white" ,fontColorMouse:"white" ,fontSize:18              ,onClick:menuOnClick ,name:"编辑"} 
+	                   ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:14              ,onClick:menuOnClick ,name:"活动颜色"} 
+	                   ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:14              ,onClick:menuOnClick ,name:"文字颜色"} 
+	                   ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:14              ,onClick:menuOnClick ,name:"页签颜色"} 
+	                   ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:14              ,onClick:menuOnClick ,name:"边框颜色"}
+	                   ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:14 ,valid:false ,onClick:menuOnClick ,name:"无效按钮"}];
+	
+	/* 采用默认参数的菜单 */
+	var v_Menus02    = [{onClick:menuOnClick ,name:"编辑"} 
+                       ,{onClick:menuOnClick ,name:"活动颜色"} 
+                       ,{onClick:menuOnClick ,name:"文字颜色"} 
+                       ,{onClick:menuOnClick ,name:"页签颜色"} 
+                       ,{onClick:menuOnClick ,name:"边框颜色"}
+                       ,{onClick:menuOnClick ,name:"无效按钮" ,valid:false}];
 	
 	
-	createSmartContextMenu(v_SVG ,35 ,v_Menus);
+	createSmartContextMenu(v_SVG.append("g").attr("transform", "translate(100,100)") ,35 ,v_Menus01);
+	createSmartContextMenu(v_SVG.append("g").attr("transform", "translate(500,100)") ,35 ,v_Menus02);
 	
 	
 	</script>

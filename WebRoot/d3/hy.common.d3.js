@@ -151,6 +151,61 @@ function calcSuperRadius(i_MenuItemSize ,i_MenuSize)
 
 
 /**
+ * 初始化聪明的右击菜单（设置默认参数）
+ *
+ * @author      ZhengWei(HY)
+ * @createDate  2019-09-02
+ * @version     v1.0
+ *
+ * @param io_Menus  菜单数据，为数组类型，格式如下
+ * @return          返回初始化后的菜单配置数据
+ */
+function initSmartContextMenu(io_Menus)
+{
+	for (var v_Index=0; v_Index<io_Menus.length; v_Index++)
+	{
+		if ( !('bgColor' in io_Menus[v_Index]) )
+		{
+			io_Menus[v_Index].bgColor = (v_Index == 0 ? "#E45D5C" : "ghostwhite");
+		}
+		
+		if ( !('bgColorMouse' in io_Menus[v_Index]) )
+		{
+			io_Menus[v_Index].bgColorMouse = "#E87372";
+		}
+		
+		if ( !('bgColorClick' in io_Menus[v_Index]) )
+		{
+			io_Menus[v_Index].bgColorClick = "#FF974D";
+		}
+		
+		if ( !('fontSize' in io_Menus[v_Index]) )
+		{
+			io_Menus[v_Index].fontSize = (v_Index == 0 ? 18 : 14);
+		}
+		
+		if ( !('fontColor' in io_Menus[v_Index]) )
+		{
+			io_Menus[v_Index].fontColor = (v_Index == 0 ? "white" : "black");
+		}
+		
+		if ( !('fontColorMouse' in io_Menus[v_Index]) )
+		{
+			io_Menus[v_Index].fontColorMouse = "white";
+		}
+		
+		if ( !('valid' in io_Menus[v_Index]) )
+		{
+			io_Menus[v_Index].valid = true;
+		}
+	}
+	
+	return io_Menus;
+}
+
+
+
+/**
  * 创建聪明的右击菜单
  *
  * @author      ZhengWei(HY)
@@ -159,30 +214,45 @@ function calcSuperRadius(i_MenuItemSize ,i_MenuSize)
  *
  * @param i_Stage          绘制右击菜单的舞台。可以是SVG，G等元素       
  * @param i_MenuItemSize   菜单项的大小。一般为圆的半径。
- * @param i_Menus          菜单数据，为数组类型，格式如下
- *                         i_Menus[i].name            菜单名称
- *                         i_Menus[i].bgColor         菜单背景色
- *                         i_Menus[i].bgColorMouse    菜单背景色，鼠标放在上面时
- *                         i_Menus[i].bgColorClick    菜单背景色，鼠标点击时
- *                         i_Menus[i].fontSize        菜单文字大小
- *                         i_Menus[i].fontColor       菜单文字颜色
- *                         i_Menus[i].fontColorMouse  菜单文字颜色，鼠标放在上面时
- *                         i_Menus[i].onClick         菜单被点击后执行方法的引用
+ * @param io_Menus         菜单数据，为数组类型，格式如下
+ *                         io_Menus[i].name            菜单名称
+ *                         io_Menus[i].bgColor         菜单背景色
+ *                         io_Menus[i].bgColorMouse    菜单背景色，鼠标放在上面时
+ *                         io_Menus[i].bgColorClick    菜单背景色，鼠标点击时
+ *                         io_Menus[i].fontSize        菜单文字大小
+ *                         io_Menus[i].fontColor       菜单文字颜色
+ *                         io_Menus[i].fontColorMouse  菜单文字颜色，鼠标放在上面时
+ *                         io_Menus[i].onClick         菜单被点击后执行方法的引用
+ *                         io_Menus[i].valid           菜单是否有效。有效的菜单才能被点击
  *                         首元素为最中间的菜单，之后的元素按顺时针环绕。
+ * @return                 返回初始化后的菜单配置数据
+ *                    
  *                         
- * 注：如果外部定义了 id="shadow" 的过滤器，则会自动启用。并用于菜单按钮的阴影样式。
+ * 注：如果外部定义了 id="shadow" 的过滤器，则会自动启用。并用于菜单按钮的阴影样式。如下代码定义
+		<defs>
+		
+			<filter id="shadow">
+		        <feGaussianBlur in="SourceAlpha" stdDeviation="1" result="blur"></feGaussianBlur>
+		        <feOffset in="blur" dx="1" dy="1" result="offset"></feOffset>
+		        <feMerge>
+		        <feMergeNode in="offset"></feMergeNode>
+		        <feMergeNode in="SourceGraphic"></feMergeNode>
+		        </feMerge>
+	        </filter>
+	        
+		</defs>
  */
-function createSmartContextMenu(i_Super ,i_MenuItemSize ,i_Menus)
+function createSmartContextMenu(i_Stage ,i_MenuItemSize ,io_Menus)
 {
-	var v_SuperRadius  = calcSuperRadius(i_MenuItemSize ,i_Menus.length - 1);   /* 背景圆的半径 */
+	var v_SuperRadius  = calcSuperRadius(i_MenuItemSize ,io_Menus.length - 1);   /* 背景圆的半径 */
 	var v_SuperPadding = 30; 
 	var v_SuperCX      = v_SuperRadius + i_MenuItemSize / 3 + v_SuperPadding;   /* 所有圆的中心点 */
 	var v_SuperCY      = v_SuperRadius + i_MenuItemSize / 3 + v_SuperPadding;   /* 所有圆的中心点 */
-	var v_OffsetAngle  = (360 / (i_Menus.length - 1)) * -1 - 90;
+	var v_OffsetAngle  = (360 / (io_Menus.length - 1)) * -1 - 90;
 	
 	
 	/* 背景最大的圆 */
-	i_Super.append("circle")
+	i_Stage.append("circle")
 	.attr("cx" ,v_SuperCX)
 	.attr("cy" ,v_SuperCY)
 	.attr("r"  ,v_SuperRadius + i_MenuItemSize / 3)
@@ -192,8 +262,11 @@ function createSmartContextMenu(i_Super ,i_MenuItemSize ,i_Menus)
 	.attr("opacity" ,0.5);
 	
 	
+	io_Menus = initSmartContextMenu(io_Menus);
+	
+	
 	/* 绘制菜单项的圆 */
-	i_Super.selectAll(".SmartMenuItem").data(i_Menus).enter()
+	i_Stage.selectAll(".SmartMenuItem").data(io_Menus).enter()
 	.append("circle")
 	.attr("id" ,function(d ,i)
 	{
@@ -206,13 +279,13 @@ function createSmartContextMenu(i_Super ,i_MenuItemSize ,i_Menus)
 		{
 			d.x = v_SuperCX;
 		}
-		else if ( i == 1 && i_Menus.length - 1 == 1 )
+		else if ( i == 1 && io_Menus.length - 1 == 1 )
 		{
 			d.x = calcCirclePointX(v_SuperCX ,v_SuperRadius ,-90);
 		}
 		else
 		{
-			d.x = calcCirclePointX(v_SuperCX ,v_SuperRadius ,360 / (i_Menus.length - 1) * i + v_OffsetAngle);
+			d.x = calcCirclePointX(v_SuperCX ,v_SuperRadius ,360 / (io_Menus.length - 1) * i + v_OffsetAngle);
 		}
 		
 		return d.x;
@@ -223,13 +296,13 @@ function createSmartContextMenu(i_Super ,i_MenuItemSize ,i_Menus)
 		{
 			d.y = v_SuperCY; 
 		}
-		else if ( i == 1 && i_Menus.length - 1 == 1 )
+		else if ( i == 1 && io_Menus.length - 1 == 1 )
 		{
 			d.y = calcCirclePointY(v_SuperCY ,v_SuperRadius ,-90);
 		}
 		else 
 		{
-			d.y = calcCirclePointY(v_SuperCY ,v_SuperRadius ,360 / (i_Menus.length - 1) * i + v_OffsetAngle);
+			d.y = calcCirclePointY(v_SuperCY ,v_SuperRadius ,360 / (io_Menus.length - 1) * i + v_OffsetAngle);
 		}
 		
 		return d.y;
@@ -252,26 +325,35 @@ function createSmartContextMenu(i_Super ,i_MenuItemSize ,i_Menus)
 	})
 	.on("mouseover" ,function(d ,i)
 	{
-		i_Super.select("#SmartMenuItem_"     + i).attr("fill" ,d.bgColorMouse);
-		i_Super.select("#SmartMenuItemName_" + i).attr("fill" ,d.fontColorMouse);
+		if ( d.valid )
+		{
+			i_Stage.select("#SmartMenuItem_"     + i).attr("fill" ,d.bgColorMouse);
+			i_Stage.select("#SmartMenuItemName_" + i).attr("fill" ,d.fontColorMouse);
+		}
 	})
 	.on("mouseout" ,function(d ,i)
 	{
-		i_Super.select("#SmartMenuItem_"     + i).attr("fill" ,d.bgColor);
-		i_Super.select("#SmartMenuItemName_" + i).attr("fill" ,d.fontColor);
+		if ( d.valid )
+		{
+			i_Stage.select("#SmartMenuItem_"     + i).attr("fill" ,d.bgColor);
+			i_Stage.select("#SmartMenuItemName_" + i).attr("fill" ,d.fontColor);
+		}
 	})
 	.on("click" ,function(d ,i)
 	{
-		i_Super.select("#SmartMenuItem_"     + i).attr("fill" ,d.bgColorClick);
-		if ( d.onClick )
+		if ( d.valid )
 		{
-			d.onClick.call(this ,d ,i);
+			i_Stage.select("#SmartMenuItem_"     + i).attr("fill" ,d.bgColorClick);
+			if ( 'onClick' in d && d.onClick )
+			{
+				d.onClick.call(this ,d ,i);
+			}
 		}
 	});
 	
 	
 	/* 绘制菜单项的名称 */
-	i_Super.selectAll(".SmartMenuItemName").data(i_Menus).enter()
+	i_Stage.selectAll(".SmartMenuItemName").data(io_Menus).enter()
 	.append("text")
 	.attr("id" ,function(d ,i)
 	{
@@ -296,7 +378,14 @@ function createSmartContextMenu(i_Super ,i_MenuItemSize ,i_Menus)
 	})
 	.attr("fill" ,function(d ,i)
 	{
-		return d.fontColor;	
+		if ( d.valid )
+		{
+			return d.fontColor;	
+		}
+		else
+		{
+			return "gainsboro";
+		}
 	})
 	.attr("font-size" ,function(d ,i)
 	{
@@ -308,20 +397,48 @@ function createSmartContextMenu(i_Super ,i_MenuItemSize ,i_Menus)
 	})
 	.on("mouseover" ,function(d ,i)
 	{
-		i_Super.select("#SmartMenuItem_"     + i).attr("fill" ,d.bgColorMouse);
-		i_Super.select("#SmartMenuItemName_" + i).attr("fill" ,d.fontColorMouse);
+		if ( d.valid )
+		{
+			i_Stage.select("#SmartMenuItem_"     + i).attr("fill" ,d.bgColorMouse);
+			i_Stage.select("#SmartMenuItemName_" + i).attr("fill" ,d.fontColorMouse);
+		}
 	})
 	.on("mouseout" ,function(d ,i)
 	{
-		i_Super.select("#SmartMenuItem_"     + i).attr("fill" ,d.bgColor);
-		i_Super.select("#SmartMenuItemName_" + i).attr("fill" ,d.fontColor);
+		if ( d.valid )
+		{
+			i_Stage.select("#SmartMenuItem_"     + i).attr("fill" ,d.bgColor);
+			i_Stage.select("#SmartMenuItemName_" + i).attr("fill" ,d.fontColor);
+		}
 	})
 	.on("click" ,function(d ,i)
 	{
-		i_Super.select("#SmartMenuItem_"     + i).attr("fill" ,d.bgColorClick);
-		if ( d.onClick )
+		if ( d.valid )
 		{
-			d.onClick.call(this ,d ,i);
+			i_Stage.select("#SmartMenuItem_"     + i).attr("fill" ,d.bgColorClick);
+			if ( 'onClick' in d && d.onClick )
+			{
+				d.onClick.call(this ,d ,i);
+			}
 		}
 	});
+	
+	return io_Menus;
+}
+
+
+
+/**
+ * 删除聪明的右击菜单
+ *
+ * @author      ZhengWei(HY)
+ * @createDate  2019-09-02
+ * @version     v1.0
+ *
+ * @param i_Stage          绘制右击菜单的舞台。可以是SVG，G等元素       
+ */
+function disposeSmartContextMenu(i_Stage)
+{
+	i_Stage.selectAll("circle").remove();
+	i_Stage.selectAll("text")  .remove();
 }

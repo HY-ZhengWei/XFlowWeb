@@ -1699,15 +1699,15 @@
 	
 	
 	
-	var v_ActivityMenus = [{bgColor:"#E45D5C"    ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"white" ,fontColorMouse:"white" ,fontSize:14 ,onClick:menuOnClick                    ,name:"编辑"} 
-	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickActivityColor       ,name:"活动颜色"} 
-	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickActivityNameColor   ,name:"文字颜色"} 
-	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickActivityFlagColor   ,name:"页签颜色"} 
-	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickActivityBorderColor ,name:"边框颜色"}];
+	var v_ActivityMenus = [{fontSize:14 ,onClick:menuOnClick                    ,name:"编辑"} 
+	                      ,{fontSize:12 ,onClick:menuOnClickActivityColor       ,name:"活动颜色"} 
+	                      ,{fontSize:12 ,onClick:menuOnClickActivityNameColor   ,name:"文字颜色"} 
+	                      ,{fontSize:12 ,onClick:menuOnClickActivityFlagColor   ,name:"页签颜色"} 
+	                      ,{fontSize:12 ,onClick:menuOnClickActivityBorderColor ,name:"边框颜色"}];
 	                      
-	var v_RounteMenus   = [{bgColor:"#E45D5C"    ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"white" ,fontColorMouse:"white" ,fontSize:14 ,onClick:menuOnClick                    ,name:"编辑"} 
-	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickRouteColor          ,name:"路由颜色"} 
-	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickRouteNameColor      ,name:"文字颜色"}];
+	var v_RounteMenus   = [{fontSize:14 ,onClick:menuOnClick                    ,name:"编辑"} 
+	                      ,{fontSize:12 ,onClick:menuOnClickRouteColor          ,name:"路由颜色"} 
+	                      ,{fontSize:12 ,onClick:menuOnClickRouteNameColor      ,name:"文字颜色"}];
 	                      
 	createSmartContextMenu(v_AMenus ,30 ,v_ActivityMenus);
 	createSmartContextMenu(v_RMenus ,30 ,v_RounteMenus);
