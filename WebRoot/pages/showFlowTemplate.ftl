@@ -94,24 +94,25 @@
 	
 	<script type="text/javascript">
 	
-	var N               = {width:160 ,height:40 ,lineWidth:1 ,flagWidth:18 };
-	var Colors          = {backgroudColor:"#FFFFFF" ,routeColor:"#6AB975" ,routeRejectColor:"#FF4444" ,markLineColor:"#0099CC"}; 
-	var v_SVG           = d3.select("body").select("svg");
-	var v_Datas         = ${activitys}.datas;
-	var v_Routes        = ${routes}.datas;
-	var v_RouteMap      = makeRouteMap (v_Routes);  /* 可通过路由ID定位路由信息 */
-	var v_RouteRefs     = makeRouteRefs(v_Routes);  /* 可通过节点ID定位到与其有关联的所有路由ID */
-	var v_XOffset       = 0;                        /* 移动时相对鼠标的偏移量X */
-	var v_YOffset       = 0;                        /* 移动时相对鼠标的偏移量Y */
-	var v_HLineTMax     = 0;                        /* 水平标线（上）离移动节点最近的值 */
-	var v_HLineBMin     = 99999;                    /* 水平标线（下）离移动节点最近的值 */
-	var v_VLineLMax     = 0;                        /* 垂直标线（左）离移动节点最近的值 */
-	var v_VLineRMin     = 99999;                    /* 垂直标线（右）离移动节点最近的值 */
-	var v_ToPoints      = d3.map();                 /* 节点链接线的到达点的位置集合信息map.key为XY坐标值，map.value为数量 */
-	var v_SelectedG     = null;                     /* 当前选择的活动所在的 G 对象 */
-	var v_ColorSettings = null;                     /* 当前颜色选择器设置的对象的数组 */
-	var v_ColorAttrName = null;                     /* 当前颜色选择器设置的对象的具体属性名称 */
-	var v_Drag          = d3.drag()
+	var N                = {width:160 ,height:40 ,lineWidth:1 ,flagWidth:18 };
+	var Colors           = {backgroudColor:"#FFFFFF" ,routeColor:"#6AB975" ,routeRejectColor:"#FF4444" ,markLineColor:"#0099CC"}; 
+	var v_SVG            = d3.select("body").select("svg");
+	var v_Datas          = ${activitys}.datas;
+	var v_Routes         = ${routes}.datas;
+	var v_RouteMap       = makeRouteMap (v_Routes);  /* 可通过路由ID定位路由信息 */
+	var v_RouteRefs      = makeRouteRefs(v_Routes);  /* 可通过节点ID定位到与其有关联的所有路由ID */
+	var v_XOffset        = 0;                        /* 移动时相对鼠标的偏移量X */
+	var v_YOffset        = 0;                        /* 移动时相对鼠标的偏移量Y */
+	var v_HLineTMax      = 0;                        /* 水平标线（上）离移动节点最近的值 */
+	var v_HLineBMin      = 99999;                    /* 水平标线（下）离移动节点最近的值 */
+	var v_VLineLMax      = 0;                        /* 垂直标线（左）离移动节点最近的值 */
+	var v_VLineRMin      = 99999;                    /* 垂直标线（右）离移动节点最近的值 */
+	var v_ToPoints       = d3.map();                 /* 节点链接线的到达点的位置集合信息map.key为XY坐标值，map.value为数量 */
+	var v_SelectedG      = null;                     /* 当前选择的活动所在的 G 对象 */
+	var v_SelectedRID    = null;                     /* 当前选择的路由ID */
+	var v_ColorSettings  = null;                     /* 当前颜色选择器设置的对象的数组 */
+	var v_ColorAttrNames = null;                     /* 当前颜色选择器设置的对象的具体属性名称的数组 */
+	var v_Drag           = d3.drag()
     .on("start" ,function()
     {
 		var v_XY = getGXY(d3.select(this));
@@ -445,14 +446,14 @@
 	 * @createDate  2019-08-31
 	 * @version     v1.0
 	 *
-	 * @param i_SettingObjects   被设置的d3对象的数组
-	 * @param i_SettingAttrName  被设置的d3对象的属性名称
+	 * @param i_SettingObjects    被设置的d3对象的数组
+	 * @param i_SettingAttrNames  被设置的d3对象的属性名称的数组
 	 */
-	function showColorDialog(i_SettingObjects ,i_SettingAttrName)
+	function showColorDialog(i_SettingObjects ,i_SettingAttrNames)
 	{
-		v_ColorSettings = i_SettingObjects;
-		v_ColorAttrName = i_SettingAttrName;
-		var v_ClickColor = v_ColorSettings[0].attr(v_ColorAttrName);
+		v_ColorSettings  = i_SettingObjects;
+		v_ColorAttrNames = i_SettingAttrNames;
+		var v_ClickColor = v_ColorSettings[0].attr(i_SettingAttrNames[0]);
 		
 		$("#colorPicker").colpick(
 		{
@@ -465,14 +466,14 @@
 		    	hideColorPicker();
 		    	for (var i=0; i<v_ColorSettings.length; i++)
 		    	{
-		    		v_ColorSettings[i].attr(v_ColorAttrName ,'#' + hex);
+		    		v_ColorSettings[i].attr(v_ColorAttrNames[i] ,'#' + hex);
 		    	}
 		    },
 			onChange: function(hsb,hex,rgb,el,bySetColor) 
 			{
 				for (var i=0; i<v_ColorSettings.length; i++)
 		    	{
-		    		v_ColorSettings[i].attr(v_ColorAttrName ,'#' + hex);
+		    		v_ColorSettings[i].attr(v_ColorAttrNames[i] ,'#' + hex);
 		    	}
 	        }
 		});
@@ -519,6 +520,7 @@
 		.attr("id"           ,"NGF" + i_Data.activityID)
 		.attr("stroke"       ,i_Data.lineColor)
 		.attr("fill"         ,i_Data.flagColor)
+		.style("cursor"      ,"move")
 		.attr("points" ,function()
 		{
 			var v_StartX = 7;
@@ -586,8 +588,8 @@
 	 * 用路由数组生成路由节点关系，可通过节点ID定位到与其有关联的所有路由ID。
 	 *    
 	 *    返回结构为：Object.节点ID1.["路由ID1-2" ,"路由ID1-3"]
-	 *                    .节点ID2.["路由ID1-2" ,"路由ID2-3"]
-	 *                    .节点ID3.["路由ID1-3" ,"路由ID2-3"]
+	 *                      .节点ID2.["路由ID1-2" ,"路由ID2-3"]
+	 *                      .节点ID3.["路由ID1-3" ,"路由ID2-3"]
 	 *
 	 * @author      ZhengWei(HY)
 	 * @createDate  2018-10-23
@@ -697,6 +699,7 @@
 				}
 			}
 		}
+		
 		
 		if ( v_Type == "H" )
 		{
@@ -1346,7 +1349,7 @@
 			v_Ret += (i_ToXY[0] + v_Offset) + "," + (i_ToXY[1] + v_RSize);
 		}
 				
-		d3.select("#ArrowY_" + i_RouteData.activityID + "_" + i_RouteData.nextActivityID).attr("d" ,v_Ret);	
+		d3.select("#" + i_RouteData.activityRouteID + "_ArrowY").attr("d" ,v_Ret);	
 		
 		return v_Ret;
 	}
@@ -1424,7 +1427,7 @@
 	.append("path")
 	.attr("id" ,function(d ,i)
 	{
-		return "ArrowY_" + d.activityID + "_" + d.nextActivityID;	
+		return d.activityRouteID + "_ArrowY";	
 	})
 	.attr("class" ,"RouteYArrow")
 	.attr("fill" ,function(d ,i)
@@ -1478,6 +1481,7 @@
 	})
 	.on("contextmenu" ,function(d ,i)
 	{
+		v_SelectedRID = d.activityRouteID;
 		hideAMenus();
 		
 		var v_Route         = d3.select("#" + d.activityRouteID + "_TEXT");
@@ -1507,6 +1511,7 @@
 	})
 	.on("contextmenu" ,function(d ,i)
 	{
+		v_SelectedRID = d.activityRouteID;
 		hideAMenus();
 		
 		var v_Route         = d3.select(this);
@@ -1581,7 +1586,7 @@
 			return;
 		}
 		
-		showColorDialog([v_SelectedG.select("rect")] ,"fill");
+		showColorDialog([v_SelectedG.select("rect")] ,["fill"]);
 	}
 	
 	
@@ -1602,7 +1607,7 @@
 			return;
 		}
 		
-		showColorDialog([v_SelectedG.select("text")] ,"fill");
+		showColorDialog([v_SelectedG.select("text")] ,["fill"]);
 	}
 	
 	
@@ -1623,13 +1628,13 @@
 			return;
 		}
 		
-		showColorDialog([v_SelectedG.select("polygon")] ,"fill");
+		showColorDialog([v_SelectedG.select("polygon")] ,["fill"]);
 	}
 	
 	
 	
 	/**
-	 * 设置活动页签颜色选择器
+	 * 设置活动边框颜色选择器
 	 *
 	 * @author      ZhengWei(HY)
 	 * @createDate  2019-08-31
@@ -1644,7 +1649,52 @@
 			return;
 		}
 		
-		showColorDialog([v_SelectedG.select("rect") ,v_SelectedG.select("polygon")] ,"stroke");
+		showColorDialog([v_SelectedG.select("rect") ,v_SelectedG.select("polygon")] ,["stroke" ,"stroke"]);
+	}
+	
+	
+	
+	/**
+	 * 设置路由的颜色选择器
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2019-09-01
+	 * @version     v1.0
+	 */
+	function menuOnClickRouteColor(d ,i)
+	{
+		hideRMenus();
+		
+		if ( v_SelectedRID == null )
+		{
+			return;
+		}
+		
+		showColorDialog([d3.select("#" + v_SelectedRID) 
+		                ,d3.select("#" + v_SelectedRID + "_ArrowY") 
+		                ,d3.select("#" + v_SelectedRID + "_ArrowY")] 
+		                ,["stroke" ,"fill" ,"stroke"]);
+	}
+	
+	
+	
+	/**
+	 * 设置路由文字颜色选择器
+	 *
+	 * @author      ZhengWei(HY)
+	 * @createDate  2019-09-01
+	 * @version     v1.0
+	 */
+	function menuOnClickRouteNameColor(d ,i)
+	{
+		hideRMenus();
+		
+		if ( v_SelectedRID == null )
+		{
+			return;
+		}
+		
+		showColorDialog([d3.select("#" + v_SelectedRID + "_TEXT")] ,["fill"]);
 	}
 	
 	
@@ -1656,8 +1706,8 @@
 	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickActivityBorderColor ,name:"边框颜色"}];
 	                      
 	var v_RounteMenus   = [{bgColor:"#E45D5C"    ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"white" ,fontColorMouse:"white" ,fontSize:14 ,onClick:menuOnClick                    ,name:"编辑"} 
-	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickActivityColor       ,name:"路由颜色"} 
-	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickActivityNameColor   ,name:"文字颜色"}];
+	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickRouteColor          ,name:"路由颜色"} 
+	                      ,{bgColor:"ghostwhite" ,bgColorMouse:"#E87372" ,bgColorClick:"#FF974D" ,fontColor:"black" ,fontColorMouse:"white" ,fontSize:12 ,onClick:menuOnClickRouteNameColor      ,name:"文字颜色"}];
 	                      
 	createSmartContextMenu(v_AMenus ,30 ,v_ActivityMenus);
 	createSmartContextMenu(v_RMenus ,30 ,v_RounteMenus);
@@ -1694,10 +1744,11 @@
 		
 		for (i=0; i<v_Routes.length; i++)
 		{
-			var v_Route = d3.select("#" + v_Routes[i].activityRouteID);
+			var v_Route     = d3.select("#" + v_Routes[i].activityRouteID);
+			var v_RouteName = d3.select("#" + v_Routes[i].activityRouteID + "_TEXT");
 			
-			v_Routes[i].lineColor = v_Route.attr("stroke");
-			v_Routes[i].fontColor = v_Route.attr("fill");
+			v_Routes[i].lineColor = v_Route    .attr("stroke");
+			v_Routes[i].fontColor = v_RouteName.attr("fill");
 		}
 		
 		var v_ActivitysJson = JSON.stringify(v_Datas);

@@ -335,7 +335,7 @@ public class FlowAction extends ActionSupport
                     v_New.setBackgroudColor("#FFFFFF");
                     v_New.setLineColor(     "#000000");
                     v_New.setFlagColor(     "#FFFFFF");
-                    v_New.setFontColor(     "gainsboro");
+                    v_New.setFontColor(     "#DCDCDC");
                 }
                 
                 v_TempActivitys.add(v_New);
@@ -381,8 +381,8 @@ public class FlowAction extends ActionSupport
                 }
                 else
                 {
-                    v_New.setLineColor("gainsboro");
-                    v_New.setFontColor("gainsboro");
+                    v_New.setLineColor("#DCDCDC");
+                    v_New.setFontColor("#DCDCDC");
                     v_TempRoutes.add(v_New);
                 }
             }
