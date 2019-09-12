@@ -145,8 +145,20 @@ public class FlowAction extends ActionSupport
                 v_New.setActivityID(        v_Route.getActivityID());
                 v_New.setNextActivityID(    v_Route.getNextActivityID());
                 v_New.setRouteType(         v_Route.getRouteType());
-                v_New.setLineColor(         v_Route.getLineColor());
                 v_New.setFontColor(Help.NVL(v_Route.getFontColor() ,"#000000"));
+                v_New.setLineColor(         v_Route.getLineColor());
+                
+                if ( Help.isNull(v_New.getLineColor()) )
+                {
+                    if ( "驳回".equals(v_Route.getRouteType().getRouteType()) )
+                    {
+                        v_New.setLineColor("#FF4444");
+                    }
+                    else
+                    {
+                        v_New.setLineColor("#6AB975");
+                    }
+                }
                 
                 v_TempRoutes.add(v_New);
             }
