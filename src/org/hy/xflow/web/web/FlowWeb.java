@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hy.common.Help;
+import org.hy.common.TablePartitionLink;
 import org.hy.common.xml.annotation.XRequest;
 import org.hy.common.xml.annotation.Xjava;
 import org.hy.common.xml.plugins.AppMessage;
@@ -215,12 +216,14 @@ public class FlowWeb extends BaseWeb
                 {
                     v_Process = v_XFlowEngine.toNext(v_FlowData.getUser() 
                                                     ,v_FlowData.getWorkID() 
+                                                    ,(FlowProcess)null
                                                     ,v_FlowData.getActivityRouteCode());
                 }
                 else
                 {
                     v_Process = v_XFlowEngine.toNext(v_FlowData.getUser() 
                                                     ,v_FlowData.getWorkID() 
+                                                    ,null
                                                     ,v_FlowData.getActivityRouteCode()
                                                     ,v_FlowData.getParticipants());
                 }
@@ -231,12 +234,14 @@ public class FlowWeb extends BaseWeb
                 {
                     v_Process = v_XFlowEngine.toNextByServiceDataID(v_FlowData.getUser() 
                                                                    ,v_FlowData.getServiceDataID()
+                                                                   ,null
                                                                    ,v_FlowData.getActivityRouteCode());
                 }
                 else
                 {
                     v_Process = v_XFlowEngine.toNextByServiceDataID(v_FlowData.getUser() 
                                                                    ,v_FlowData.getServiceDataID()
+                                                                   ,null
                                                                    ,v_FlowData.getActivityRouteCode()
                                                                    ,v_FlowData.getParticipants());
                 }
@@ -475,6 +480,71 @@ public class FlowWeb extends BaseWeb
             v_WorkIDs = v_XFlowEngine.queryServiceDataIDsByDone(v_FlowData.getUser());
             
             v_Ret.setBody(v_WorkIDs);
+            v_Ret.setResult(true);
+        }
+        catch (Exception exce)
+        {
+            exce.printStackTrace();
+            v_Ret.setBody(null);
+            v_Ret.setResult(false);
+            if ( exce.getCause() != null )
+            {
+                v_Ret.setRi(exce.getCause().toString() + "   " + Help.isNull(exce.getMessage()));
+            }
+            else
+            {
+                v_Ret.setRi(exce.getMessage());
+            }
+        }
+        
+        return v_Ret;
+    }
+    
+    
+    
+    /**
+     * 查询历次的汇总情况。首次为最新的流转（即按时间顺序倒排的）
+     * 
+     *   1. 可通过实例ID查询。
+     *   2. 可通过业务ID查询。
+     * 
+     * @author      ZhengWei(HY)
+     * @createDate  2019-09-18
+     * @version     v1.0
+     *
+     * @param i_AppMsg
+     * @return
+     */
+    @XRequest(id="I008querySummarys")
+    public AppMessage<Object> querySummarysByWorkID(AppMessage<FlowData> i_AppMsg)
+    {
+        if ( i_AppMsg == null )
+        {
+            return null;
+        }
+        
+        if ( i_AppMsg.getBody() == null )
+        {
+            return null;
+        }
+        
+        AppMessage<Object>                      v_Ret         = i_AppMsg.clone();
+        FlowData                                v_FlowData    = i_AppMsg.getBody();
+        XFlowEngine                             v_XFlowEngine = XFlowEngine.getInstance();
+        TablePartitionLink<String ,FlowProcess> v_Summarys    = null;
+        
+        try
+        {
+            if ( !Help.isNull(v_FlowData.getWorkID()) )
+            {
+                v_Summarys = v_XFlowEngine.querySummarysByWorkID(v_FlowData.getWorkID());
+            }
+            else if ( !Help.isNull(v_FlowData.getServiceDataID()) )
+            {
+                v_Summarys = v_XFlowEngine.querySummarysByServiceDataID(v_FlowData.getServiceDataID());
+            }
+            
+            v_Ret.setBody(v_Summarys);
             v_Ret.setResult(true);
         }
         catch (Exception exce)

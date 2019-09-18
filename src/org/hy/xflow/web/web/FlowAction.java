@@ -304,7 +304,14 @@ public class FlowAction extends ActionSupport
         for (FlowProcess v_Process : v_Processes)
         {
             v_ProcessActivitys.putRow(Help.NVL(v_Process.getCurrentActivityID()) ,v_Process);
-            v_ProcessRoutes   .putRow(Help.NVL(v_Process.getCurrentActivityID()) + "-" + Help.NVL(v_Process.getNextActivityID()) ,v_Process);
+            
+            String [] v_NextAIDs = Help.NVL(v_Process.getNextActivityID()).split(",");
+            
+            // 多路并行路由的情况
+            for (String v_NextAID : v_NextAIDs)
+            {
+                v_ProcessRoutes.putRow(Help.NVL(v_Process.getCurrentActivityID()) + "-" + v_NextAID ,v_Process);
+            }
         }
         
         try
@@ -366,8 +373,8 @@ public class FlowAction extends ActionSupport
                 v_New.setActivityRouteCode(v_Route.getActivityRouteCode());
                 v_New.setActivityRouteName(v_Route.getActivityRouteName());
                 v_New.setActivityID(       v_Route.getActivityID());
-                v_New.setNextActivityID(   v_Route.getNextActivityID());
                 v_New.setRouteType(        v_Route.getRouteType());
+                v_New.setNextActivityID(   v_Route.getNextActivityID());
                 
                 List<FlowProcess> v_NodeProcess = v_ProcessRoutes.get(v_Route.getActivityID() + "-" + v_Route.getNextActivityID());
                 if ( !Help.isNull(v_NodeProcess) )
