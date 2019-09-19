@@ -4,15 +4,15 @@
     "sid": "I002QueryNextRoutes",
     "body": {
         "user": {
-            "userID": "8a81b2b54b7b391b014b7d12b66400fc",
-            "userName": "公用销售人员",
+            "userID": "Children-01",
+            "userName": "小明",
             "roles": [
                 {
-                    "roleID": "004",
-                    "roleName": "销售人员"
+                    "roleID": "Children-Role",
+                    "roleName": "孩子的角色"
                 }
             ]
         },
-        "serviceDataID": "SID999"
+        "serviceDataID": "能玩游戏吗011"
     }
 }</string></body></request></rest-client>

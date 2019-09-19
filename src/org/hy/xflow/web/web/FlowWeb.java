@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hy.common.Help;
-import org.hy.common.TablePartitionLink;
 import org.hy.common.xml.annotation.XRequest;
 import org.hy.common.xml.annotation.Xjava;
 import org.hy.common.xml.plugins.AppMessage;
@@ -14,6 +13,7 @@ import org.hy.xflow.engine.bean.FlowData;
 import org.hy.xflow.engine.bean.FlowInfo;
 import org.hy.xflow.engine.bean.FlowProcess;
 import org.hy.xflow.engine.bean.NextRoutes;
+import org.hy.xflow.engine.enums.RouteTypeEnum;
 import org.hy.xflow.web.common.BaseWeb;
 
 
@@ -104,6 +104,7 @@ public class FlowWeb extends BaseWeb
      * @author      ZhengWei(HY)
      * @createDate  2018-05-17
      * @version     v1.0
+     *              v2.0  添加：返回结果除了可走的路由外，将返回更多的信息，如当前流转信息、工作流实例信息、参与人信息、汇总信息
      *
      * @param i_AppMsg
      * @return
@@ -125,7 +126,6 @@ public class FlowWeb extends BaseWeb
         FlowData            v_FlowData    = i_AppMsg.getBody();
         XFlowEngine         v_XFlowEngine = XFlowEngine.getInstance();
         NextRoutes          v_NextRouts   = null;
-        List<ActivityRoute> v_RetRoutes   = null;
         
         try
         {
@@ -138,24 +138,75 @@ public class FlowWeb extends BaseWeb
                 v_NextRouts = v_XFlowEngine.queryNextRoutesByServiceDataID(v_FlowData.getUser() ,v_FlowData.getServiceDataID());
             }
             
-            // 防止递归引用，删除部分对象引用
-            if ( !Help.isNull(v_NextRouts.getRoutes()) )
+            // 没有可走的路由
+            if ( Help.isNull(v_NextRouts.getRoutes()) )
             {
-                v_RetRoutes = new ArrayList<ActivityRoute>();
-                
-                for (ActivityRoute v_Route : v_NextRouts.getRoutes())
+                v_NextRouts.setFlow(null);
+                v_NextRouts.setCurrentProcess(null);
+                v_NextRouts.setCurrentActivity(null);
+                v_NextRouts.setFlowParticipants(null);
+                v_NextRouts.setRoutes(new ArrayList<ActivityRoute>());
+            }
+            else
+            {
+                // 防止递归引用，删除部分对象引用
+                if ( !Help.isNull(v_NextRouts.getRoutes()) )
                 {
-                    ActivityRoute v_NewRoute = new ActivityRoute();
+                    v_NextRouts.setFlowParticipants(null);
                     
-                    v_NewRoute.initNotNull(v_Route);
-                    v_NewRoute.setActivity(null);
-                    v_NewRoute.setNextActivity(null);
+                    List<ActivityRoute> v_RetRoutes = new ArrayList<ActivityRoute>();
                     
-                    v_RetRoutes.add(v_NewRoute);
+                    for (ActivityRoute v_Route : v_NextRouts.getRoutes())
+                    {
+                        ActivityRoute v_NewRoute = new ActivityRoute();
+                        
+                        v_NewRoute.initNotNull(v_Route);
+                        
+                        if ( v_NewRoute.getActivity() != null )
+                        {
+                            v_NewRoute.setActivity(v_NewRoute.getActivity().toSimple());
+                        }
+                        
+                        if ( v_NewRoute.getNextActivity() != null )
+                        {
+                            v_NewRoute.setNextActivity(v_NewRoute.getNextActivity().toSimple());
+                        }
+                        
+                        v_RetRoutes.add(v_NewRoute);
+                    }
+                    
+                    v_NextRouts.setRoutes(v_RetRoutes);
+                }
+                
+                // 防止递归引用，删除部分对象引用
+                if ( v_NextRouts.getCurrentActivity() != null )
+                {
+                    v_NextRouts.setCurrentActivity(v_NextRouts.getCurrentActivity().toSimple());
+                }
+                
+                if ( v_NextRouts.getFlow() != null )
+                {
+                    v_NextRouts.getFlow().setProcesses(null);
+                }
+                
+                if ( v_NextRouts.getCurrentProcess() != null )
+                {
+                    // 判定：当前流转是否是从“汇总路由”过来的。即当前节点是汇总节点
+                    if ( RouteTypeEnum.$ToSum.equals(RouteTypeEnum.get(v_NextRouts.getCurrentProcess().getPreviousOperateTypeID())) )
+                    {
+                        if ( !Help.isNull(v_FlowData.getWorkID()) )
+                        {
+                            v_NextRouts.setSummarys(v_XFlowEngine.querySummarysByWorkID(v_FlowData.getWorkID()));
+                        }
+                        else if ( !Help.isNull(v_FlowData.getServiceDataID()) )
+                        {
+                            v_NextRouts.setSummarys(v_XFlowEngine.querySummarysByServiceDataID(v_FlowData.getServiceDataID()));
+                        }
+                    }
                 }
             }
             
-            v_Ret.setBody(v_RetRoutes);
+            v_Ret.setBody(v_NextRouts);
             v_Ret.setResult(true);
         }
         catch (Exception exce)
@@ -515,7 +566,7 @@ public class FlowWeb extends BaseWeb
      * @param i_AppMsg
      * @return
      */
-    @XRequest(id="I008querySummarys")
+    @XRequest(id="I008QuerySummarys")
     public AppMessage<Object> querySummarysByWorkID(AppMessage<FlowData> i_AppMsg)
     {
         if ( i_AppMsg == null )
@@ -528,10 +579,10 @@ public class FlowWeb extends BaseWeb
             return null;
         }
         
-        AppMessage<Object>                      v_Ret         = i_AppMsg.clone();
-        FlowData                                v_FlowData    = i_AppMsg.getBody();
-        XFlowEngine                             v_XFlowEngine = XFlowEngine.getInstance();
-        TablePartitionLink<String ,FlowProcess> v_Summarys    = null;
+        AppMessage<Object> v_Ret         = i_AppMsg.clone();
+        FlowData           v_FlowData    = i_AppMsg.getBody();
+        XFlowEngine        v_XFlowEngine = XFlowEngine.getInstance();
+        List<FlowProcess>  v_Summarys    = null;
         
         try
         {
