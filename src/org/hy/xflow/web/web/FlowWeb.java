@@ -236,6 +236,7 @@ public class FlowWeb extends BaseWeb
      * @author      ZhengWei(HY)
      * @createDate  2018-05-17
      * @version     v1.0
+     *              v2.0  2019-09-19  添加：汇总值、汇总人数、操作文件、操作数据、备注说明
      *
      * @param i_AppMsg
      * @return
