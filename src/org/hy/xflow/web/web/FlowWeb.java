@@ -261,20 +261,28 @@ public class FlowWeb extends BaseWeb
         
         try
         {
+            FlowProcess v_ProcessExtra = new FlowProcess();
+            
+            v_ProcessExtra.setSummary(     Help.NVL(v_FlowData.getSummary()));
+            v_ProcessExtra.setCounter(     Help.NVL(v_FlowData.getCounter()));
+            v_ProcessExtra.setOperateFiles(Help.NVL(v_FlowData.getOperateFiles()));
+            v_ProcessExtra.setOperateDatas(Help.NVL(v_FlowData.getOperateDatas()));
+            v_ProcessExtra.setInfoComment( Help.NVL(v_FlowData.getInfoComment()));
+            
             if ( Help.isNull(v_FlowData.getServiceDataID()) )
             {
                 if ( Help.isNull(v_FlowData.getParticipants()) )
                 {
                     v_Process = v_XFlowEngine.toNext(v_FlowData.getUser() 
                                                     ,v_FlowData.getWorkID() 
-                                                    ,(FlowProcess)null
+                                                    ,v_ProcessExtra
                                                     ,v_FlowData.getActivityRouteCode());
                 }
                 else
                 {
                     v_Process = v_XFlowEngine.toNext(v_FlowData.getUser() 
                                                     ,v_FlowData.getWorkID() 
-                                                    ,null
+                                                    ,v_ProcessExtra
                                                     ,v_FlowData.getActivityRouteCode()
                                                     ,v_FlowData.getParticipants());
                 }
@@ -285,14 +293,14 @@ public class FlowWeb extends BaseWeb
                 {
                     v_Process = v_XFlowEngine.toNextByServiceDataID(v_FlowData.getUser() 
                                                                    ,v_FlowData.getServiceDataID()
-                                                                   ,null
+                                                                   ,v_ProcessExtra
                                                                    ,v_FlowData.getActivityRouteCode());
                 }
                 else
                 {
                     v_Process = v_XFlowEngine.toNextByServiceDataID(v_FlowData.getUser() 
                                                                    ,v_FlowData.getServiceDataID()
-                                                                   ,null
+                                                                   ,v_ProcessExtra
                                                                    ,v_FlowData.getActivityRouteCode()
                                                                    ,v_FlowData.getParticipants());
                 }
