@@ -12,6 +12,7 @@ import org.hy.xflow.engine.bean.ActivityRoute;
 import org.hy.xflow.engine.bean.FlowInfo;
 import org.hy.xflow.engine.bean.FlowProcess;
 import org.hy.xflow.engine.bean.Template;
+import org.hy.xflow.engine.enums.RouteTypeEnum;
 import org.hy.xflow.engine.service.IFlowInfoService;
 import org.hy.xflow.engine.service.IFlowProcessService;
 import org.hy.xflow.engine.service.ITemplateService;
@@ -346,7 +347,45 @@ public class FlowAction extends ActionSupport
                     
                     if ( Help.isNull(v_LastProcess.getNextActivityID()) )
                     {
-                        v_New.setActivityName("《 " + v_New.getActivityName() + " 》");
+                        // 判定：当前流转是否是从“汇总路由”过来的。即当前节点是汇总节点
+                        if ( RouteTypeEnum.$ToSum.equals(RouteTypeEnum.get(v_LastProcess.getPreviousOperateTypeID())) )
+                        {
+                            FlowProcess v_Summary        = v_ProcessService.querySummary(v_LastProcess);
+                            String      v_PassType       = v_Activity.getPassType();
+                            boolean     v_IsSummaryPass  = false;
+                            boolean     v_IsCounterPass  = false;
+                            
+                            if ( v_Summary.getSummaryPass().doubleValue() > 0 )
+                            {
+                                if ( v_Summary.getSummary().doubleValue() >= v_Summary.getSummaryPass().doubleValue() )
+                                {
+                                    v_IsSummaryPass = true;
+                                }
+                            }
+                            
+                            if ( v_Summary.getCounterPass().intValue() > 0 )
+                            {
+                                if ( v_Summary.getCounter().intValue() >= v_Summary.getCounterPass().intValue() )
+                                {
+                                    v_IsCounterPass = true;
+                                }
+                            }
+                            
+                            if ( ("AND".equalsIgnoreCase(v_PassType) && (v_IsSummaryPass && v_IsCounterPass))
+                              || ("OR" .equalsIgnoreCase(v_PassType) && (v_IsSummaryPass || v_IsCounterPass)) )
+                            {
+                                // 汇总通过
+                                v_New.setActivityName("《 " + v_New.getActivityName() + " 》");
+                            }
+                            else
+                            {
+                                v_New.setActivityName(v_New.getActivityName());
+                            }
+                        }
+                        else
+                        {
+                            v_New.setActivityName("《 " + v_New.getActivityName() + " 》");
+                        }
                     }
                 }
                 else
