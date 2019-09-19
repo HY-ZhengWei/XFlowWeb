@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rest-client version="3.5"><request><http-version>1.1</http-version><http-follow-redirects/><URL>http://127.0.0.1/XFlowWeb/app</URL><method>POST</method><body><string content-type="text/plain" charset="UTF-8">{
+    "sysid": "xx",
+    "sid": "I003ToNext",
+    "body": {
+        "user": {
+            "userID": "Children-01",
+            "userName": "小明",
+            "roles": [
+                {
+                    "roleID": "Children-Role",
+                    "roleName": "孩子的角色"
+                }
+            ]
+        },
+        "serviceDataID": "能玩游戏吗013",
+        "routes": [
+        	{
+		        "activityRouteCode": "问爸爸",
+		        "participants": [
+		            {
+		                "objectID": "Father-01",
+		                "objectName": "小明的爸爸",
+		                "objectType": "1"
+		            }
+		        ]
+	        },
+	        {
+	        	"activityRouteCode": "问妈妈",
+	        	"participants": [
+		            {
+		                "objectID": "Mother-01",
+		                "objectName": "小明的妈妈",
+		                "objectType": "1"
+		            }
+		        ]
+	        }
+        ]
+    }
+}</string></body></request></rest-client>

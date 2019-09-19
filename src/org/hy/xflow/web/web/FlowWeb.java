@@ -4,15 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hy.common.Help;
+import org.hy.common.PartitionMap;
+import org.hy.common.TablePartition;
 import org.hy.common.xml.annotation.XRequest;
 import org.hy.common.xml.annotation.Xjava;
 import org.hy.common.xml.plugins.AppMessage;
 import org.hy.xflow.engine.XFlowEngine;
 import org.hy.xflow.engine.bean.ActivityRoute;
 import org.hy.xflow.engine.bean.FlowData;
+import org.hy.xflow.engine.bean.FlowDataRoute;
 import org.hy.xflow.engine.bean.FlowInfo;
 import org.hy.xflow.engine.bean.FlowProcess;
 import org.hy.xflow.engine.bean.NextRoutes;
+import org.hy.xflow.engine.bean.UserParticipant;
 import org.hy.xflow.engine.enums.RouteTypeEnum;
 import org.hy.xflow.web.common.BaseWeb;
 
@@ -257,7 +261,7 @@ public class FlowWeb extends BaseWeb
         AppMessage<Object> v_Ret         = i_AppMsg.clone();
         FlowData           v_FlowData    = i_AppMsg.getBody();
         XFlowEngine        v_XFlowEngine = XFlowEngine.getInstance();
-        FlowProcess        v_Process     = null;
+        List<FlowProcess>  v_ProcessList = null;
         
         
         try
@@ -270,44 +274,36 @@ public class FlowWeb extends BaseWeb
             v_ProcessExtra.setOperateDatas(Help.NVL(v_FlowData.getOperateDatas()));
             v_ProcessExtra.setInfoComment( Help.NVL(v_FlowData.getInfoComment()));
             
-            if ( Help.isNull(v_FlowData.getServiceDataID()) )
+            PartitionMap<String ,UserParticipant> i_ActivityRouteCodes = new TablePartition<String ,UserParticipant>();
+            if ( !Help.isNull(v_FlowData.getActivityRouteCode()) )
             {
-                if ( Help.isNull(v_FlowData.getParticipants()) )
-                {
-                    v_Process = v_XFlowEngine.toNext(v_FlowData.getUser() 
-                                                    ,v_FlowData.getWorkID() 
-                                                    ,v_ProcessExtra
-                                                    ,v_FlowData.getActivityRouteCode());
-                }
-                else
-                {
-                    v_Process = v_XFlowEngine.toNext(v_FlowData.getUser() 
-                                                    ,v_FlowData.getWorkID() 
-                                                    ,v_ProcessExtra
-                                                    ,v_FlowData.getActivityRouteCode()
-                                                    ,v_FlowData.getParticipants());
-                }
+                i_ActivityRouteCodes.putRows(v_FlowData.getActivityRouteCode() ,v_FlowData.getParticipants());
             }
-            else 
+            
+            if ( !Help.isNull(v_FlowData.getRoutes()) )
             {
-                if ( Help.isNull(v_FlowData.getParticipants()) )
+                for (FlowDataRoute v_RouteItem : v_FlowData.getRoutes())
                 {
-                    v_Process = v_XFlowEngine.toNextByServiceDataID(v_FlowData.getUser() 
-                                                                   ,v_FlowData.getServiceDataID()
-                                                                   ,v_ProcessExtra
-                                                                   ,v_FlowData.getActivityRouteCode());
-                }
-                else
-                {
-                    v_Process = v_XFlowEngine.toNextByServiceDataID(v_FlowData.getUser() 
-                                                                   ,v_FlowData.getServiceDataID()
-                                                                   ,v_ProcessExtra
-                                                                   ,v_FlowData.getActivityRouteCode()
-                                                                   ,v_FlowData.getParticipants());
+                    i_ActivityRouteCodes.putRows(v_RouteItem.getActivityRouteCode() ,v_RouteItem.getParticipants());
                 }
             }
             
-            v_Ret.setBody(v_Process);
+            if ( Help.isNull(v_FlowData.getServiceDataID()) )
+            {
+                v_ProcessList = v_XFlowEngine.toNext(v_FlowData.getUser() 
+                                                    ,v_FlowData.getWorkID() 
+                                                    ,v_ProcessExtra
+                                                    ,i_ActivityRouteCodes);
+            }
+            else 
+            {
+                v_ProcessList = v_XFlowEngine.toNextByServiceDataID(v_FlowData.getUser() 
+                                                                   ,v_FlowData.getServiceDataID() 
+                                                                   ,v_ProcessExtra
+                                                                   ,i_ActivityRouteCodes);
+            }
+            
+            v_Ret.setBody(v_ProcessList);
             v_Ret.setResult(true);
         }
         catch (Exception exce)
