@@ -40,7 +40,7 @@
 			
 	        <item id="TPool_MaxThread">
 	            <name>TPool_MaxThread</name>
-				<value>10</value>
+				<value>100</value>
 				<comment>最大线程数</comment>
 	        </item>
 	        

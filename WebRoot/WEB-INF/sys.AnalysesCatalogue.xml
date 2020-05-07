@@ -20,7 +20,7 @@
 	    		<icon>:HttpBasePath/windows/images/xFlowWeb.png</icon>
 	    		<backgroundColor>#5ad190</backgroundColor>
 	    		<url>:HttpBasePath/web/showFlowTemplates</url>
-	    		<x>830</x>
+	    		<x>610</x>
 	    		<y>390</y>
 	    		<desktopShow>true</desktopShow>
 	    		<sizeType>max</sizeType>
