@@ -2,89 +2,89 @@
 
 <config>
 
-	<import name="xconfig"         class="java.util.ArrayList" />
-	<import name="xparam"          class="java.util.Hashtable" />
-	<import name="item"            class="org.hy.common.app.Param" />
-	<import name="expireFile"      class="org.hy.common.file.plugins.ExpireFileService" />
-	
-	
-	
-	<!-- 系统配置参数信息 -->
-	<xconfig>
-		
-	    <xparam id="SYSParam" key="name">
-	    
-	    	<item id="APPWEBID">
-	            <name>APPWEBID</name>
-				<value>XFlowWeb</value>
-				<comment>部署Web服务所在主机的标示(建议只包含：数字和英文)</comment>
-	        </item>
-	        
-	    	<item id="RootPackageName">
-	            <name>RootPackageName</name>
-				<value>org.hy.xflow.web</value>
-				<comment>顶级包的路径。用于初始化。一般不修改</comment>
-	        </item>
-			
-			<item id="DataSourceType">
-	            <name>DataSourceType</name>
-				<value>MYSQL</value>
-				<comment>配置数据库是什么类型的。详见：org.hy.common.db.DataSourceGroup</comment>
-	        </item>
-	        
-	        <item id="ClusterTimeout">
-	            <name>ClusterTimeout</name>
-				<value>120000</value>
-				<comment>集群并发通讯的超时时长(单位：毫秒)</comment>
-	        </item>
-			
-	        <item id="TPool_MaxThread">
-	            <name>TPool_MaxThread</name>
-				<value>100</value>
-				<comment>最大线程数</comment>
-	        </item>
-	        
-	        <item id="TPool_MinThread">
-	            <name>TPool_MinThread</name>
-				<value>1</value>
-				<comment>最小线程数</comment>
-	        </item>
-	        
-	        <item id="TPool_MinIdleThread">
-	            <name>TPool_MinIdleThread</name>
-				<value>1</value>
-				<comment>最小空闲数</comment>
-	        </item>
-	        
-	        <item id="TPool_IntervalTime">
-	            <name>TPool_IntervalTime</name>
-				<value>50</value>
-				<comment>间隔时间</comment>
-	        </item>
-	        
-	        <item id="TPool_IdleTimeKill">
-	            <name>TPool_IdleTimeKill</name>
-				<value>600</value>
-				<comment>空闲自毁时长</comment>
-	        </item>
-	        
-	        <item id="Digit">
-	            <name>Digit</name>
-				<value>3</value>
-				<comment>四舍五入保留的小数位数</comment>
-	        </item>
-	        
-		</xparam>
-		
-		
-		
-		<!-- Tomcat的Logs日志目录中的日志保留7天后就释放磁盘空间 -->
-		<expireFile id="ExpireLogs">
-			<folder>webhome:../../logs</folder>
-			<expireDays>7</expireDays>
-			<isDelChilds>true</isDelChilds>
-		</expireFile>
-		
-	</xconfig>
-	
+    <import name="xconfig"         class="java.util.ArrayList" />
+    <import name="xparam"          class="java.util.Hashtable" />
+    <import name="item"            class="org.hy.common.app.Param" />
+    <import name="expireFile"      class="org.hy.common.file.plugins.ExpireFileService" />
+    
+    
+    
+    <!-- 系统配置参数信息 -->
+    <xconfig>
+        
+        <xparam id="SYSParam" key="name">
+        
+            <item id="APPWEBID">
+                <name>APPWEBID</name>
+                <value>XFlowWeb</value>
+                <comment>部署Web服务所在主机的标示(建议只包含：数字和英文)</comment>
+            </item>
+            
+            <item id="RootPackageName">
+                <name>RootPackageName</name>
+                <value>org.hy.xflow.web</value>
+                <comment>顶级包的路径。用于初始化。一般不修改</comment>
+            </item>
+            
+            <item id="DataSourceType">
+                <name>DataSourceType</name>
+                <value>MYSQL</value>
+                <comment>配置数据库是什么类型的。详见：org.hy.common.db.DataSourceGroup</comment>
+            </item>
+            
+            <item id="ClusterTimeout">
+                <name>ClusterTimeout</name>
+                <value>120000</value>
+                <comment>集群并发通讯的超时时长(单位：毫秒)</comment>
+            </item>
+            
+            <item id="TPool_MaxThread">
+                <name>TPool_MaxThread</name>
+                <value>100</value>
+                <comment>最大线程数</comment>
+            </item>
+            
+            <item id="TPool_MinThread">
+                <name>TPool_MinThread</name>
+                <value>1</value>
+                <comment>最小线程数</comment>
+            </item>
+            
+            <item id="TPool_MinIdleThread">
+                <name>TPool_MinIdleThread</name>
+                <value>1</value>
+                <comment>最小空闲数</comment>
+            </item>
+            
+            <item id="TPool_IntervalTime">
+                <name>TPool_IntervalTime</name>
+                <value>50</value>
+                <comment>间隔时间</comment>
+            </item>
+            
+            <item id="TPool_IdleTimeKill">
+                <name>TPool_IdleTimeKill</name>
+                <value>600</value>
+                <comment>空闲自毁时长</comment>
+            </item>
+            
+            <item id="Digit">
+                <name>Digit</name>
+                <value>3</value>
+                <comment>四舍五入保留的小数位数</comment>
+            </item>
+            
+        </xparam>
+        
+        
+        
+        <!-- Tomcat的Logs日志目录中的日志保留7天后就释放磁盘空间 -->
+        <expireFile id="ExpireLogs">
+            <folder>webhome:../../logs</folder>
+            <expireDays>7</expireDays>
+            <isDelChilds>true</isDelChilds>
+        </expireFile>
+        
+    </xconfig>
+    
 </config>
