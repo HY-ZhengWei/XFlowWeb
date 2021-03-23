@@ -1,109 +1,109 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.5" 
-	xmlns="http://java.sun.com/xml/ns/javaee" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
-	http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-	
-	<context-param> 
+    xmlns="http://java.sun.com/xml/ns/javaee" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+    http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+    
+    <context-param> 
         <param-name>webAppRootKey</param-name> 
         <param-value>XFlowWeb</param-value> 
-	</context-param>
-	<display-name>XFlowWeb</display-name>
-	
-	
-	<context-param>
-		<param-name>log4jConfigLocation</param-name>
-		<param-value>/WEB-INF/conf/log4j.properties</param-value>
-	</context-param>
-	 
-	
-	<!-- 记录一次页面访问所对应执行的SQL信息  ZhengWei(HY) Add 2017-07-13 -->
-	<filter>
-		<filter-name>XSQLFilter</filter-name>
-		<filter-class>org.hy.common.xml.plugins.XSQLFilter</filter-class>
-		<init-param>
-			<param-name>exclusions</param-name>
-			<param-value>*.js,*.gif,*.jpg,*.png,*.css,*.ico,*.swf</param-value>
-		</init-param>
-		<init-param>
-			<param-name>cachesize</param-name>
-			<param-value>1000</param-value>
-		</init-param>
-		<init-param>
-			<param-name>timeout</param-name>
-			<param-value>60</param-value>
-		</init-param>
-	</filter>
-	<filter-mapping>
-		<filter-name>XSQLFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-	
-	
-	<!-- ZhengWei(HY) Add 2017-08-09 -->
-	<filter>    
-	    <filter-name>CharacterEncoding</filter-name>    
-	    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>    
-	    <init-param>    
-	        <param-name>encoding</param-name>    
-	        <param-value>UTF-8</param-value>    
-	    </init-param>    
-	</filter>    
-	<filter-mapping>    
-	    <filter-name>CharacterEncoding</filter-name>    
-	    <url-pattern>/*</url-pattern>    
-	</filter-mapping> 
-	
-	
-	<!-- 定义struts2 的核心控制器，用于生成ActionMapper ,拦截所有的Action请求-->
-	<filter>
-		<filter-name>struts2</filter-name>
-		<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>struts2</filter-name>
-		<url-pattern>/web/*</url-pattern>
-	</filter-mapping>
-	
-	
-	<!-- Listener contextConfigLocation -->
-	<listener>
-		<listener-class>
-			org.springframework.web.context.ContextLoaderListener
-		</listener-class>
-	</listener>
-	
-	<!-- 系统初始化信息 ZhengWei(HY) Add 2015-07-02 -->
-	<listener>
-		<listener-class>org.hy.xflow.web.config.InitConfig</listener-class>
-	</listener>
-	
-	<!-- ContextConfigLocation -->
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>
-			/WEB-INF/spring-context/applicationContext.xml
-		</param-value>
-	</context-param>
-	
-	
-	<servlet>
-	    <servlet-name>freemarker</servlet-name>
-	    <servlet-class>freemarker.ext.servlet.FreemarkerServlet</servlet-class>
-	    <init-param>
-	        <!-- 配置模板存放的位置 -->
-	        <param-name>TemplatePath</param-name>
-	        <param-value>/pages</param-value>
-	    </init-param>
-	    <load-on-startup>1</load-on-startup>
-	</servlet>
-	<servlet-mapping>
-	    <servlet-name>freemarker</servlet-name>
-	    <url-pattern>*.ftl</url-pattern>
-	</servlet-mapping>
-	
-	<servlet>
+    </context-param>
+    <display-name>XFlowWeb</display-name>
+    
+    
+    <context-param>
+        <param-name>log4jConfigLocation</param-name>
+        <param-value>/WEB-INF/conf/log4j.properties</param-value>
+    </context-param>
+     
+    
+    <!-- 记录一次页面访问所对应执行的SQL信息  ZhengWei(HY) Add 2017-07-13 -->
+    <filter>
+        <filter-name>XSQLFilter</filter-name>
+        <filter-class>org.hy.common.xml.plugins.XSQLFilter</filter-class>
+        <init-param>
+            <param-name>exclusions</param-name>
+            <param-value>*.js,*.gif,*.jpg,*.png,*.css,*.ico,*.swf</param-value>
+        </init-param>
+        <init-param>
+            <param-name>cachesize</param-name>
+            <param-value>1000</param-value>
+        </init-param>
+        <init-param>
+            <param-name>timeout</param-name>
+            <param-value>60</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>XSQLFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+    
+    <!-- ZhengWei(HY) Add 2017-08-09 -->
+    <filter>    
+        <filter-name>CharacterEncoding</filter-name>    
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>    
+        <init-param>    
+            <param-name>encoding</param-name>    
+            <param-value>UTF-8</param-value>    
+        </init-param>    
+    </filter>    
+    <filter-mapping>    
+        <filter-name>CharacterEncoding</filter-name>    
+        <url-pattern>/*</url-pattern>    
+    </filter-mapping> 
+    
+    
+    <!-- 定义struts2 的核心控制器，用于生成ActionMapper ,拦截所有的Action请求-->
+    <filter>
+        <filter-name>struts2</filter-name>
+        <filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>struts2</filter-name>
+        <url-pattern>/web/*</url-pattern>
+    </filter-mapping>
+    
+    
+    <!-- Listener contextConfigLocation -->
+    <listener>
+        <listener-class>
+            org.springframework.web.context.ContextLoaderListener
+        </listener-class>
+    </listener>
+    
+    <!-- 系统初始化信息 ZhengWei(HY) Add 2015-07-02 -->
+    <listener>
+        <listener-class>org.hy.xflow.web.config.InitConfig</listener-class>
+    </listener>
+    
+    <!-- ContextConfigLocation -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            /WEB-INF/spring-context/applicationContext.xml
+        </param-value>
+    </context-param>
+    
+    
+    <servlet>
+        <servlet-name>freemarker</servlet-name>
+        <servlet-class>freemarker.ext.servlet.FreemarkerServlet</servlet-class>
+        <init-param>
+            <!-- 配置模板存放的位置 -->
+            <param-name>TemplatePath</param-name>
+            <param-value>/pages</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>freemarker</servlet-name>
+        <url-pattern>*.ftl</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
         <servlet-name>AppBaseServlet</servlet-name>
         <servlet-class>org.hy.common.xml.plugins.AppBaseServlet</servlet-class>
     </servlet>
@@ -112,39 +112,39 @@
         <url-pattern>/app</url-pattern>
     </servlet-mapping>
     
-	<servlet>
-		<servlet-name>AnalysesServlet</servlet-name>
-		<servlet-class>org.hy.common.xml.plugins.analyse.AnalysesServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-    	<servlet-name>AnalysesServlet</servlet-name>
-    	<url-pattern>/analyses/*</url-pattern>
-	</servlet-mapping>
+    <servlet>
+        <servlet-name>AnalysesServlet</servlet-name>
+        <servlet-class>org.hy.common.xml.plugins.analyse.AnalysesServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AnalysesServlet</servlet-name>
+        <url-pattern>/analyses/*</url-pattern>
+    </servlet-mapping>
   
-	<servlet>
-		<servlet-name>AnalyseServerServlet</servlet-name>
-		<servlet-class>org.hy.common.xml.plugins.analyse.AnalyseServerServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-    	<servlet-name>AnalyseServerServlet</servlet-name>
-    	<url-pattern>/analyses/analyseDB</url-pattern>
-	</servlet-mapping>
-	
-	<servlet>
-		<servlet-name>AnalyseObjectServlet</servlet-name>
-		<servlet-class>org.hy.common.xml.plugins.analyse.AnalyseObjectServlet</servlet-class>
-		<init-param>
+    <servlet>
+        <servlet-name>AnalyseServerServlet</servlet-name>
+        <servlet-class>org.hy.common.xml.plugins.analyse.AnalyseServerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AnalyseServerServlet</servlet-name>
+        <url-pattern>/analyses/analyseDB</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>AnalyseObjectServlet</servlet-name>
+        <servlet-class>org.hy.common.xml.plugins.analyse.AnalyseObjectServlet</servlet-class>
+        <init-param>
             <param-name>password</param-name>
             <param-value>3958D700BA10B12321294C7B314630CB</param-value>
         </init-param>
-	</servlet>
-	<servlet-mapping>
-    	<servlet-name>AnalyseObjectServlet</servlet-name>
-    	<url-pattern>/analyses/analyseObject</url-pattern>
-	</servlet-mapping>
-	
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AnalyseObjectServlet</servlet-name>
+        <url-pattern>/analyses/analyseObject</url-pattern>
+    </servlet-mapping>
+    
   
-	<welcome-file-list>
-		<welcome-file>index.jsp</welcome-file>
-	</welcome-file-list>
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
 </web-app>

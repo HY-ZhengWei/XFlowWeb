@@ -6,6 +6,7 @@ import org.hy.common.Help;
 import org.hy.common.app.Param;
 import org.hy.common.thread.ThreadPool;
 import org.hy.common.xml.XJava;
+import org.hy.common.xml.log.Logger;
 import org.hy.common.xml.plugins.AppInitConfig;
 import org.hy.xflow.engine.XFlowEngine;
 
@@ -31,6 +32,7 @@ public final class InitConfig extends AppInitConfig
     
     public InitConfig()
     {
+        Logger.useLog4J();
         XJava.putObject("IsOpenServerSocket" ,Boolean.TRUE);
         this.xmlRoot = Help.getWebINFPath();
         init();
