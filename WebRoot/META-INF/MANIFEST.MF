@@ -1,7 +1,7 @@
-Manifest-Version: 1.0.5
+Manifest-Version: 1.0.7
 Created-By: HY.ZhengWei@qq.com  2018
-Specification-Version: 1.0.5  2020-06-02
+Specification-Version: 1.0.7  2022-03-31
 SourceCode: https://github.com/HY-ZhengWei/XFlowWeb
-SourceCode: https://gitee.com/HY-ZhengWei/XFlowWeb
-Build-JDK: 1.6
+SourceCodeChina: https://gitee.com/HY-ZhengWei/XFlowWeb
+Build-JDK: 1.8
 

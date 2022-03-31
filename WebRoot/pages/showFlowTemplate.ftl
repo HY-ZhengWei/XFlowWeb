@@ -124,6 +124,7 @@
     var v_SVG            = d3.select("body").select("svg");
     var v_Datas          = ${activitys}.datas;
     var v_Routes         = ${routes}.datas;
+    console.log(v_Routes);
     var v_RouteMap       = makeRouteMap (v_Routes);  /* 可通过路由ID定位路由信息 */
     var v_RouteRefs      = makeRouteRefs(v_Routes);  /* 可通过节点ID定位到与其有关联的所有路由ID */
     var v_XOffset        = 0;                        /* 移动时相对鼠标的偏移量X */
