@@ -13,11 +13,13 @@ import org.hy.common.xml.plugins.AppMessage;
 import org.hy.xflow.engine.XFlowEngine;
 import org.hy.xflow.engine.bean.ActivityRoute;
 import org.hy.xflow.engine.bean.FlowData;
+import org.hy.xflow.engine.bean.FlowDataActivity;
 import org.hy.xflow.engine.bean.FlowDataRoute;
 import org.hy.xflow.engine.bean.FlowInfo;
 import org.hy.xflow.engine.bean.FlowProcess;
 import org.hy.xflow.engine.bean.NextRoutes;
 import org.hy.xflow.engine.bean.UserParticipant;
+import org.hy.xflow.engine.enums.RejectModeEnum;
 import org.hy.xflow.engine.enums.RouteTypeEnum;
 import org.hy.xflow.web.common.BaseWeb;
 
@@ -138,7 +140,7 @@ public class FlowWeb extends BaseWeb
             {
                 v_NextRouts = v_XFlowEngine.queryNextRoutes(v_FlowData.getUser() ,v_FlowData.getWorkID());
             }
-            else 
+            else
             {
                 v_NextRouts = v_XFlowEngine.queryNextRoutesByServiceDataID(v_FlowData.getUser() ,v_FlowData.getServiceDataID());
             }
@@ -275,12 +277,14 @@ public class FlowWeb extends BaseWeb
             v_ProcessExtra.setOperateDatas(Help.NVL(v_FlowData.getOperateDatas()));
             v_ProcessExtra.setInfoComment( Help.NVL(v_FlowData.getInfoComment()));
             
+            // 单路流转信息
             PartitionMap<String ,UserParticipant> i_ActivityRouteCodes = new TablePartition<String ,UserParticipant>();
             if ( !Help.isNull(v_FlowData.getActivityRouteCode()) )
             {
                 i_ActivityRouteCodes.putRows(v_FlowData.getActivityRouteCode() ,v_FlowData.getParticipants());
             }
             
+            // 多路流转信息
             if ( !Help.isNull(v_FlowData.getRoutes()) )
             {
                 for (FlowDataRoute v_RouteItem : v_FlowData.getRoutes())
@@ -291,17 +295,119 @@ public class FlowWeb extends BaseWeb
             
             if ( Help.isNull(v_FlowData.getServiceDataID()) )
             {
-                v_ProcessList = v_XFlowEngine.toNext(v_FlowData.getUser() 
-                                                    ,v_FlowData.getWorkID() 
+                v_ProcessList = v_XFlowEngine.toNext(v_FlowData.getUser()
+                                                    ,v_FlowData.getWorkID()
                                                     ,v_ProcessExtra
                                                     ,i_ActivityRouteCodes);
             }
-            else 
+            else
             {
-                v_ProcessList = v_XFlowEngine.toNextByServiceDataID(v_FlowData.getUser() 
-                                                                   ,v_FlowData.getServiceDataID() 
+                v_ProcessList = v_XFlowEngine.toNextByServiceDataID(v_FlowData.getUser()
+                                                                   ,v_FlowData.getServiceDataID()
                                                                    ,v_ProcessExtra
                                                                    ,i_ActivityRouteCodes);
+            }
+            
+            v_Ret.setBody(v_ProcessList);
+            v_Ret.setResult(true);
+        }
+        catch (Exception exce)
+        {
+            exce.printStackTrace();
+            v_Ret.setBody(null);
+            v_Ret.setResult(false);
+            if ( exce.getCause() != null )
+            {
+                v_Ret.setRi(exce.getCause().toString() + "   " + Help.isNull(exce.getMessage()));
+            }
+            else
+            {
+                v_Ret.setRi(exce.getMessage());
+            }
+        }
+        
+        return v_Ret;
+    }
+    
+    
+    
+    /**
+     * 1. 按工作流实例ID，自由驳回（未在工作流模板上预先配置驳回路由）
+     * 2. 按第三方使用系统的业务数据ID，自由驳回（未在工作流模板上预先配置驳回路由）
+     * 
+     * 模板上预先配置驳回路由的方式：可用toNext()方法。
+     * 自由驳回是对toNext()方法的专项定制扩展，允许未在模板上定义驳回路由
+     * 
+     * @author      ZhengWei(HY)
+     * @createDate  2023-02-22
+     * @version     v1.0
+     *
+     * @param i_AppMsg
+     * @return
+     */
+    @XRequest(id="I003ToReject")
+    public AppMessage<Object> toReject(AppMessage<FlowData> i_AppMsg)
+    {
+        if ( i_AppMsg == null )
+        {
+            return null;
+        }
+        
+        if ( i_AppMsg.getBody() == null )
+        {
+            return null;
+        }
+        
+        AppMessage<Object> v_Ret         = i_AppMsg.clone();
+        FlowData           v_FlowData    = i_AppMsg.getBody();
+        XFlowEngine        v_XFlowEngine = XFlowEngine.getInstance();
+        List<FlowProcess>  v_ProcessList = null;
+        
+        
+        try
+        {
+            if ( v_FlowData.getRejectMode() == null )
+            {
+                v_FlowData.setRejectMode(RejectModeEnum.$Auto);
+            }
+            
+            FlowProcess v_ProcessExtra = new FlowProcess();
+            
+            v_ProcessExtra.setOperateFiles(Help.NVL(v_FlowData.getOperateFiles()));
+            v_ProcessExtra.setOperateDatas(Help.NVL(v_FlowData.getOperateDatas()));
+            v_ProcessExtra.setInfoComment( Help.NVL(v_FlowData.getInfoComment()));
+            
+            // 单路流转信息
+            PartitionMap<String ,UserParticipant> i_ActivityRouteCodes = new TablePartition<String ,UserParticipant>();
+            if ( !Help.isNull(v_FlowData.getActivityCode()) )
+            {
+                i_ActivityRouteCodes.putRows(v_FlowData.getActivityCode() ,v_FlowData.getParticipants());
+            }
+            
+            // 多路流转信息
+            if ( !Help.isNull(v_FlowData.getActivitys()) )
+            {
+                for (FlowDataActivity v_ActivityItem : v_FlowData.getActivitys())
+                {
+                    i_ActivityRouteCodes.putRows(v_ActivityItem.getActivityCode() ,v_ActivityItem.getParticipants());
+                }
+            }
+            
+            if ( Help.isNull(v_FlowData.getServiceDataID()) )
+            {
+                v_ProcessList = v_XFlowEngine.toReject(v_FlowData.getUser()
+                                                      ,v_FlowData.getWorkID()
+                                                      ,v_FlowData.getRejectMode()
+                                                      ,v_ProcessExtra
+                                                      ,i_ActivityRouteCodes);
+            }
+            else
+            {
+                v_ProcessList = v_XFlowEngine.toRejectByServiceDataID(v_FlowData.getUser()
+                                                                     ,v_FlowData.getServiceDataID()
+                                                                     ,v_FlowData.getRejectMode()
+                                                                     ,v_ProcessExtra
+                                                                     ,i_ActivityRouteCodes);
             }
             
             v_Ret.setBody(v_ProcessList);
