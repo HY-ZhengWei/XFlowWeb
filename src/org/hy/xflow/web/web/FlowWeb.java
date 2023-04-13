@@ -1,6 +1,5 @@
 package org.hy.xflow.web.web;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +32,7 @@ import org.hy.xflow.web.common.BaseWeb;
  * @author      ZhengWei(HY)
  * @createDate  2018-05-17
  * @version     v1.0
+ *              v2.0  2023-04-13  添加：I002QueryNextRoutes查询可走路由接口，返回下一节点的活动参与人
  */
 @Xjava
 public class FlowWeb extends BaseWeb
@@ -177,6 +177,8 @@ public class FlowWeb extends BaseWeb
                         if ( v_NewRoute.getNextActivity() != null )
                         {
                             v_NewRoute.setNextActivity(v_NewRoute.getNextActivity().toSimple());
+                            // 2023-04-14 添加下一节点的活动参与人
+                            v_NewRoute.getNextActivity().setParticipants(v_Route.getNextActivity().getParticipants());
                         }
                         
                         v_RetRoutes.add(v_NewRoute);
