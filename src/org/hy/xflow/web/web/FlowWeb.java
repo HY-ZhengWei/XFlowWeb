@@ -6,6 +6,7 @@ import java.util.List;
 import org.hy.common.Help;
 import org.hy.common.PartitionMap;
 import org.hy.common.TablePartition;
+import org.hy.common.xml.XJava;
 import org.hy.common.xml.annotation.XRequest;
 import org.hy.common.xml.annotation.Xjava;
 import org.hy.common.xml.plugins.AppMessage;
@@ -17,9 +18,11 @@ import org.hy.xflow.engine.bean.FlowDataRoute;
 import org.hy.xflow.engine.bean.FlowInfo;
 import org.hy.xflow.engine.bean.FlowProcess;
 import org.hy.xflow.engine.bean.NextRoutes;
+import org.hy.xflow.engine.bean.Template;
 import org.hy.xflow.engine.bean.UserParticipant;
 import org.hy.xflow.engine.enums.RejectModeEnum;
 import org.hy.xflow.engine.enums.RouteTypeEnum;
+import org.hy.xflow.engine.service.ITemplateService;
 import org.hy.xflow.web.common.BaseWeb;
 
 
@@ -33,10 +36,103 @@ import org.hy.xflow.web.common.BaseWeb;
  * @createDate  2018-05-17
  * @version     v1.0
  *              v2.0  2023-04-13  添加：I002QueryNextRoutes查询可走路由接口，返回下一节点的活动参与人
+ *                                添加：refreshTemplate()方法
  */
 @Xjava
 public class FlowWeb extends BaseWeb
 {
+    
+    /**
+     * 加载&更新工作流模板缓存。数据库更新成功后，应即时更新高速缓存
+     * 
+     * @author      ZhengWei(HY)
+     * @createDate  2023-04-14
+     * @version     v1.0
+     *
+     * @param i_AppMsg
+     * @return
+     */
+    @XRequest(id="I000RefreshTemplate")
+    public AppMessage<Object> refreshTemplate(AppMessage<FlowData> i_AppMsg)
+    {
+        if ( i_AppMsg == null )
+        {
+            return null;
+        }
+        
+        if ( i_AppMsg.getBody() == null )
+        {
+            return null;
+        }
+        
+        AppMessage<Object> v_Ret      = i_AppMsg.clone();
+        FlowData           v_FlowData = i_AppMsg.getBody();
+        
+        try
+        {
+            v_Ret.setBody(null);
+            if ( Help.isNull(v_FlowData.getTemplateName()) )
+            {
+                v_Ret.setRi("模板名称为空");
+                v_Ret.setResult(false);
+                return v_Ret;
+            }
+            
+            ITemplateService v_TemplateService = (ITemplateService)XJava.getObject("TemplateService");
+            List<Template>   v_Templates       = v_TemplateService.queryAll();
+            for (Template v_Template : v_Templates)
+            {
+                if ( v_FlowData.getTemplateName().equals(v_Template.getTemplateName()) )
+                {
+                    v_Ret.setResult(v_TemplateService.refreshCache(v_Template.getTemplateID()));
+                    
+                    Template v_New   = v_TemplateService.queryByID(v_Template);
+                    Template v_Clone = new Template();
+                    
+                    v_Clone.setTemplateID(  v_New.getTemplateID());
+                    v_Clone.setVersion(     v_New.getVersion());
+                    v_Clone.setVersionNo(   v_New.getVersionNo());
+                    v_Clone.setTemplateName(v_New.getTemplateName());
+                    v_Clone.setInfoComment( v_New.getInfoComment());
+                    v_Clone.setCreaterID(   v_New.getCreaterID());
+                    v_Clone.setCreater(     v_New.getCreater());
+                    v_Clone.setCreateTime(  v_New.getCreateTime());
+                    v_Clone.setLastUserID(  v_New.getLastUserID());
+                    v_Clone.setLastUser(    v_New.getLastUser());
+                    v_Clone.setLastTime(    v_New.getLastTime());
+                    v_Clone.setIsValid(     v_New.getIsValid());
+                    v_Clone.setIsDelete(    v_New.getIsDelete());
+                    
+                    v_Ret.setBody(v_Clone);
+                    break;
+                }
+            }
+            
+            if ( v_Ret.getBody() == null )
+            {
+                v_Ret.setRi("未匹配到模板名称");
+                v_Ret.setResult(false);
+            }
+        }
+        catch (Exception exce)
+        {
+            exce.printStackTrace();
+            v_Ret.setBody(null);
+            v_Ret.setResult(false);
+            if ( exce.getCause() != null )
+            {
+                v_Ret.setRi(exce.getCause().toString() + "   " + Help.isNull(exce.getMessage()));
+            }
+            else
+            {
+                v_Ret.setRi(exce.getMessage());
+            }
+        }
+        
+        return v_Ret;
+    }
+    
+    
     
     /**
      * 按工作流模板名称创建工作流实例。
