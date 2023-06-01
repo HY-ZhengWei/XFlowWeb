@@ -826,4 +826,122 @@ public class FlowWeb extends BaseWeb
         return v_Ret;
     }
     
+    
+    
+    /**
+     * 获取用户督办（抄送的）的工作流实例ID。
+     * 
+     *   1. 通过用户ID查询
+     *   2. 通过部门ID查询
+     *   3. 通过角色ID查询，支持多角色。
+     * 
+     * @author      ZhengWei(HY)
+     * @createDate  2023-06-01
+     * @version     v1.0
+     *
+     * @param i_AppMsg
+     * @return
+     */
+    @XRequest(id="I009QuerySuperviseWorkIDs")
+    public AppMessage<Object> querySuperviseWorkIDs(AppMessage<FlowData> i_AppMsg)
+    {
+        if ( i_AppMsg == null )
+        {
+            return null;
+        }
+        
+        if ( i_AppMsg.getBody() == null )
+        {
+            return null;
+        }
+        
+        AppMessage<Object> v_Ret         = i_AppMsg.clone();
+        FlowData           v_FlowData    = i_AppMsg.getBody();
+        XFlowEngine        v_XFlowEngine = XFlowEngine.getInstance();
+        List<String>       v_WorkIDs     = null;
+        
+        try
+        {
+            v_WorkIDs = v_XFlowEngine.querySuperviseWorkIDs(v_FlowData.getUser());
+            
+            v_Ret.setBody(v_WorkIDs);
+            v_Ret.setResult(true);
+        }
+        catch (Exception exce)
+        {
+            exce.printStackTrace();
+            v_Ret.setBody(null);
+            v_Ret.setResult(false);
+            if ( exce.getCause() != null )
+            {
+                v_Ret.setRi(exce.getCause().toString() + "   " + Help.isNull(exce.getMessage()));
+            }
+            else
+            {
+                v_Ret.setRi(exce.getMessage());
+            }
+        }
+        
+        return v_Ret;
+    }
+    
+    
+    
+    /**
+     * 获取用户督办（抄送的）的工作流实例对应的第三方使用系统的业务数据ID。
+     * 
+     *   1. 通过用户ID查询
+     *   2. 通过部门ID查询
+     *   3. 通过角色ID查询，支持多角色。
+     * 
+     * @author      ZhengWei(HY)
+     * @createDate  2023-06-01
+     * @version     v1.0
+     *
+     * @param i_AppMsg
+     * @return
+     */
+    @XRequest(id="I010QuerySuperviseServiceDataIDs")
+    public AppMessage<Object> querySuperviseServiceDataIDs(AppMessage<FlowData> i_AppMsg)
+    {
+        if ( i_AppMsg == null )
+        {
+            return null;
+        }
+        
+        if ( i_AppMsg.getBody() == null )
+        {
+            return null;
+        }
+        
+        AppMessage<Object> v_Ret            = i_AppMsg.clone();
+        FlowData           v_FlowData       = i_AppMsg.getBody();
+        XFlowEngine        v_XFlowEngine    = XFlowEngine.getInstance();
+        List<String>       v_ServiceDataIDs = null;
+        
+        try
+        {
+            v_ServiceDataIDs = v_XFlowEngine.querySuperviseServiceDataIDs(v_FlowData.getUser());
+            
+            v_Ret.setBody(v_ServiceDataIDs);
+            v_Ret.setResult(true);
+        }
+        catch (Exception exce)
+        {
+            exce.printStackTrace();
+            v_Ret.setBody(null);
+            v_Ret.setResult(false);
+            if ( exce.getCause() != null )
+            {
+                v_Ret.setRi(exce.getCause().toString() + "   " + Help.isNull(exce.getMessage()));
+            }
+            else
+            {
+                v_Ret.setRi(exce.getMessage());
+            }
+        }
+        
+        return v_Ret;
+    }
+    
 }
