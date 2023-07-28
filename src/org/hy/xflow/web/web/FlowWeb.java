@@ -12,6 +12,7 @@ import org.hy.common.xml.annotation.Xjava;
 import org.hy.common.xml.plugins.AppMessage;
 import org.hy.xflow.engine.XFlowEngine;
 import org.hy.xflow.engine.bean.ActivityRoute;
+import org.hy.xflow.engine.bean.FlowComment;
 import org.hy.xflow.engine.bean.FlowData;
 import org.hy.xflow.engine.bean.FlowDataActivity;
 import org.hy.xflow.engine.bean.FlowDataRoute;
@@ -1043,6 +1044,191 @@ public class FlowWeb extends BaseWeb
             
             v_Ret.setBody(v_ServiceDataIDs);
             v_Ret.setResult(true);
+        }
+        catch (Exception exce)
+        {
+            exce.printStackTrace();
+            v_Ret.setBody(null);
+            v_Ret.setResult(false);
+            if ( exce.getCause() != null )
+            {
+                v_Ret.setRi(exce.getCause().toString() + "   " + Help.isNull(exce.getMessage()));
+            }
+            else
+            {
+                v_Ret.setRi(exce.getMessage());
+            }
+        }
+        
+        return v_Ret;
+    }
+    
+    
+    
+    /**
+     * 添加工作流备注
+     * 
+     * @author      ZhengWei(HY)
+     * @createDate  2023-07-28
+     * @version     v1.0
+     *
+     * @param i_AppMsg
+     * @return
+     */
+    @XRequest(id="I013AddFlowComment")
+    public AppMessage<Object> addFlowComment(AppMessage<FlowComment> i_AppMsg)
+    {
+        if ( i_AppMsg == null )
+        {
+            return null;
+        }
+        
+        if ( i_AppMsg.getBody() == null )
+        {
+            return null;
+        }
+        
+        AppMessage<Object> v_Ret         = i_AppMsg.clone();
+        FlowComment        v_FlowComment = i_AppMsg.getBody();
+        XFlowEngine        v_XFlowEngine = XFlowEngine.getInstance();
+        boolean            v_AddRet      = false;
+        
+        try
+        {
+            if ( v_FlowComment == null )
+            {
+                v_Ret.setRi("Flow comment is null.");
+                v_Ret.setResult(false);
+                v_Ret.setBody(null);
+                return v_Ret;
+            }
+            
+            if ( Help.isNull(v_FlowComment.getWorkID()) && Help.isNull(v_FlowComment.getServiceDataID()) )
+            {
+                v_Ret.setRi("WorkID and ServiceDataID is null.");
+                v_Ret.setResult(false);
+                v_Ret.setBody(null);
+                return v_Ret;
+            }
+            
+            if ( v_FlowComment.getCreateUser() == null || Help.isNull(v_FlowComment.getCreateUser().getUserID()) )
+            {
+                v_Ret.setRi("CreateUser is null.");
+                v_Ret.setResult(false);
+                v_Ret.setBody(null);
+                return v_Ret;
+            }
+            
+            if ( Help.isNull(v_FlowComment.getCommentTitle())
+              && Help.isNull(v_FlowComment.getComment())
+              && Help.isNull(v_FlowComment.getCommentFiles())
+              && Help.isNull(v_FlowComment.getCommentImages()) )
+            {
+                v_Ret.setRi("CommentTitle and Files and Images and Comment is null.");
+                v_Ret.setResult(false);
+                v_Ret.setBody(null);
+                return v_Ret;
+            }
+            
+            v_AddRet = v_XFlowEngine.addComment(v_FlowComment);
+            
+            if ( v_AddRet )
+            {
+                v_Ret.setBody(v_FlowComment);
+                v_Ret.setResult(true);
+            }
+            else
+            {
+                v_Ret.setRi("WorkID[" + v_FlowComment.getWorkID() + "] User[" + v_FlowComment.getCreaterID() + "] is not participant.");
+                v_Ret.setResult(false);
+                v_Ret.setBody(null);
+            }
+        }
+        catch (Exception exce)
+        {
+            exce.printStackTrace();
+            v_Ret.setBody(null);
+            v_Ret.setResult(false);
+            if ( exce.getCause() != null )
+            {
+                v_Ret.setRi(exce.getCause().toString() + "   " + Help.isNull(exce.getMessage()));
+            }
+            else
+            {
+                v_Ret.setRi(exce.getMessage());
+            }
+        }
+        
+        return v_Ret;
+    }
+    
+    
+    
+    /**
+     * 查询工作流备注
+     * 
+     * @author      ZhengWei(HY)
+     * @createDate  2023-07-28
+     * @version     v1.0
+     *
+     * @param i_AppMsg
+     * @return
+     */
+    @XRequest(id="I014QueryFlowComment")
+    public AppMessage<Object> queryFlowComment(AppMessage<FlowComment> i_AppMsg)
+    {
+        if ( i_AppMsg == null )
+        {
+            return null;
+        }
+        
+        if ( i_AppMsg.getBody() == null )
+        {
+            return null;
+        }
+        
+        AppMessage<Object> v_Ret         = i_AppMsg.clone();
+        FlowComment        v_FlowComment = i_AppMsg.getBody();
+        XFlowEngine        v_XFlowEngine = XFlowEngine.getInstance();
+        List<FlowComment>  v_Comments    = null;
+        
+        try
+        {
+            if ( v_FlowComment == null )
+            {
+                v_Ret.setRi("Flow comment is null.");
+                v_Ret.setResult(false);
+                v_Ret.setBody(null);
+                return v_Ret;
+            }
+            
+            if ( Help.isNull(v_FlowComment.getWorkID()) && Help.isNull(v_FlowComment.getServiceDataID()) )
+            {
+                v_Ret.setRi("WorkID and ServiceDataID is null.");
+                v_Ret.setResult(false);
+                v_Ret.setBody(null);
+                return v_Ret;
+            }
+            
+            if ( !Help.isNull(v_FlowComment.getWorkID()) )
+            {
+                v_Comments = v_XFlowEngine.queryCommentByWorkID(v_FlowComment.getWorkID());
+            }
+            else
+            {
+                v_Comments = v_XFlowEngine.queryCommentByServiceDataID(v_FlowComment.getServiceDataID());
+            }
+            
+            if ( !Help.isNull(v_Comments) )
+            {
+                v_Ret.setBody(v_Comments);
+                v_Ret.setResult(true);
+            }
+            else
+            {
+                v_Ret.setResult(false);
+                v_Ret.setBody(null);
+            }
         }
         catch (Exception exce)
         {
