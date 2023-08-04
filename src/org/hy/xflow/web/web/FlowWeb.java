@@ -1248,4 +1248,95 @@ public class FlowWeb extends BaseWeb
         return v_Ret;
     }
     
+    
+    
+    /**
+     * 流程的发起人有权随时结束整个流程
+     * 
+     * @author      ZhengWei(HY)
+     * @createDate  2023-08-03
+     * @version     v1.0
+     *
+     * @param i_AppMsg
+     * @return
+     */
+    @XRequest(id="I015ToFinishCreater")
+    public AppMessage<Object> toFinishCreater(AppMessage<FlowData> i_AppMsg)
+    {
+        if ( i_AppMsg == null )
+        {
+            return null;
+        }
+        
+        if ( i_AppMsg.getBody() == null )
+        {
+            return null;
+        }
+        
+        AppMessage<Object> v_Ret         = i_AppMsg.clone();
+        FlowData           v_FlowData    = i_AppMsg.getBody();
+        XFlowEngine        v_XFlowEngine = XFlowEngine.getInstance();
+        FlowProcess        v_FlowProcess = null;
+        
+        try
+        {
+            if ( v_FlowData == null )
+            {
+                v_Ret.setRi("Flow data is null.");
+                v_Ret.setResult(false);
+                v_Ret.setBody(null);
+                return v_Ret;
+            }
+            
+            if ( Help.isNull(v_FlowData.getWorkID()) && Help.isNull(v_FlowData.getServiceDataID()) )
+            {
+                v_Ret.setRi("WorkID and ServiceDataID is null.");
+                v_Ret.setResult(false);
+                v_Ret.setBody(null);
+                return v_Ret;
+            }
+            
+            FlowProcess v_ProcessExtra = new FlowProcess();
+            v_ProcessExtra.setOperateFiles(Help.NVL(v_FlowData.getOperateFiles()));
+            v_ProcessExtra.setOperateDatas(Help.NVL(v_FlowData.getOperateDatas()));
+            v_ProcessExtra.setInfoComment( Help.NVL(v_FlowData.getInfoComment()));
+            
+            if ( !Help.isNull(v_FlowData.getWorkID()) )
+            {
+                v_FlowProcess = v_XFlowEngine.toFinishCreater(v_FlowData.getUser() ,v_FlowData.getWorkID() ,v_ProcessExtra);
+            }
+            else
+            {
+                v_FlowProcess = v_XFlowEngine.toFinishCreaterByServiceDataID(v_FlowData.getUser() ,v_FlowData.getServiceDataID() ,v_ProcessExtra);
+            }
+            
+            if ( !Help.isNull(v_FlowProcess) )
+            {
+                v_Ret.setBody(v_FlowProcess);
+                v_Ret.setResult(true);
+            }
+            else
+            {
+                v_Ret.setResult(false);
+                v_Ret.setBody(null);
+            }
+        }
+        catch (Exception exce)
+        {
+            exce.printStackTrace();
+            v_Ret.setBody(null);
+            v_Ret.setResult(false);
+            if ( exce.getCause() != null )
+            {
+                v_Ret.setRi(exce.getCause().toString() + "   " + Help.isNull(exce.getMessage()));
+            }
+            else
+            {
+                v_Ret.setRi(exce.getMessage());
+            }
+        }
+        
+        return v_Ret;
+    }
+    
 }
