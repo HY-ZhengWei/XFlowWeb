@@ -38,6 +38,10 @@ import org.hy.xflow.web.common.BaseWeb;
  * @version     v1.0
  *              v2.0  2023-04-13  添加：I002QueryNextRoutes查询可走路由接口，返回下一节点的活动参与人
  *                                添加：refreshTemplate()方法
+ *              v3.0  2024-02-23  添加：按人员信息查询待办时，可按流程模板名称过滤
+ *                                添加：按人员信息查询已办时，可按流程模板名称过滤
+ *                                添加：按人员信息查询督查时，可按流程模板名称过滤
+ *                                添加：按人员信息查询督办时，可按流程模板名称过滤
  */
 @Xjava
 public class FlowWeb extends BaseWeb
@@ -542,6 +546,7 @@ public class FlowWeb extends BaseWeb
      * @author      ZhengWei(HY)
      * @createDate  2018-05-17
      * @version     v1.0
+     *              v2.0  2024-02-23  1. 添加：按人员信息查询待办时，可按流程模板名称过滤
      *
      * @param i_AppMsg
      * @return
@@ -566,7 +571,7 @@ public class FlowWeb extends BaseWeb
         
         try
         {
-            v_WorkIDs = v_XFlowEngine.queryWorkIDs(v_FlowData.getUser());
+            v_WorkIDs = v_XFlowEngine.queryWorkIDs(v_FlowData.getUser() ,v_FlowData.getTemplateName());
             
             v_Ret.setBody(v_WorkIDs);
             v_Ret.setResult(true);
@@ -601,6 +606,7 @@ public class FlowWeb extends BaseWeb
      * @author      ZhengWei(HY)
      * @createDate  2018-05-17
      * @version     v1.0
+     *              v2.0  2024-02-23  1. 添加：按人员信息查询待办时，可按流程模板名称过滤
      *
      * @param i_AppMsg
      * @return
@@ -625,7 +631,7 @@ public class FlowWeb extends BaseWeb
         
         try
         {
-            v_ServiceDataIDs = v_XFlowEngine.queryServiceDataIDs(v_FlowData.getUser());
+            v_ServiceDataIDs = v_XFlowEngine.queryServiceDataIDs(v_FlowData.getUser() ,v_FlowData.getTemplateName());
             
             v_Ret.setBody(v_ServiceDataIDs);
             v_Ret.setResult(true);
@@ -658,6 +664,7 @@ public class FlowWeb extends BaseWeb
      * @author      ZhengWei(HY)
      * @createDate  2018-06-11
      * @version     v1.0
+     *              v2.0  2024-02-23  1. 添加：按人员信息查询已办时，可按流程模板名称过滤
      *
      * @param i_AppMsg
      * @return
@@ -682,7 +689,7 @@ public class FlowWeb extends BaseWeb
         
         try
         {
-            v_WorkIDs = v_XFlowEngine.queryWorkIDsByDone(v_FlowData.getUser());
+            v_WorkIDs = v_XFlowEngine.queryWorkIDsByDone(v_FlowData.getUser() ,v_FlowData.getTemplateName());
             
             v_Ret.setBody(v_WorkIDs);
             v_Ret.setResult(true);
@@ -715,6 +722,7 @@ public class FlowWeb extends BaseWeb
      * @author      ZhengWei(HY)
      * @createDate  2018-06-11
      * @version     v1.0
+     *              v2.0  2024-02-23  1. 添加：按人员信息查询已办时，可按流程模板名称过滤
      *
      * @param i_AppMsg
      * @return
@@ -739,7 +747,7 @@ public class FlowWeb extends BaseWeb
         
         try
         {
-            v_WorkIDs = v_XFlowEngine.queryServiceDataIDsByDone(v_FlowData.getUser());
+            v_WorkIDs = v_XFlowEngine.queryServiceDataIDsByDone(v_FlowData.getUser() ,v_FlowData.getTemplateName());
             
             v_Ret.setBody(v_WorkIDs);
             v_Ret.setResult(true);
@@ -839,6 +847,7 @@ public class FlowWeb extends BaseWeb
      * @author      ZhengWei(HY)
      * @createDate  2023-06-01
      * @version     v1.0
+     *              v2.0  2024-02-23  添加：按人员信息查询督办时，可按流程模板名称过滤
      *
      * @param i_AppMsg
      * @return
@@ -863,7 +872,7 @@ public class FlowWeb extends BaseWeb
         
         try
         {
-            v_WorkIDs = v_XFlowEngine.querySuperviseWorkIDs(v_FlowData.getUser());
+            v_WorkIDs = v_XFlowEngine.querySuperviseWorkIDs(v_FlowData);
             
             v_Ret.setBody(v_WorkIDs);
             v_Ret.setResult(true);
@@ -898,6 +907,7 @@ public class FlowWeb extends BaseWeb
      * @author      ZhengWei(HY)
      * @createDate  2023-06-01
      * @version     v1.0
+     *              v2.0  2024-02-23  添加：按人员信息查询督办时，可按流程模板名称过滤
      *
      * @param i_AppMsg
      * @return
@@ -922,7 +932,7 @@ public class FlowWeb extends BaseWeb
         
         try
         {
-            v_ServiceDataIDs = v_XFlowEngine.querySuperviseServiceDataIDs(v_FlowData.getUser());
+            v_ServiceDataIDs = v_XFlowEngine.querySuperviseServiceDataIDs(v_FlowData);
             
             v_Ret.setBody(v_ServiceDataIDs);
             v_Ret.setResult(true);
@@ -957,6 +967,7 @@ public class FlowWeb extends BaseWeb
      * @author      ZhengWei(HY)
      * @createDate  2023-06-02
      * @version     v1.0
+     *              v2.0  2024-02-23  添加：按人员信息查询督查时，可按流程模板名称过滤
      *
      * @param i_AppMsg
      * @return
@@ -981,7 +992,7 @@ public class FlowWeb extends BaseWeb
         
         try
         {
-            v_WorkIDs = v_XFlowEngine.queryBySupervisionWorkIDs(v_FlowData.getUser());
+            v_WorkIDs = v_XFlowEngine.queryBySupervisionWorkIDs(v_FlowData);
             
             v_Ret.setBody(v_WorkIDs);
             v_Ret.setResult(true);
@@ -1016,6 +1027,7 @@ public class FlowWeb extends BaseWeb
      * @author      ZhengWei(HY)
      * @createDate  2023-06-02
      * @version     v1.0
+     *              v2.0  2024-02-23  添加：按人员信息查询督查时，可按流程模板名称过滤
      *
      * @param i_AppMsg
      * @return
@@ -1040,7 +1052,7 @@ public class FlowWeb extends BaseWeb
         
         try
         {
-            v_ServiceDataIDs = v_XFlowEngine.queryBySupervisionServiceDataIDs(v_FlowData.getUser());
+            v_ServiceDataIDs = v_XFlowEngine.queryBySupervisionServiceDataIDs(v_FlowData);
             
             v_Ret.setBody(v_ServiceDataIDs);
             v_Ret.setResult(true);
