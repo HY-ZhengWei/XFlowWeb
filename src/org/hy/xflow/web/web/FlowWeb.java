@@ -379,6 +379,7 @@ public class FlowWeb extends BaseWeb
             v_ProcessExtra.setOperateFiles(Help.NVL(v_FlowData.getOperateFiles()));
             v_ProcessExtra.setOperateDatas(Help.NVL(v_FlowData.getOperateDatas()));
             v_ProcessExtra.setInfoComment( Help.NVL(v_FlowData.getInfoComment()));
+            v_ProcessExtra.setCounterSignature(     v_FlowData.getCounterSignature());
             
             // 单路流转信息
             PartitionMap<String ,UserParticipant> i_ActivityRouteCodes = new TablePartition<String ,UserParticipant>();
