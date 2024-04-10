@@ -11,10 +11,12 @@ import org.hy.xflow.engine.bean.ActivityInfo;
 import org.hy.xflow.engine.bean.ActivityRoute;
 import org.hy.xflow.engine.bean.FlowInfo;
 import org.hy.xflow.engine.bean.FlowProcess;
+import org.hy.xflow.engine.bean.ProcessCounterSignatureLog;
 import org.hy.xflow.engine.bean.Template;
 import org.hy.xflow.engine.enums.RouteTypeEnum;
 import org.hy.xflow.engine.service.IFlowInfoService;
 import org.hy.xflow.engine.service.IFlowProcessService;
+import org.hy.xflow.engine.service.IProcessCounterSignatureService;
 import org.hy.xflow.engine.service.ITemplateService;
 
 import com.opensymphony.xwork2.ActionSupport;
@@ -30,7 +32,7 @@ import com.opensymphony.xwork2.ActionSupport;
  * @createDate  2018-10-31
  * @version     v1.0
  */
-public class FlowAction extends ActionSupport 
+public class FlowAction extends ActionSupport
 {
 
     private static final long serialVersionUID = 1206259536207222380L;
@@ -109,7 +111,7 @@ public class FlowAction extends ActionSupport
         
         try
         {
-            this.templateID   = v_Template.getTemplateID(); 
+            this.templateID   = v_Template.getTemplateID();
             this.templateName = v_Template.getTemplateName();
             this.version      = v_Template.getVersion();
             
@@ -151,7 +153,9 @@ public class FlowAction extends ActionSupport
                 
                 if ( Help.isNull(v_New.getLineColor()) )
                 {
-                    if ( "驳回".equals(v_Route.getRouteType().getRouteType()) )
+                    if ( RouteTypeEnum.$Reject     .equals(v_Route.getRouteType().getRouteTypeID())
+                      || RouteTypeEnum.$Reject_Auto.equals(v_Route.getRouteType().getRouteTypeID())
+                      || RouteTypeEnum.$Reject_Team.equals(v_Route.getRouteType().getRouteTypeID()) )
                     {
                         v_New.setLineColor("#FF4444");
                     }
@@ -317,7 +321,9 @@ public class FlowAction extends ActionSupport
         
         try
         {
-            this.templateID   = v_Template.getTemplateID(); 
+            IProcessCounterSignatureService v_CSService = (IProcessCounterSignatureService)XJava.getObject("ProcessCounterSignatureService");
+            
+            this.templateID   = v_Template.getTemplateID();
             this.templateName = v_Template.getTemplateName();
             this.version      = v_Template.getVersion();
             
@@ -426,7 +432,9 @@ public class FlowAction extends ActionSupport
                     }
                     else
                     {
-                        if ( "驳回".equals(v_Route.getRouteType().getRouteType()) )
+                        if ( RouteTypeEnum.$Reject     .equals(v_Route.getRouteType().getRouteTypeID())
+                          || RouteTypeEnum.$Reject_Auto.equals(v_Route.getRouteType().getRouteTypeID())
+                          || RouteTypeEnum.$Reject_Team.equals(v_Route.getRouteType().getRouteTypeID()) )
                         {
                             v_New.setLineColor("#FF4444");
                         }
@@ -437,7 +445,37 @@ public class FlowAction extends ActionSupport
                     }
                     
                     v_New.setFontColor(Help.NVL(v_Route.getFontColor() ,"#000000"));
-                    v_New.setActivityRouteName(v_New.getActivityRouteName() + "（" + Help.NVL(v_LastProcess.getOperateUser() ,v_LastProcess.getOperateUserID()) + "）");
+                    if ( RouteTypeEnum.$CounterSignature.equals(v_New.getRouteType().getRouteTypeID()) )
+                    {
+                        ProcessCounterSignatureLog v_CSLog = new ProcessCounterSignatureLog();
+                        v_CSLog.setWorkID(v_LastProcess.getWorkID());
+                        v_CSLog.setProcessID(v_CSLog.getProcessID());
+                        
+                        List<ProcessCounterSignatureLog> v_CSInfos = v_CSService.queryCSLogsByWorkID(v_CSLog);
+                        StringBuilder v_CS = new StringBuilder();
+                        if ( !Help.isNull(v_CSInfos) )
+                        {
+                            ProcessCounterSignatureLog v_CSInfo = v_CSInfos.get(0);
+                            v_CS.append(" 应签").append(v_CSInfo.getCsMaxUserCount());
+                            v_CS.append(" 需签").append(v_CSInfo.getCsMinUserCount());
+                            v_CS.append(" 已签");
+                            
+                            if ( Help.isNull(v_CSInfo.getLogs()) )
+                            {
+                                v_CS.append("0");
+                            }
+                            else
+                            {
+                                v_CS.append(v_CSInfo.getLogs().size());
+                            }
+                        }
+                        
+                        v_New.setActivityRouteName(v_New.getActivityRouteName() + "（" + Help.NVL(v_LastProcess.getOperateUser() ,v_LastProcess.getOperateUserID()) + "）" + v_CS.toString());
+                    }
+                    else
+                    {
+                        v_New.setActivityRouteName(v_New.getActivityRouteName() + "（" + Help.NVL(v_LastProcess.getOperateUser() ,v_LastProcess.getOperateUserID()) + "）");
+                    }
                     v_ValidRoutes.add(v_New);
                 }
                 else
@@ -493,7 +531,7 @@ public class FlowAction extends ActionSupport
     /**
      * 设置：模板ID
      * 
-     * @param templateID 
+     * @param templateID
      */
     public void setTemplateID(String templateID)
     {
@@ -515,7 +553,7 @@ public class FlowAction extends ActionSupport
     /**
      * 设置：模板版本号
      * 
-     * @param version 
+     * @param version
      */
     public void setVersion(String version)
     {
@@ -537,7 +575,7 @@ public class FlowAction extends ActionSupport
     /**
      * 设置：模板名称
      * 
-     * @param templateName 
+     * @param templateName
      */
     public void setTemplateName(String templateName)
     {
@@ -559,7 +597,7 @@ public class FlowAction extends ActionSupport
     /**
      * 设置：模板的所有活动节点的Json信息
      * 
-     * @param activitys 
+     * @param activitys
      */
     public void setActivitys(String activitys)
     {
@@ -581,7 +619,7 @@ public class FlowAction extends ActionSupport
     /**
      * 设置：模板的所有路由的Json信息
      * 
-     * @param routes 
+     * @param routes
      */
     public void setRoutes(String routes)
     {
@@ -613,7 +651,7 @@ public class FlowAction extends ActionSupport
     /**
      * 设置：是否显示操作工具栏（如，保存功能）
      * 
-     * @param showOperations 
+     * @param showOperations
      */
     public void setShowOperations(String showOperations)
     {
@@ -635,7 +673,7 @@ public class FlowAction extends ActionSupport
     /**
      * 设置：工作流实例ID
      * 
-     * @param workID 
+     * @param workID
      */
     public void setWorkID(String workID)
     {
@@ -657,7 +695,7 @@ public class FlowAction extends ActionSupport
     /**
      * 设置：第三方使用系统的业务数据ID。即支持用第三方ID也能找到工作流信息
      * 
-     * @param serviceDataID 
+     * @param serviceDataID
      */
     public void setServiceDataID(String serviceDataID)
     {

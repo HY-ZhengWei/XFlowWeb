@@ -3,6 +3,7 @@ package org.hy.xflow.web.web;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hy.common.Date;
 import org.hy.common.Help;
 import org.hy.common.PartitionMap;
 import org.hy.common.TablePartition;
@@ -19,6 +20,7 @@ import org.hy.xflow.engine.bean.FlowDataRoute;
 import org.hy.xflow.engine.bean.FlowInfo;
 import org.hy.xflow.engine.bean.FlowProcess;
 import org.hy.xflow.engine.bean.NextRoutes;
+import org.hy.xflow.engine.bean.ProcessCounterSignatureLog;
 import org.hy.xflow.engine.bean.Template;
 import org.hy.xflow.engine.bean.UserParticipant;
 import org.hy.xflow.engine.enums.RejectModeEnum;
@@ -347,6 +349,7 @@ public class FlowWeb extends BaseWeb
      * @createDate  2018-05-17
      * @version     v1.0
      *              v2.0  2019-09-19  添加：汇总值、汇总人数、操作文件、操作数据、备注说明
+     *              v3.0  2024-04-10  添加：汇签
      *
      * @param i_AppMsg
      * @return
@@ -380,6 +383,14 @@ public class FlowWeb extends BaseWeb
             v_ProcessExtra.setOperateDatas(Help.NVL(v_FlowData.getOperateDatas()));
             v_ProcessExtra.setInfoComment( Help.NVL(v_FlowData.getInfoComment()));
             v_ProcessExtra.setCounterSignature(     v_FlowData.getCounterSignature());
+            
+            if ( v_ProcessExtra.getCounterSignature() != null )
+            {
+                ProcessCounterSignatureLog v_CSInfo = v_ProcessExtra.getCounterSignature();
+                v_CSInfo.setCsMaxUserCount(Help.max(Help.NVL(v_CSInfo.getCsMaxUserCount() ,0) ,0));
+                v_CSInfo.setCsMinUserCount(Help.max(Help.NVL(v_CSInfo.getCsMinUserCount() ,0) ,0));
+                v_CSInfo.setCsExpireTime(Help.NVL(v_CSInfo.getCsExpireTime() ,new Date("9999-12-31 23:59:59")));
+            }
             
             // 单路流转信息
             PartitionMap<String ,UserParticipant> i_ActivityRouteCodes = new TablePartition<String ,UserParticipant>();
@@ -1333,6 +1344,78 @@ public class FlowWeb extends BaseWeb
                 v_Ret.setResult(false);
                 v_Ret.setBody(null);
             }
+        }
+        catch (Exception exce)
+        {
+            exce.printStackTrace();
+            v_Ret.setBody(null);
+            v_Ret.setResult(false);
+            if ( exce.getCause() != null )
+            {
+                v_Ret.setRi(exce.getCause().toString() + "   " + Help.isNull(exce.getMessage()));
+            }
+            else
+            {
+                v_Ret.setRi(exce.getMessage());
+            }
+        }
+        
+        return v_Ret;
+    }
+    
+    
+    
+    /**
+     * 查询历次的汇总情况。首次为最新的流转（即按时间顺序倒排的）
+     * 
+     *   1. 可通过实例ID查询。
+     *   2. 可通过业务ID查询。
+     * 
+     * @author      ZhengWei(HY)
+     * @createDate  2024-04-10
+     * @version     v1.0
+     *
+     * @param i_AppMsg
+     * @return
+     */
+    @XRequest(id="I016QueryCounterSignatures")
+    public AppMessage<Object> queryCounterSignatures(AppMessage<FlowData> i_AppMsg)
+    {
+        if ( i_AppMsg == null )
+        {
+            return null;
+        }
+        
+        if ( i_AppMsg.getBody() == null )
+        {
+            return null;
+        }
+        
+        AppMessage<Object>               v_Ret         = i_AppMsg.clone();
+        FlowData                         v_FlowData    = i_AppMsg.getBody();
+        XFlowEngine                      v_XFlowEngine = XFlowEngine.getInstance();
+        List<ProcessCounterSignatureLog> v_CSInfos     = null;
+        
+        try
+        {
+            if ( v_FlowData.getCounterSignature() == null )
+            {
+                v_FlowData.setCounterSignature(new ProcessCounterSignatureLog());
+            }
+            
+            if ( !Help.isNull(v_FlowData.getWorkID()) )
+            {
+                v_FlowData.getCounterSignature().setWorkID(v_FlowData.getWorkID());
+                v_CSInfos = v_XFlowEngine.queryCSLogsByWorkID(v_FlowData.getCounterSignature());
+            }
+            else if ( !Help.isNull(v_FlowData.getServiceDataID()) )
+            {
+                v_FlowData.getCounterSignature().setServiceDataID(v_FlowData.getServiceDataID());
+                v_CSInfos = v_XFlowEngine.queryCSLogsByServiceDataID(v_FlowData.getCounterSignature());
+            }
+            
+            v_Ret.setBody(v_CSInfos);
+            v_Ret.setResult(true);
         }
         catch (Exception exce)
         {

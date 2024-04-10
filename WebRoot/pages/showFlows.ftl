@@ -54,8 +54,8 @@ a{ color:#0099CC; text-decoration:none; outline:none;}
 a:hover{color:#33B5E5;text-decoration:none;}
 
 body {
-	font-family: "微软雅黑";
-	font-size: 12px;
+    font-family: "微软雅黑";
+    font-size: 12px;
 }
 
 </style>
@@ -67,24 +67,24 @@ body {
 
 </head>
 <body> 
-		
-	<div class="Column_logininfobody">
-		<div class="Column_logininfo" /> 
-		<div class="Column_clearTag">
-			<div class="Column_labeTag">编号</div>
-			<div class="Column_WorkID_Title">实例ID</div>
-			<div class="Column_ServiceDataID_Title">业务ID</div>
-			<div class="Column_Creater_Title">创建人员</div>
-			<div class="Column_CreateTime_Title">创建时间</div>
-			<div class="Column_LastUser_Title">最后操作人员</div>
-			<div class="Column_LastTime_Title">最后操作时间</div>
-			<div class="Column_Operate_Title">操作</div>
-		</div>
-	</div> 
-	   
-	<div id="info_fill" class="Column_logininfo1"> 
-	
-		<div class="Column_clearTag1">
+        
+    <div class="Column_logininfobody">
+        <div class="Column_logininfo" /> 
+        <div class="Column_clearTag">
+            <div class="Column_labeTag">编号</div>
+            <div class="Column_WorkID_Title">实例ID</div>
+            <div class="Column_ServiceDataID_Title">业务ID</div>
+            <div class="Column_Creater_Title">创建人员</div>
+            <div class="Column_CreateTime_Title">创建时间</div>
+            <div class="Column_LastUser_Title">最后操作人员</div>
+            <div class="Column_LastTime_Title">最后操作时间</div>
+            <div class="Column_Operate_Title">操作</div>
+        </div>
+    </div> 
+       
+    <div id="info_fill" class="Column_logininfo1"> 
+    
+        <div class="Column_clearTag1">
             <div class="Column_labeTag1"></div>
             <div class="Column_WorkID"></div>
             <div class="Column_ServiceDataID"></div>
@@ -93,63 +93,63 @@ body {
             <div class="Column_LastUser"></div>
             <div class="Column_LastTime"></div>
             <div class="Column_Operate"></div>
- 	    </div> 
-		
-		<#list flows as item>
-		<div class="Column_clearTag1">
-			<div class="Column_labeTag1">${item_index+1}</div>
-			
-			<div class="Column_WorkID">
-				<div class="cont_show_WorkID"><a href="showFlow?templateID=${item.flowTemplateID}&workID=${item.workID}" target="_blank">${item.workID}</a></div>
-			</div>
-			
-			<div class="Column_ServiceDataID">
-				<div class="cont_show_ServiceDataID">
-				<#if item.serviceDataID ??>
-					<a href="showFlow?templateID=${item.flowTemplateID}&serviceDataID=${item.serviceDataID}" target="_blank">${item.serviceDataID}</a>
-				<#else>
-					-
-				</#if>
-				</div>
-			</div>
-			
-			<div class="Column_Creater">
-				<div class="cont_show_Creater">
-				<#if item.creater ??>
-					${item.creater}
-				<#else>
-					${item.createrID}
-				</#if>
-				</div>
-			</div>
-			
-			<div class="Column_CreateTime">
-				<div class="cont_show_CreateTime">${item.createTime.full}</div>
-			</div>
-			
-			<div class="Column_LastUser">
-				<div class="cont_show_LastUser">
-				<#if item.lastUser ??>
-					${item.lastUser}
-				<#else>
-					${item.lastUserID}
-				</#if>
-				</div>
-			</div>
-			
-			<div class="Column_LastTime">
-				<div class="cont_show_LastTime">${item.lastTime.full}</div>
-			</div>
-			
-			<div class="Column_Operate">
-				<div class="cont_show_Operate">
-					<a href="showFlow?templateID=${item.flowTemplateID}&workID=${item.workID}" target="_blank">流程图</a>
-				</div>
-			</div>
-		</div>
-		</#list>
-		
-	</div>
+        </div> 
+        
+        <#list flows as item>
+        <div class="Column_clearTag1">
+            <div class="Column_labeTag1">${item_index+1}</div>
+            
+            <div class="Column_WorkID">
+                <div class="cont_show_WorkID"><a href="showFlow?templateID=${item.flowTemplateID}&workID=${item.workID}" target="_blank">${item.workID}</a></div>
+            </div>
+            
+            <div class="Column_ServiceDataID">
+                <div class="cont_show_ServiceDataID">
+                <#if item.serviceDataID ??>
+                    <a href="showFlow?templateID=${item.flowTemplateID}&serviceDataID=${item.serviceDataID}" target="_blank">${item.serviceDataID}</a>
+                <#else>
+                    -
+                </#if>
+                </div>
+            </div>
+            
+            <div class="Column_Creater">
+                <div class="cont_show_Creater">
+                <#if item.creater ??>
+                    ${item.creater}
+                <#else>
+                    ${item.createrID}
+                </#if>
+                </div>
+            </div>
+            
+            <div class="Column_CreateTime">
+                <div class="cont_show_CreateTime">${item.createTime.full}</div>
+            </div>
+            
+            <div class="Column_LastUser">
+                <div class="cont_show_LastUser">
+                <#if item.lastUser ??>
+                    ${item.lastUser}
+                <#else>
+                    ${item.lastUserID}
+                </#if>
+                </div>
+            </div>
+            
+            <div class="Column_LastTime">
+                <div class="cont_show_LastTime">${item.lastTime.full}</div>
+            </div>
+            
+            <div class="Column_Operate">
+                <div class="cont_show_Operate">
+                    <a href="showFlow?templateID=${item.flowTemplateID}&workID=${item.workID}" target="_blank">流程图</a>
+                </div>
+            </div>
+        </div>
+        </#list>
+        
+    </div>
 
 </body>
 </html>
