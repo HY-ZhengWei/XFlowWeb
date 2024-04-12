@@ -10,8 +10,22 @@
 
     <!-- 任务配置信息 -->
     <xconfig>
-
+        
+        <job id="JOB_MS_XFlowWeb_CounterSignatureExpire">
+            <code>JOB_MS_Modbus_Heartbeat</code>
+            <name>汇签过期，自动向下继续流转</name>
+            <comment>汇签过期，自动向下继续流转</comment>
+            <intervalType ref="this.$IntervalType_Minute"/>
+            <intervalLen>1</intervalLen>
+            <startTime>2024-04-10 00:00:00</startTime>
+            <xid>XFlowEngine</xid>
+            <methodName>toNextCounterSignatureExpire</methodName>
+        </job>
+        
+        
+        
         <jobs id="JOBS" this="JOBS">
+            <addJob ref="JOB_MS_XFlowWeb_CounterSignatureExpire" />
             <call name="startup" />
         </jobs>
 
