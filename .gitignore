@@ -3,3 +3,4 @@ WebRoot/WEB-INF/classes/struts.xml
 WebRoot/WEB-INF/classes/MANIFEST.MF
 *.class
 
+WebRoot/WEB-INF/classes/org/hy/xflow/web/web/FlowWeb.class

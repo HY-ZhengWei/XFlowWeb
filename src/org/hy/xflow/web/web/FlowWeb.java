@@ -44,6 +44,7 @@ import org.hy.xflow.web.common.BaseWeb;
  *                                添加：按人员信息查询已办时，可按流程模板名称过滤
  *                                添加：按人员信息查询督查时，可按流程模板名称过滤
  *                                添加：按人员信息查询督办时，可按流程模板名称过滤
+ *              v4.0  2024-05-06  添加：待办查询：可按活动节点Code查询
  */
 @Xjava
 public class FlowWeb extends BaseWeb
@@ -554,11 +555,13 @@ public class FlowWeb extends BaseWeb
      *   1. 通过用户ID查询
      *   2. 通过部门ID查询
      *   3. 通过角色ID查询，支持多角色。
+     *   4. 通过模板、活动Code查询
      * 
      * @author      ZhengWei(HY)
      * @createDate  2018-05-17
      * @version     v1.0
      *              v2.0  2024-02-23  1. 添加：按人员信息查询待办时，可按流程模板名称过滤
+     *              v3.0  2024-05-06  1. 添加：可按活动节点Code查询
      *
      * @param i_AppMsg
      * @return
@@ -583,7 +586,14 @@ public class FlowWeb extends BaseWeb
         
         try
         {
-            v_WorkIDs = v_XFlowEngine.queryWorkIDs(v_FlowData.getUser() ,v_FlowData.getTemplateName());
+            if ( Help.isNull(v_FlowData.getActivityCode()) )
+            {
+                v_WorkIDs = v_XFlowEngine.queryWorkIDs(v_FlowData.getUser() ,v_FlowData.getTemplateName());
+            }
+            else
+            {
+                v_WorkIDs = v_XFlowEngine.queryWorkIDs(v_FlowData.getUser() ,v_FlowData.getTemplateName() ,v_FlowData.getActivityCode());
+            }
             
             v_Ret.setBody(v_WorkIDs);
             v_Ret.setResult(true);
@@ -614,11 +624,13 @@ public class FlowWeb extends BaseWeb
      *   1. 通过用户ID查询
      *   2. 通过部门ID查询
      *   3. 通过角色ID查询，支持多角色。
+     *   4. 通过模板、活动Code查询
      * 
      * @author      ZhengWei(HY)
      * @createDate  2018-05-17
      * @version     v1.0
      *              v2.0  2024-02-23  1. 添加：按人员信息查询待办时，可按流程模板名称过滤
+     *              v3.0  2024-05-06  1. 添加：可按活动节点Code查询
      *
      * @param i_AppMsg
      * @return
@@ -643,7 +655,14 @@ public class FlowWeb extends BaseWeb
         
         try
         {
-            v_ServiceDataIDs = v_XFlowEngine.queryServiceDataIDs(v_FlowData.getUser() ,v_FlowData.getTemplateName());
+            if ( Help.isNull(v_FlowData.getActivityCode()) )
+            {
+                v_ServiceDataIDs = v_XFlowEngine.queryServiceDataIDs(v_FlowData.getUser() ,v_FlowData.getTemplateName());
+            }
+            else
+            {
+                v_ServiceDataIDs = v_XFlowEngine.queryServiceDataIDs(v_FlowData.getUser() ,v_FlowData.getTemplateName() ,v_FlowData.getActivityCode());
+            }
             
             v_Ret.setBody(v_ServiceDataIDs);
             v_Ret.setResult(true);
