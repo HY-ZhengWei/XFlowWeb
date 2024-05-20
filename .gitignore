@@ -4,3 +4,4 @@ WebRoot/WEB-INF/classes/MANIFEST.MF
 *.class
 
 WebRoot/WEB-INF/classes/org/hy/xflow/web/web/FlowWeb.class
+WebRoot/WEB-INF/classes/log4j.properties
