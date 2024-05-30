@@ -720,7 +720,7 @@ public class FlowWeb extends BaseWeb
         
         try
         {
-            v_WorkIDs = v_XFlowEngine.queryWorkIDsByDone(v_FlowData.getUser() ,v_FlowData.getTemplateName());
+            v_WorkIDs = v_XFlowEngine.queryWorkIDsByDone(v_FlowData.getUser() ,Help.isNull(v_FlowData.getTemplateName()) ? null : v_FlowData.getTemplateName());
             
             v_Ret.setBody(v_WorkIDs);
             v_Ret.setResult(true);
@@ -778,7 +778,7 @@ public class FlowWeb extends BaseWeb
         
         try
         {
-            v_WorkIDs = v_XFlowEngine.queryServiceDataIDsByDone(v_FlowData.getUser() ,v_FlowData.getTemplateName());
+            v_WorkIDs = v_XFlowEngine.queryServiceDataIDsByDone(v_FlowData.getUser() ,Help.isNull(v_FlowData.getTemplateName()) ? null : v_FlowData.getTemplateName());
             
             v_Ret.setBody(v_WorkIDs);
             v_Ret.setResult(true);
@@ -903,6 +903,7 @@ public class FlowWeb extends BaseWeb
         
         try
         {
+            v_FlowData.setTemplateName(Help.NVL(v_FlowData.getTemplateName() ,null));
             v_WorkIDs = v_XFlowEngine.querySuperviseWorkIDs(v_FlowData);
             
             v_Ret.setBody(v_WorkIDs);
@@ -963,6 +964,7 @@ public class FlowWeb extends BaseWeb
         
         try
         {
+            v_FlowData.setTemplateName(Help.NVL(v_FlowData.getTemplateName() ,null));
             v_ServiceDataIDs = v_XFlowEngine.querySuperviseServiceDataIDs(v_FlowData);
             
             v_Ret.setBody(v_ServiceDataIDs);
