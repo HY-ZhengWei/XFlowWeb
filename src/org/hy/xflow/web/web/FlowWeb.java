@@ -484,7 +484,7 @@ public class FlowWeb extends BaseWeb
         {
             if ( v_FlowData.getRejectMode() == null )
             {
-                v_FlowData.setRejectMode(RejectModeEnum.$Auto);
+                v_FlowData.setRejectModeEnum(RejectModeEnum.$Auto);
             }
             
             FlowProcess v_ProcessExtra = new FlowProcess();
@@ -513,7 +513,7 @@ public class FlowWeb extends BaseWeb
             {
                 v_ProcessList = v_XFlowEngine.toReject(v_FlowData.getUser()
                                                       ,v_FlowData.getWorkID()
-                                                      ,v_FlowData.getRejectMode()
+                                                      ,v_FlowData.getRejectModeEnum()
                                                       ,v_ProcessExtra
                                                       ,i_ActivityRouteCodes);
             }
@@ -521,7 +521,7 @@ public class FlowWeb extends BaseWeb
             {
                 v_ProcessList = v_XFlowEngine.toRejectByServiceDataID(v_FlowData.getUser()
                                                                      ,v_FlowData.getServiceDataID()
-                                                                     ,v_FlowData.getRejectMode()
+                                                                     ,v_FlowData.getRejectModeEnum()
                                                                      ,v_ProcessExtra
                                                                      ,i_ActivityRouteCodes);
             }
